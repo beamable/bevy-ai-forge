@@ -128,7 +128,7 @@ fn setup(
                             InventoryContainer,
                             NodeBundle {
                                 style: Style {
-                                    padding: UiRect::axes(Val::Px(5.0), Val::Px(20.0)),
+                                    padding: UiRect::axes(Val::Px(5.0), Val::Px(80.0)),
                                     flex_direction: bevy::ui::FlexDirection::ColumnReverse,
                                     align_items: AlignItems::Start,
                                     width: Val::Percent(100.0),
