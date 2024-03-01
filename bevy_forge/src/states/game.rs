@@ -10,7 +10,7 @@ use crate::{
     microservice::MicroserviceSellSword,
 };
 
-#[derive(Resource,Reflect,Default)]
+#[derive(Resource, Reflect, Default)]
 pub struct ItemsOnSale(pub Vec<String>);
 
 pub struct GameStatePlugin;
@@ -49,15 +49,15 @@ fn sell_sword_pressed(
     mut sword_sell_event: EventReader<crate::microservice::SellSwordEventCompleted>,
     q: Query<(Entity, &SellItemButton, &Parent)>,
     mut cmd: Commands,
-    mut on_sale: ResMut<ItemsOnSale>
+    mut on_sale: ResMut<ItemsOnSale>,
 ) {
     for event in events.read() {
         if let Ok(button) = q.get(**event) {
             cmd.add(MicroserviceSellSword(SellSwordRequestArgs {
-                item_id: button.1.0.clone(),
+                item_id: button.1 .0.clone(),
             }));
             cmd.entity(button.0).remove::<Interaction>();
-            on_sale.0.push(button.1.0.clone());
+            on_sale.0.push(button.1 .0.clone());
             if let Some(entity_commands) = cmd.get_entity(button.2.get()) {
                 entity_commands.despawn_recursive();
             }
@@ -300,7 +300,7 @@ fn update_inventory(
     inv_container_q: Query<Entity, With<InventoryContainer>>,
     inv_items_q: Query<(Entity, &ItemDisplay), With<ItemDisplay>>,
     mut commands: Commands,
-    on_sale: Res<ItemsOnSale>
+    on_sale: Res<ItemsOnSale>,
 ) {
     let Ok(container_entity) = inv_container_q.get_single() else {
         return;
@@ -342,15 +342,12 @@ fn update_inventory(
         commands
             .entity(container_entity)
             .with_children(|inventory| {
-                
-
                 let Some(proxy_id) = item.proxy_id else {
                     return;
                 };
                 if on_sale.0.iter().any(|id| id.eq(&proxy_id)) {
                     return;
                 }
-
 
                 let Some(name) = item.properties.iter().find(|i| &i.name == "name") else {
                     return;

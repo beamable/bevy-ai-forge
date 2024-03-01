@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_button_released_plugin::ButtonReleasedEvent;
-use bevy_simple_text_input::{TextInputValue, TextInputSettings};
+use bevy_simple_text_input::{TextInputSettings, TextInputValue};
 
 use crate::{
     beam::{api::BeamableBasicApi, context::BeamContext},
@@ -154,11 +154,11 @@ fn setup(
                         ..default()
                     },
                     bevy_simple_text_input::TextInputBundle::default()
-                    .with_text_style(text_style.clone())
-                    .with_value("NewUser")
-                    .with_settings(TextInputSettings {
-                        retain_on_submit: true,
-                    }),
+                        .with_text_style(text_style.clone())
+                        .with_value("NewUser")
+                        .with_settings(TextInputSettings {
+                            retain_on_submit: true,
+                        }),
                     LoginScreenObject,
                 ));
                 parent
