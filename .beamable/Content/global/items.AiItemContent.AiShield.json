@@ -1,0 +1,38 @@
+{
+  "icon": {
+    "data": {}
+  },
+  "dynamicProperties": {
+    "data": [
+      {
+        "propertyName": "name",
+        "propertyDescription": "creative shield name"
+      },
+      {
+        "propertyName": "description",
+        "propertyDescription": "shield description, max 2000 characters"
+      },
+      {
+        "propertyName": "image",
+        "propertyDescription": "short item image description"
+      }
+    ]
+  },
+  "external": {
+    "data": {
+      "service": "ForgeService",
+      "namespace": "OpenAI"
+    }
+  },
+  "itemType": {
+    "data": "shield"
+  },
+  "clientPermission": {
+    "data": {
+      "write_self": true
+    }
+  },
+  "itemTheme": {
+    "data": "dark age"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "icon": {
+    "data": {}
+  },
+  "dynamicProperties": {
+    "data": [
+      {
+        "propertyName": "name",
+        "propertyDescription": "creative sword name"
+      },
+      {
+        "propertyName": "description",
+        "propertyDescription": "sword description, max 2000 characters"
+      },
+      {
+        "propertyName": "image",
+        "propertyDescription": "short item image description"
+      }
+    ]
+  },
+  "external": {
+    "data": {
+      "service": "ForgeService",
+      "namespace": "OpenAI"
+    }
+  },
+  "itemType": {
+    "data": "sword"
+  },
+  "clientPermission": {
+    "data": {
+      "write_self": true
+    }
+  },
+  "itemTheme": {
+    "data": "dark age"
+  }
+}

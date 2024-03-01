@@ -1,0 +1,13 @@
+# OpenAiAuthenticateRequestArgs
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**token** | **String** |  | 
+**challenge** | **String** |  | 
+**solution** | **String** |  | 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

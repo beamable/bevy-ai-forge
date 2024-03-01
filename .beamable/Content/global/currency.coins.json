@@ -1,0 +1,15 @@
+{
+  "startingAmount": {
+    "data": 100
+  },
+  "icon": {
+    "data": {
+      "referenceKey": "bfecb79b0ae49d640b5bba7b19cdcb0f"
+    }
+  },
+  "clientPermission": {
+    "data": {
+      "write_self": true
+    }
+  }
+}
