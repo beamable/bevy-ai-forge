@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0 OR CC0-1.0"
 console_error_panic_hook = "0.1"
 bevy = "0.13"
 bevy_egui = "0.25"
-bevy-inspector-egui = "0.23.2"
+bevy-inspector-egui = {git ="https://github.com/jakobhellermann/bevy-inspector-egui", rev="ae7cdf5"}
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 futures-lite = "2.2.0"
