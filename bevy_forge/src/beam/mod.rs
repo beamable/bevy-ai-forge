@@ -50,6 +50,7 @@ impl Plugin for BeamPlugin {
                 Update,
                 (
                     context::handle_accounts_callbacks,
+                    context::handle_token_callbacks,
                     context::handle_inventory_get,
                     context::update_user_info,
                 ),

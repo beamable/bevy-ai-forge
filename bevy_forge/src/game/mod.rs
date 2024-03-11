@@ -32,7 +32,7 @@ impl Plugin for GamePlugin {
     }
 }
 
-fn hide_items(mut q: Query<&mut Style, Added<components::HiddenUiElement>>) {
+fn hide_items(mut q: Query<&mut Style, With<components::HiddenUiElement>>) {
     for mut s in q.iter_mut() {
         s.display = Display::None;
     }

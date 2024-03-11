@@ -23,10 +23,7 @@ pub struct BeamContext {
 
 impl BeamContext {
     pub fn id(&self) -> Option<i64> {
-        match &self.user {
-            Some(user_view) => Some(user_view.id),
-            None => None,
-        }
+        self.user.as_ref().map(|view| view.id)
     }
 }
 
@@ -197,7 +194,7 @@ pub fn save_user_info(
 
 pub fn update_user_info(
     mut ev: EventReader<PostTokenEvent>,
-    mut beam: Option<ResMut<BeamContext>>,
+    beam: Option<ResMut<BeamContext>>,
     mut pkv: ResMut<PkvStore>,
 ) {
     let Some(mut beam) = beam else {
@@ -251,15 +248,49 @@ pub fn handle_inventory_get(
     }
 }
 
-pub fn handle_accounts_callbacks(
+pub fn handle_token_callbacks(
     mut get_token_events: EventReader<GetTokenEvent>,
     mut post_token_events: EventReader<PostTokenEvent>,
+    beam: Option<ResMut<BeamContext>>,
+    mut commands: Commands,
+) {
+    let Some(mut beam) = beam else {
+        return;
+    };
+    for event in get_token_events.read() {
+        debug!("GetTokenEvent: {:#?}", event);
+        match &**event {
+            Ok(data) => {
+                beam.token.as_mut().unwrap().access_token = Some(data.token.clone());
+                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
+                commands.beam_get_user_info();
+            }
+            Err(_) => {
+                let token = beam.token.as_ref().unwrap();
+                commands.beam_post_token(token.refresh_token.clone().unwrap());
+            }
+        }
+    }
+    for event in post_token_events.read() {
+        debug!("PostTokenEvent: {:#?}", event);
+        match &**event {
+            Ok(data) => {
+                beam.token = Some(TokenStorage::from_token_response(data));
+                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
+                commands.beam_get_user_info();
+            }
+            Err(_) => {}
+        }
+    }
+}
+
+pub fn handle_accounts_callbacks(
     mut get_user_event: EventReader<GetAccountMeCompletedEvent>,
     mut attach_third_party_event: EventReader<AttachFederatedIdentityCompletedEvent>,
-    beam: Option<ResMut<BeamContext>>,
     external_identity: Option<Res<BeamExternalIdentityConfig>>,
-    mut commands: Commands,
     mut next_state: ResMut<NextState<super::state::BeamableInitStatus>>,
+    beam: Option<ResMut<BeamContext>>,
+    mut commands: Commands,
 ) {
     let Some(mut beam) = beam else {
         return;
@@ -290,31 +321,6 @@ pub fn handle_accounts_callbacks(
         debug!("{:#?}", event);
         if (**event).is_ok() {
             next_state.set(super::state::BeamableInitStatus::FullyInitialized);
-        }
-    }
-    for event in get_token_events.read() {
-        debug!("GetTokenEvent: {:#?}", event);
-        match &**event {
-            Ok(data) => {
-                beam.token.as_mut().unwrap().access_token = Some(data.token.clone());
-                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
-                commands.beam_get_user_info();
-            }
-            Err(_) => {
-                let token = beam.token.as_ref().clone().unwrap();
-                commands.beam_post_token(token.refresh_token.clone().unwrap());
-            }
-        }
-    }
-    for event in post_token_events.read() {
-        debug!("PostTokenEvent: {:#?}", event);
-        match &**event {
-            Ok(data) => {
-                beam.token = Some(TokenStorage::from_token_response(data));
-                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
-                commands.beam_get_user_info();
-            }
-            Err(_) => {}
         }
     }
 }
