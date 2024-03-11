@@ -39,7 +39,7 @@ impl Plugin for GameStatePlugin {
                     }
                     cmd.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
                 })
-                .run_if(on_timer(std::time::Duration::from_secs(3))),
+                .run_if(on_timer(std::time::Duration::from_secs(1))),
             );
     }
 }
