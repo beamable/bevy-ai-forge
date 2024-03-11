@@ -7,7 +7,7 @@ use bevy_pkv::PkvStore;
 use serde::{Deserialize, Serialize};
 
 use super::api::accounts::{AttachFederatedIdentityCompletedEvent, GetAccountMeCompletedEvent};
-use super::api::common::{CreateAnononymousUserCompletedEvent, GetTokenEvent};
+use super::api::common::{CreateAnononymousUserCompletedEvent, GetTokenEvent, PostTokenEvent};
 use super::api::inventory::InventoryGetCompletedEvent;
 use crate::beam::api::BeamableBasicApi;
 use crate::beam::config::BeamExternalIdentityConfig;
@@ -16,10 +16,18 @@ use beam_common::models::*;
 #[derive(Serialize, Debug, Deserialize, Resource, Reflect, Default)]
 #[reflect(Resource)]
 pub struct BeamContext {
-    pub id: i64,
     pub name: Option<String>,
     pub token: Option<TokenStorage>,
     pub user: Option<UserView>,
+}
+
+impl BeamContext {
+    pub fn id(&self) -> Option<i64> {
+        match &self.user {
+            Some(user_view) => Some(user_view.id),
+            None => None,
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Reflect, Deserialize)]
@@ -169,8 +177,8 @@ impl TokenStorage {
 
 pub fn save_user_info(
     mut ev: EventReader<CreateAnononymousUserCompletedEvent>,
-    mut beam: ResMut<BeamContext>,
     mut next_state: ResMut<NextState<super::state::BeamableInitStatus>>,
+    mut beam: ResMut<BeamContext>,
     mut pkv: ResMut<PkvStore>,
 ) {
     for event in ev.read() {
@@ -181,6 +189,27 @@ pub fn save_user_info(
                 pkv.set("user_context", &(*beam))
                     .expect("failed to store user");
                 next_state.set(super::state::BeamableInitStatus::LoggedIn);
+            }
+            Err(err) => println!("Failure: {:#?}", err),
+        }
+    }
+}
+
+pub fn update_user_info(
+    mut ev: EventReader<PostTokenEvent>,
+    mut beam: Option<ResMut<BeamContext>>,
+    mut pkv: ResMut<PkvStore>,
+) {
+    let Some(mut beam) = beam else {
+        return;
+    };
+    for event in ev.read() {
+        let event = event.deref();
+        match event {
+            Ok(token) => {
+                beam.token = Some(TokenStorage::from_token_response(token));
+                pkv.set("user_context", &(*beam))
+                    .expect("failed to store user");
             }
             Err(err) => println!("Failure: {:#?}", err),
         }
@@ -198,7 +227,6 @@ pub fn read_context(
         user
     } else {
         let user = BeamContext {
-            id: 0,
             name: Some("Andrew".to_string()),
             token: None,
             user: None,
@@ -215,6 +243,7 @@ pub fn handle_inventory_get(
     mut commands: Commands,
 ) {
     for event in inventory_events.read() {
+        debug!("{:#?}", event);
         if let Ok(event) = &**event {
             let inventory = BeamInventory::from((*event).clone());
             commands.insert_resource(inventory);
@@ -224,6 +253,7 @@ pub fn handle_inventory_get(
 
 pub fn handle_accounts_callbacks(
     mut get_token_events: EventReader<GetTokenEvent>,
+    mut post_token_events: EventReader<PostTokenEvent>,
     mut get_user_event: EventReader<GetAccountMeCompletedEvent>,
     mut attach_third_party_event: EventReader<AttachFederatedIdentityCompletedEvent>,
     beam: Option<ResMut<BeamContext>>,
@@ -235,7 +265,7 @@ pub fn handle_accounts_callbacks(
         return;
     };
     for event in get_user_event.read() {
-        debug!("{:#?}", event);
+        debug!("GetAccountMe: {:#?}", event);
         if let Ok(event) = &**event {
             beam.user = Some(UserView::from((*event).clone()));
             if let Some(ref external) = &external_identity {
@@ -263,11 +293,24 @@ pub fn handle_accounts_callbacks(
         }
     }
     for event in get_token_events.read() {
-        debug!("{:#?}", event);
+        debug!("GetTokenEvent: {:#?}", event);
         match &**event {
             Ok(data) => {
-                beam.id = data.gamer_tag.unwrap_or(-1);
                 beam.token.as_mut().unwrap().access_token = Some(data.token.clone());
+                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
+                commands.beam_get_user_info();
+            }
+            Err(_) => {
+                let token = beam.token.as_ref().clone().unwrap();
+                commands.beam_post_token(token.refresh_token.clone().unwrap());
+            }
+        }
+    }
+    for event in post_token_events.read() {
+        debug!("PostTokenEvent: {:#?}", event);
+        match &**event {
+            Ok(data) => {
+                beam.token = Some(TokenStorage::from_token_response(data));
                 commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
                 commands.beam_get_user_info();
             }

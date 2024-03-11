@@ -7,7 +7,7 @@ use crate::{
     beam::{api::BeamableBasicApi, context::BeamInventory, state::BeamableInitStatus},
     consts::{self, *},
     game::components::*,
-    microservice::MicroserviceSellSword,
+    microservice::{MicroserviceSellSword, MicroserviceStartForging},
 };
 
 #[derive(Resource, Reflect, Default)]
@@ -285,7 +285,8 @@ fn handle_buttons(
         };
         match button {
             GameplayButton::StartForgingSword => {
-                commands.beam_add_to_inventory(vec!["items.AiItemContent.AiSword".into()]);
+                commands.add(MicroserviceStartForging);
+                // commands.beam_add_to_inventory(vec!["items.AiItemContent.AiSword".into()]);
             }
             GameplayButton::StartForgingShield => {
                 commands.beam_add_to_inventory(vec!["items.AiItemContent.AiShield".into()]);

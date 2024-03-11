@@ -14,6 +14,7 @@ pub(crate) trait BeamableBasicApi {
     ) -> &mut Self;
     fn beam_get_user_info(&mut self) -> &mut Self;
     fn beam_get_token(&mut self, token: String) -> &mut Self;
+    fn beam_post_token(&mut self, token: String) -> &mut Self;
     fn beam_get_inventory(&mut self, scope: Option<String>) -> &mut Self;
     fn beam_add_to_inventory(&mut self, new_items: Vec<String>) -> &mut Self;
 }
@@ -38,6 +39,10 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
         self.add(common::GetToken(token));
         self
     }
+    fn beam_post_token(&mut self, token: String) -> &mut Self {
+        self.add(common::PostToken(token));
+        self
+    }
     fn beam_get_inventory(&mut self, scope: Option<String>) -> &mut Self {
         let val = scope.unwrap_or("items".to_owned());
         self.add(inventory::InventoryGetCommand { scope: val });
@@ -52,6 +57,7 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
 pub fn register_types(app: &mut App) {
     common::CreateAnononymousUserTask::register(app);
     common::GetTokenTask::register(app);
+    common::PostTokenTask::register(app);
     accounts::GetAccountMeTask::register(app);
     accounts::AttachFederatedIdentityTask::register(app);
     inventory::InventoryGet::register(app);

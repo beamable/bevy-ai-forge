@@ -51,6 +51,7 @@ impl Plugin for BeamPlugin {
                 (
                     context::handle_accounts_callbacks,
                     context::handle_inventory_get,
+                    context::update_user_info,
                 ),
             );
         api::register_types(app);

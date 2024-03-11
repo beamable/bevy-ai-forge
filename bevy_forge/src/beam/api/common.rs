@@ -31,3 +31,23 @@ async fn basic_token_get(
 ) -> Result<models::Token, beam_common::apis::Error<BasicAuthTokenGetError>> {
     basic_auth_token_get(configuration, &token.unwrap()).await
 }
+
+create_request!(
+    PostTokenTask,
+    PostToken,
+    PostTokenEvent,
+    basic_token_post,
+    String,
+    TokenResponse,
+    BasicAuthTokenPostError
+);
+
+// I made this so I don't need to create third macro right now
+async fn basic_token_post(
+    configuration: &beam_common::apis::configuration::Configuration,
+    token: Option<String>,
+) -> Result<models::TokenResponse, beam_common::apis::Error<BasicAuthTokenPostError>> {
+    let mut wrapper = TokenRequestWrapper::new("refresh_token".to_owned());
+    wrapper.refresh_token = token;
+    basic_auth_token_post(configuration, Some(wrapper)).await
+}
