@@ -19,10 +19,14 @@ pub struct BeamContext {
     pub name: Option<String>,
     pub token: Option<TokenStorage>,
     pub user: Option<UserView>,
+    pub gamer_tag: Option<i64>
 }
 
 impl BeamContext {
-    pub fn id(&self) -> Option<i64> {
+    pub fn get_gamer_tag(&self) -> Option<i64> {
+        if let Some(id) = self.gamer_tag {
+            return Some(id);
+        }
         self.user.as_ref().map(|view| view.id)
     }
 }
@@ -227,6 +231,7 @@ pub fn read_context(
             name: Some("Andrew".to_string()),
             token: None,
             user: None,
+            gamer_tag: None,
         };
         pkv.set("Andrew", &user).expect("failed to store user");
         user
@@ -240,7 +245,7 @@ pub fn handle_inventory_get(
     mut commands: Commands,
 ) {
     for event in inventory_events.read() {
-        debug!("{:#?}", event);
+        info!("Inventory Get: {:#?}", event);
         if let Ok(event) = &**event {
             let inventory = BeamInventory::from((*event).clone());
             commands.insert_resource(inventory);
@@ -258,10 +263,11 @@ pub fn handle_token_callbacks(
         return;
     };
     for event in get_token_events.read() {
-        debug!("GetTokenEvent: {:#?}", event);
+        info!("GetTokenEvent: {:#?}", event);
         match &**event {
             Ok(data) => {
                 beam.token.as_mut().unwrap().access_token = Some(data.token.clone());
+                beam.gamer_tag = data.gamer_tag;
                 commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
                 commands.beam_get_user_info();
             }
@@ -272,7 +278,7 @@ pub fn handle_token_callbacks(
         }
     }
     for event in post_token_events.read() {
-        debug!("PostTokenEvent: {:#?}", event);
+        info!("PostTokenEvent: {:#?}", event);
         match &**event {
             Ok(data) => {
                 beam.token = Some(TokenStorage::from_token_response(data));
@@ -296,7 +302,7 @@ pub fn handle_accounts_callbacks(
         return;
     };
     for event in get_user_event.read() {
-        debug!("GetAccountMe: {:#?}", event);
+        info!("GetAccountMe: {:#?}", event);
         if let Ok(event) = &**event {
             beam.user = Some(UserView::from((*event).clone()));
             if let Some(ref external) = &external_identity {
@@ -318,7 +324,7 @@ pub fn handle_accounts_callbacks(
         }
     }
     for event in attach_third_party_event.read() {
-        debug!("{:#?}", event);
+        println!("Attach third party: {:#?}", event);
         if (**event).is_ok() {
             next_state.set(super::state::BeamableInitStatus::FullyInitialized);
         }

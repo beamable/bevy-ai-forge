@@ -34,6 +34,9 @@ pub async fn api_presence_query_post(configuration: &configuration::Configuratio
     if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder = local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&online_status_query);
 
     let local_var_req = local_var_req_builder.build()?;

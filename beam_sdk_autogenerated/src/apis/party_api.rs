@@ -83,6 +83,9 @@ pub async fn api_parties_id_get(configuration: &configuration::Configuration, id
     if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder = local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -110,6 +113,9 @@ pub async fn api_parties_id_invite_delete(configuration: &configuration::Configu
     if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder = local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&cancel_invite_to_party);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -138,6 +144,9 @@ pub async fn api_parties_id_invite_post(configuration: &configuration::Configura
     if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder = local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&invite_to_party);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -166,6 +175,9 @@ pub async fn api_parties_id_members_delete(configuration: &configuration::Config
     if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder = local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&leave_party);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -194,6 +206,9 @@ pub async fn api_parties_id_metadata_put(configuration: &configuration::Configur
     if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder = local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&update_party);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -222,6 +237,9 @@ pub async fn api_parties_id_promote_put(configuration: &configuration::Configura
     if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder = local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&promote_new_leader);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -250,6 +268,9 @@ pub async fn api_parties_id_put(configuration: &configuration::Configuration, id
     if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder = local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -277,6 +298,9 @@ pub async fn api_parties_post(configuration: &configuration::Configuration, crea
     if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder = local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&create_party);
 
     let local_var_req = local_var_req_builder.build()?;

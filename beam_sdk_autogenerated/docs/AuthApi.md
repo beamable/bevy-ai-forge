@@ -27,7 +27,7 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-No authorization required
+[user](../README.md#user)
 
 ### HTTP request headers
 
@@ -55,7 +55,7 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-No authorization required
+[user](../README.md#user)
 
 ### HTTP request headers
 

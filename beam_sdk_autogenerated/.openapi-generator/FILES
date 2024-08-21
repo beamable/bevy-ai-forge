@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 .travis.yml
 Cargo.toml
 README.md
@@ -121,6 +120,7 @@ docs/DatabaseMeasurement.md
 docs/DatabaseMeasurements.md
 docs/DatabasePerformanceRequest.md
 docs/DateRange.md
+docs/DefaultApi.md
 docs/DeleteAnnouncementRequest.md
 docs/DeleteDevicesRequest.md
 docs/DeleteExternalIdentityApiRequest.md
@@ -341,6 +341,7 @@ docs/ListTokensRequest.md
 docs/ListTrialsResponse.md
 docs/Listing.md
 docs/Lobby.md
+docs/LobbyApi.md
 docs/LobbyPlayer.md
 docs/LobbyQueryResponse.md
 docs/LobbyRestriction.md
@@ -359,6 +360,7 @@ docs/MailSearchResponse.md
 docs/MailSearchResponseClause.md
 docs/MailSuccessResponse.md
 docs/MailTemplate.md
+docs/MailboxApi.md
 docs/MakeDonationRequest.md
 docs/MakeFriendshipRequest.md
 docs/Manifest.md
@@ -368,6 +370,7 @@ docs/ManifestReferencesInner.md
 docs/ManifestSummary.md
 docs/ManifestView.md
 docs/Match.md
+docs/MatchApi.md
 docs/MatchMakingMatchesPvpResponse.md
 docs/MatchMakingRanking.md
 docs/MatchMakingWindowResp.md
@@ -403,6 +406,7 @@ docs/PaNamespace.md
 docs/PaSlowQuery.md
 docs/PaSuggestedIndex.md
 docs/Party.md
+docs/PartyApi.md
 docs/PartyInvitation.md
 docs/PartyInvitesForPlayerResponse.md
 docs/PasswordUpdateConfirmation.md
@@ -417,11 +421,13 @@ docs/PerformanceResponse.md
 docs/Period.md
 docs/PingRsp.md
 docs/Player.md
+docs/PlayerApi.md
 docs/PlayerBasicCloudDataRequest.md
 docs/PlayerIdRequest.md
 docs/PlayerListingView.md
 docs/PlayerOfferView.md
 docs/PlayerOnlineStatusResponse.md
+docs/PlayerPresenceApi.md
 docs/PlayerReward.md
 docs/PlayerStatRequirement.md
 docs/PlayerStatus.md
@@ -431,6 +437,7 @@ docs/PlayersStatusResponse.md
 docs/PostManifestRequest.md
 docs/PostManifestResponse.md
 docs/PreSignedUrlsResponse.md
+docs/PresenceApi.md
 docs/PresenceStatus.md
 docs/PreviewVipBonusResponse.md
 docs/Price.md
@@ -497,6 +504,7 @@ docs/SaveTextResponse.md
 docs/Schedule.md
 docs/ScheduleDefinition.md
 docs/ScheduleTrialRequest.md
+docs/SchedulerApi.md
 docs/ScoreRequest.md
 docs/SearchAccountsRequest.md
 docs/SearchAnnouncementsRequest.md
@@ -569,6 +577,7 @@ docs/TextReference.md
 docs/ThirdPartyAssociation.md
 docs/ThirdPartyAvailableRequest.md
 docs/Ticket.md
+docs/TicketApi.md
 docs/TicketReservationRequest.md
 docs/TicketReservationResponse.md
 docs/Token.md
@@ -616,7 +625,17 @@ docs/WebhookServiceType.md
 git_push.sh
 src/apis/auth_api.rs
 src/apis/configuration.rs
+src/apis/default_api.rs
+src/apis/lobby_api.rs
+src/apis/mailbox_api.rs
+src/apis/match_api.rs
 src/apis/mod.rs
+src/apis/party_api.rs
+src/apis/player_api.rs
+src/apis/player_presence_api.rs
+src/apis/presence_api.rs
+src/apis/scheduler_api.rs
+src/apis/ticket_api.rs
 src/lib.rs
 src/models/accept_multiple_attachments.rs
 src/models/account.rs

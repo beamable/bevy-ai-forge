@@ -2815,6 +2815,17 @@ pub async fn basic_accounts_admin_admin_user_post(configuration: &configuration:
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&add_account_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -2847,6 +2858,17 @@ pub async fn basic_accounts_admin_admin_users_get(configuration: &configuration:
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -2878,6 +2900,17 @@ pub async fn basic_accounts_admin_me_get(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -2910,6 +2943,9 @@ pub async fn basic_accounts_available_device_id_get(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -2946,6 +2982,9 @@ pub async fn basic_accounts_available_external_identity_get(configuration: &conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -2978,6 +3017,9 @@ pub async fn basic_accounts_available_get(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3011,6 +3053,9 @@ pub async fn basic_accounts_available_third_party_get(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3042,6 +3087,17 @@ pub async fn basic_accounts_email_update_confirm_post(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&email_update_confirmation);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3074,6 +3130,17 @@ pub async fn basic_accounts_email_update_init_post(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&email_update_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3106,6 +3173,17 @@ pub async fn basic_accounts_external_identity_delete(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&delete_external_identity_api_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3138,6 +3216,17 @@ pub async fn basic_accounts_external_identity_post(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&attach_external_identity_api_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3171,6 +3260,17 @@ pub async fn basic_accounts_find_get(configuration: &configuration::Configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3203,6 +3303,9 @@ pub async fn basic_accounts_get_personally_identifiable_information_get(configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3234,6 +3337,17 @@ pub async fn basic_accounts_me_device_delete(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&delete_devices_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3266,6 +3380,17 @@ pub async fn basic_accounts_me_get(configuration: &configuration::Configuration,
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3297,6 +3422,17 @@ pub async fn basic_accounts_me_put(configuration: &configuration::Configuration,
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&account_update);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3329,6 +3465,17 @@ pub async fn basic_accounts_me_third_party_delete(configuration: &configuration:
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&third_party_available_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3361,6 +3508,9 @@ pub async fn basic_accounts_password_update_confirm_post(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&password_update_confirmation);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3393,6 +3543,9 @@ pub async fn basic_accounts_password_update_init_post(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&password_update_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3425,6 +3578,17 @@ pub async fn basic_accounts_register_post(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&account_registration);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3460,6 +3624,17 @@ pub async fn basic_accounts_search_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3491,6 +3666,17 @@ pub async fn basic_announcements_content_get(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3522,6 +3708,17 @@ pub async fn basic_announcements_delete(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&delete_announcement_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3554,6 +3751,17 @@ pub async fn basic_announcements_list_definitions_get(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3585,6 +3793,17 @@ pub async fn basic_announcements_list_get(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3619,6 +3838,17 @@ pub async fn basic_announcements_list_tags_get(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3650,6 +3880,17 @@ pub async fn basic_announcements_post(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&announcement_dto);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3685,6 +3926,17 @@ pub async fn basic_announcements_search_get(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3717,6 +3969,9 @@ pub async fn basic_auth_token_get(configuration: &configuration::Configuration, 
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3757,6 +4012,17 @@ pub async fn basic_auth_token_list_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3788,6 +4054,9 @@ pub async fn basic_auth_token_post(configuration: &configuration::Configuration,
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&token_request_wrapper);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3820,6 +4089,17 @@ pub async fn basic_auth_token_revoke_put(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&revoke_token_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3852,6 +4132,17 @@ pub async fn basic_beamo_image_commit_put(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&commit_image_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3884,6 +4175,17 @@ pub async fn basic_beamo_image_urls_post(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&get_service_urls_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3916,6 +4218,17 @@ pub async fn basic_beamo_logs_url_post(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&get_logs_url_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -3951,6 +4264,17 @@ pub async fn basic_beamo_manifest_current_get(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -3982,6 +4306,17 @@ pub async fn basic_beamo_manifest_deploy_post(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4017,6 +4352,17 @@ pub async fn basic_beamo_manifest_get(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4048,6 +4394,17 @@ pub async fn basic_beamo_manifest_post(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&post_manifest_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4080,6 +4437,17 @@ pub async fn basic_beamo_manifest_pull_post(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&pull_beamo_manifest_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4121,6 +4489,17 @@ pub async fn basic_beamo_manifests_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4152,6 +4531,17 @@ pub async fn basic_beamo_metrics_url_post(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&get_metrics_url_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4184,6 +4574,17 @@ pub async fn basic_beamo_microservice_secret_get(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4215,6 +4616,17 @@ pub async fn basic_beamo_query_logs_delete(configuration: &configuration::Config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&query);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4247,6 +4659,17 @@ pub async fn basic_beamo_query_logs_post(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&get_logs_insight_url_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4279,6 +4702,17 @@ pub async fn basic_beamo_query_logs_result_post(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&query);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4311,6 +4745,17 @@ pub async fn basic_beamo_registry_get(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4342,6 +4787,17 @@ pub async fn basic_beamo_status_get(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4373,6 +4829,17 @@ pub async fn basic_beamo_storage_connection_get(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4415,6 +4882,17 @@ pub async fn basic_beamo_storage_performance_get(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4446,6 +4924,17 @@ pub async fn basic_beamo_templates_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4477,6 +4966,17 @@ pub async fn basic_beamo_upload_api_get(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4508,6 +5008,17 @@ pub async fn basic_cloudsaving_data_commit_manifest_put(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&upload_requests);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4540,6 +5051,17 @@ pub async fn basic_cloudsaving_data_delete(configuration: &configuration::Config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&object_requests);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4572,6 +5094,17 @@ pub async fn basic_cloudsaving_data_download_url_from_portal_post(configuration:
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&object_requests);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4604,6 +5137,17 @@ pub async fn basic_cloudsaving_data_download_url_post(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&object_requests);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4645,6 +5189,17 @@ pub async fn basic_cloudsaving_data_metadata_get(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4676,6 +5231,17 @@ pub async fn basic_cloudsaving_data_move_from_portal_put(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&player_basic_cloud_data_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4708,6 +5274,17 @@ pub async fn basic_cloudsaving_data_move_put(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&player_basic_cloud_data_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4740,6 +5317,17 @@ pub async fn basic_cloudsaving_data_replace_post(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&replace_objects_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4772,6 +5360,17 @@ pub async fn basic_cloudsaving_data_upload_url_from_portal_post(configuration: &
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&upload_requests_from_portal);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4804,6 +5403,17 @@ pub async fn basic_cloudsaving_data_upload_url_post(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&upload_requests);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4839,6 +5449,9 @@ pub async fn basic_cloudsaving_get(configuration: &configuration::Configuration,
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4873,6 +5486,17 @@ pub async fn basic_commerce_catalog_get(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4904,6 +5528,17 @@ pub async fn basic_commerce_catalog_legacy_post(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&save_catalog_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -4939,6 +5574,9 @@ pub async fn basic_commerce_skus_get(configuration: &configuration::Configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -4970,6 +5608,17 @@ pub async fn basic_commerce_skus_post(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&save_skus_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5002,6 +5651,17 @@ pub async fn basic_content_binary_post(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&save_binary_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5036,6 +5696,17 @@ pub async fn basic_content_content_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5067,6 +5738,17 @@ pub async fn basic_content_localizations_delete(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&delete_localization_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5099,6 +5781,17 @@ pub async fn basic_content_localizations_get(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5130,6 +5823,17 @@ pub async fn basic_content_localizations_put(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&put_localizations_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5165,6 +5869,9 @@ pub async fn basic_content_manifest_checksum_get(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5196,6 +5903,17 @@ pub async fn basic_content_manifest_checksums_get(configuration: &configuration:
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5228,6 +5946,17 @@ pub async fn basic_content_manifest_exact_get(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5262,6 +5991,17 @@ pub async fn basic_content_manifest_get(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5299,6 +6039,17 @@ pub async fn basic_content_manifest_history_get(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5330,6 +6081,17 @@ pub async fn basic_content_manifest_post(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&save_manifest_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5365,6 +6127,17 @@ pub async fn basic_content_manifest_private_get(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5399,6 +6172,17 @@ pub async fn basic_content_manifest_private_json_get(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5433,6 +6217,9 @@ pub async fn basic_content_manifest_public_get(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5467,6 +6254,9 @@ pub async fn basic_content_manifest_public_json_get(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5498,6 +6288,17 @@ pub async fn basic_content_manifest_pull_post(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&pull_manifest_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5530,6 +6331,17 @@ pub async fn basic_content_manifest_repeat_put(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&repeat_manifest_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5562,6 +6374,17 @@ pub async fn basic_content_manifests_archive_post(configuration: &configuration:
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&archive_or_unarchive_manifests_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5594,6 +6417,17 @@ pub async fn basic_content_manifests_get(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5625,6 +6459,17 @@ pub async fn basic_content_manifests_pull_post(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&pull_all_manifests_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5657,6 +6502,17 @@ pub async fn basic_content_manifests_unarchive_post(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&archive_or_unarchive_manifests_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5689,6 +6545,17 @@ pub async fn basic_content_post(configuration: &configuration::Configuration, x_
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&save_content_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5721,6 +6588,17 @@ pub async fn basic_content_text_post(configuration: &configuration::Configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&save_text_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5753,6 +6631,17 @@ pub async fn basic_events_apply_content_post(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&event_apply_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -5797,6 +6686,17 @@ pub async fn basic_events_calendar_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5828,6 +6728,17 @@ pub async fn basic_events_content_get(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5859,6 +6770,9 @@ pub async fn basic_events_running_get(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5890,6 +6804,9 @@ pub async fn basic_inventory_currency_get(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5921,6 +6838,9 @@ pub async fn basic_inventory_items_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5956,6 +6876,17 @@ pub async fn basic_leaderboards_assignment_get(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -5996,6 +6927,17 @@ pub async fn basic_leaderboards_list_get(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -6028,6 +6970,17 @@ pub async fn basic_leaderboards_player_get(configuration: &configuration::Config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -6059,6 +7012,17 @@ pub async fn basic_leaderboards_uid_get(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -6090,6 +7054,17 @@ pub async fn basic_mail_attachments_put(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&accept_multiple_attachments);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6122,6 +7097,17 @@ pub async fn basic_mail_bulk_post(configuration: &configuration::Configuration, 
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&bulk_send_mail_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6155,6 +7141,9 @@ pub async fn basic_mail_get(configuration: &configuration::Configuration, x_beam
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -6186,6 +7175,17 @@ pub async fn basic_mail_put(configuration: &configuration::Configuration, x_beam
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&update_mail_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6220,6 +7220,9 @@ pub async fn basic_mail_template_get(configuration: &configuration::Configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -6251,6 +7254,17 @@ pub async fn basic_notification_channel_post(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&notification_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6283,6 +7297,17 @@ pub async fn basic_notification_custom_post(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&notification_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6315,6 +7340,17 @@ pub async fn basic_notification_game_post(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&notification_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6347,6 +7383,17 @@ pub async fn basic_notification_generic_post(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&notification_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6379,6 +7426,17 @@ pub async fn basic_notification_get(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -6410,6 +7468,17 @@ pub async fn basic_notification_player_post(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&notification_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6442,6 +7511,17 @@ pub async fn basic_notification_server_post(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&server_event);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6495,6 +7575,9 @@ pub async fn basic_payments_audits_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -6527,6 +7610,9 @@ pub async fn basic_payments_coupon_product_get(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -6558,6 +7644,17 @@ pub async fn basic_payments_coupon_purchase_begin_post(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&begin_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6590,6 +7687,17 @@ pub async fn basic_payments_coupon_purchase_cancel_post(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&cancel_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6622,6 +7730,9 @@ pub async fn basic_payments_coupon_purchase_complete_post(configuration: &config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&complete_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6654,6 +7765,17 @@ pub async fn basic_payments_coupon_purchase_fail_post(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&fail_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6686,6 +7808,9 @@ pub async fn basic_payments_coupon_purchase_track_post(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&track_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6718,6 +7843,9 @@ pub async fn basic_payments_coupon_purchase_verify_post(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&verify_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6751,6 +7879,9 @@ pub async fn basic_payments_facebook_product_get(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -6782,6 +7913,17 @@ pub async fn basic_payments_facebook_purchase_begin_post(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&begin_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6814,6 +7956,17 @@ pub async fn basic_payments_facebook_purchase_cancel_post(configuration: &config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&cancel_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6846,6 +7999,9 @@ pub async fn basic_payments_facebook_purchase_complete_post(configuration: &conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&complete_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6878,6 +8034,17 @@ pub async fn basic_payments_facebook_purchase_fail_post(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&fail_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6910,6 +8077,9 @@ pub async fn basic_payments_facebook_purchase_track_post(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&track_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6942,6 +8112,9 @@ pub async fn basic_payments_facebook_purchase_verify_post(configuration: &config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&verify_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -6977,6 +8150,9 @@ pub async fn basic_payments_facebook_update_get(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -7008,6 +8184,9 @@ pub async fn basic_payments_facebook_update_post(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&facebook_payment_update_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7041,6 +8220,9 @@ pub async fn basic_payments_googleplay_product_get(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -7072,6 +8254,17 @@ pub async fn basic_payments_googleplay_purchase_begin_post(configuration: &confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&begin_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7104,6 +8297,17 @@ pub async fn basic_payments_googleplay_purchase_cancel_post(configuration: &conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&cancel_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7136,6 +8340,9 @@ pub async fn basic_payments_googleplay_purchase_complete_post(configuration: &co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&complete_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7168,6 +8375,17 @@ pub async fn basic_payments_googleplay_purchase_fail_post(configuration: &config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&fail_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7200,6 +8418,9 @@ pub async fn basic_payments_googleplay_purchase_track_post(configuration: &confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&track_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7232,6 +8453,9 @@ pub async fn basic_payments_googleplay_purchase_verify_post(configuration: &conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&verify_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7265,6 +8489,9 @@ pub async fn basic_payments_itunes_product_get(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -7296,6 +8523,17 @@ pub async fn basic_payments_itunes_purchase_begin_post(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&begin_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7328,6 +8566,17 @@ pub async fn basic_payments_itunes_purchase_cancel_post(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&cancel_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7360,6 +8609,9 @@ pub async fn basic_payments_itunes_purchase_complete_post(configuration: &config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&complete_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7392,6 +8644,17 @@ pub async fn basic_payments_itunes_purchase_fail_post(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&fail_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7424,6 +8687,9 @@ pub async fn basic_payments_itunes_purchase_track_post(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&track_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7456,6 +8722,9 @@ pub async fn basic_payments_itunes_purchase_verify_post(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&verify_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7488,6 +8757,9 @@ pub async fn basic_payments_steam_auth_post(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&steam_auth_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7521,6 +8793,17 @@ pub async fn basic_payments_steam_order_get(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -7553,6 +8836,9 @@ pub async fn basic_payments_steam_prices_get(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -7585,6 +8871,9 @@ pub async fn basic_payments_steam_product_get(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -7617,6 +8906,9 @@ pub async fn basic_payments_steam_products_get(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -7648,6 +8940,17 @@ pub async fn basic_payments_steam_purchase_begin_post(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&begin_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7680,6 +8983,17 @@ pub async fn basic_payments_steam_purchase_cancel_post(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&cancel_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7712,6 +9026,9 @@ pub async fn basic_payments_steam_purchase_complete_post(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&complete_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7744,6 +9061,17 @@ pub async fn basic_payments_steam_purchase_fail_post(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&fail_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7776,6 +9104,9 @@ pub async fn basic_payments_steam_purchase_track_post(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&track_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7808,6 +9139,9 @@ pub async fn basic_payments_steam_purchase_verify_post(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&verify_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7841,6 +9175,9 @@ pub async fn basic_payments_test_product_get(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -7872,6 +9209,17 @@ pub async fn basic_payments_test_purchase_begin_post(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&begin_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7904,6 +9252,17 @@ pub async fn basic_payments_test_purchase_cancel_post(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&cancel_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7936,6 +9295,9 @@ pub async fn basic_payments_test_purchase_complete_post(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&complete_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -7968,6 +9330,17 @@ pub async fn basic_payments_test_purchase_fail_post(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&fail_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8000,6 +9373,9 @@ pub async fn basic_payments_test_purchase_track_post(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&track_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8032,6 +9408,9 @@ pub async fn basic_payments_test_purchase_verify_post(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&verify_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8065,6 +9444,9 @@ pub async fn basic_payments_windows_product_get(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8096,6 +9478,17 @@ pub async fn basic_payments_windows_purchase_begin_post(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&begin_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8128,6 +9521,17 @@ pub async fn basic_payments_windows_purchase_cancel_post(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&cancel_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8160,6 +9564,9 @@ pub async fn basic_payments_windows_purchase_complete_post(configuration: &confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&complete_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8192,6 +9599,17 @@ pub async fn basic_payments_windows_purchase_fail_post(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&fail_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8224,6 +9642,9 @@ pub async fn basic_payments_windows_purchase_track_post(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&track_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8256,6 +9677,9 @@ pub async fn basic_payments_windows_purchase_verify_post(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&verify_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8288,6 +9712,17 @@ pub async fn basic_push_register_post(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&register_req);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8320,6 +9755,17 @@ pub async fn basic_push_send_post(configuration: &configuration::Configuration, 
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&send_req);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8352,6 +9798,17 @@ pub async fn basic_realms_admin_customer_get(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8383,6 +9840,17 @@ pub async fn basic_realms_admin_inflight_failures_delete(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&batch_delete_in_flight_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8419,6 +9887,17 @@ pub async fn basic_realms_admin_inflight_failures_get(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8450,6 +9929,9 @@ pub async fn basic_realms_client_defaults_get(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8481,6 +9963,17 @@ pub async fn basic_realms_config_get(configuration: &configuration::Configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8512,6 +10005,17 @@ pub async fn basic_realms_config_put(configuration: &configuration::Configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&realm_config_save_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8545,6 +10049,9 @@ pub async fn basic_realms_customer_alias_available_get(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8576,6 +10083,17 @@ pub async fn basic_realms_customer_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8607,6 +10125,9 @@ pub async fn basic_realms_customer_post(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&new_customer_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8639,6 +10160,9 @@ pub async fn basic_realms_customers_get(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8671,6 +10195,17 @@ pub async fn basic_realms_game_get(configuration: &configuration::Configuration,
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8702,6 +10237,17 @@ pub async fn basic_realms_game_post(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&new_game_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8734,6 +10280,17 @@ pub async fn basic_realms_game_put(configuration: &configuration::Configuration,
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&update_game_hierarchy_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8766,6 +10323,17 @@ pub async fn basic_realms_games_get(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8797,6 +10365,9 @@ pub async fn basic_realms_is_customer_get(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8828,6 +10399,17 @@ pub async fn basic_realms_launch_message_delete(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&remove_launch_message_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8860,6 +10442,17 @@ pub async fn basic_realms_launch_message_get(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8891,6 +10484,17 @@ pub async fn basic_realms_launch_message_post(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&create_launch_message_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8923,6 +10527,17 @@ pub async fn basic_realms_plans_get(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -8954,6 +10569,17 @@ pub async fn basic_realms_plans_post(configuration: &configuration::Configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&create_plan_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -8986,6 +10612,17 @@ pub async fn basic_realms_project_beamable_post(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&create_project_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9018,6 +10655,17 @@ pub async fn basic_realms_project_delete(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&archive_project_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9050,6 +10698,9 @@ pub async fn basic_realms_project_get(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -9081,6 +10732,17 @@ pub async fn basic_realms_project_post(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&create_project_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9126,6 +10788,17 @@ pub async fn basic_realms_project_promote_get(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -9157,6 +10830,17 @@ pub async fn basic_realms_project_promote_post(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&promote_realm_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9189,6 +10873,17 @@ pub async fn basic_realms_project_put(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&unarchive_project_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9221,6 +10916,17 @@ pub async fn basic_realms_project_rename_put(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&rename_project_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9266,6 +10972,17 @@ pub async fn basic_realms_promotion_get(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -9297,6 +11014,17 @@ pub async fn basic_realms_promotion_post(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&promote_realm_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9335,6 +11063,17 @@ pub async fn basic_session_client_history_get(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -9366,6 +11105,17 @@ pub async fn basic_session_heartbeat_post(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -9404,6 +11154,17 @@ pub async fn basic_session_history_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -9435,6 +11196,17 @@ pub async fn basic_session_post(configuration: &configuration::Configuration, x_
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&start_session_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9469,6 +11241,17 @@ pub async fn basic_session_status_get(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -9500,6 +11283,17 @@ pub async fn basic_social_blocked_delete(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&player_id_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9532,6 +11326,17 @@ pub async fn basic_social_blocked_post(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&player_id_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9564,6 +11369,17 @@ pub async fn basic_social_friends_delete(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&player_id_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9596,6 +11412,17 @@ pub async fn basic_social_friends_import_post(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&import_friends_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9628,6 +11455,17 @@ pub async fn basic_social_friends_invite_delete(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&send_friend_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9660,6 +11498,17 @@ pub async fn basic_social_friends_invite_post(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&send_friend_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9692,6 +11541,17 @@ pub async fn basic_social_friends_make_post(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&make_friendship_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9728,6 +11588,17 @@ pub async fn basic_social_get(configuration: &configuration::Configuration, x_be
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -9759,6 +11630,17 @@ pub async fn basic_social_my_get(configuration: &configuration::Configuration, x
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -9790,6 +11672,17 @@ pub async fn basic_stats_batch_post(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&batch_set_stats_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9829,6 +11722,9 @@ pub async fn basic_stats_client_batch_get(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -9860,6 +11756,17 @@ pub async fn basic_stats_search_extended_post(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&search_extended_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9892,6 +11799,17 @@ pub async fn basic_stats_search_post(configuration: &configuration::Configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&stats_search_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9924,6 +11842,17 @@ pub async fn basic_stats_subscribe_delete(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&stats_unsubscribe_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9956,6 +11885,17 @@ pub async fn basic_stats_subscribe_put(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&stats_subscribe_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -9998,6 +11938,17 @@ pub async fn basic_tournaments_admin_player_get(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10029,6 +11980,17 @@ pub async fn basic_tournaments_admin_player_put(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&update_player_status_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10066,6 +12028,17 @@ pub async fn basic_tournaments_champions_get(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10106,6 +12079,9 @@ pub async fn basic_tournaments_get(configuration: &configuration::Configuration,
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10153,6 +12129,17 @@ pub async fn basic_tournaments_global_get(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10200,6 +12187,17 @@ pub async fn basic_tournaments_groups_get(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10240,6 +12238,17 @@ pub async fn basic_tournaments_me_get(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10274,6 +12283,17 @@ pub async fn basic_tournaments_me_group_get(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10305,6 +12325,17 @@ pub async fn basic_tournaments_post(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&join_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10343,6 +12374,17 @@ pub async fn basic_tournaments_rewards_get(configuration: &configuration::Config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10374,6 +12416,17 @@ pub async fn basic_tournaments_rewards_post(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&rewards_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10406,6 +12459,9 @@ pub async fn basic_tournaments_score_post(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&score_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10438,6 +12494,9 @@ pub async fn basic_tournaments_search_groups_post(configuration: &configuration:
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&get_status_for_groups_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10486,6 +12545,17 @@ pub async fn basic_tournaments_standings_get(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10533,6 +12603,17 @@ pub async fn basic_tournaments_standings_group_get(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10565,6 +12646,17 @@ pub async fn basic_trials_admin_data_get(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10597,6 +12689,17 @@ pub async fn basic_trials_admin_get(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10628,6 +12731,17 @@ pub async fn basic_trials_data_delete(configuration: &configuration::Configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&delete_trial_data_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10660,6 +12774,17 @@ pub async fn basic_trials_data_post(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&upload_trial_data_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10692,6 +12817,17 @@ pub async fn basic_trials_delete(configuration: &configuration::Configuration, x
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&delete_trial_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10724,6 +12860,17 @@ pub async fn basic_trials_get(configuration: &configuration::Configuration, x_be
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10755,6 +12902,17 @@ pub async fn basic_trials_pause_put(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&pause_trial_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10787,6 +12945,17 @@ pub async fn basic_trials_post(configuration: &configuration::Configuration, x_b
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&create_trial_rest_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10819,6 +12988,17 @@ pub async fn basic_trials_schedule_put(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&schedule_trial_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10851,6 +13031,17 @@ pub async fn basic_trials_start_put(configuration: &configuration::Configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&start_trial_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10883,6 +13074,17 @@ pub async fn object_accounts_object_id_admin_email_put(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&email_update_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10915,6 +13117,17 @@ pub async fn object_accounts_object_id_admin_forget_delete(configuration: &confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -10946,6 +13159,17 @@ pub async fn object_accounts_object_id_admin_scope_delete(configuration: &config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&delete_role);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -10978,6 +13202,17 @@ pub async fn object_accounts_object_id_admin_scope_put(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&update_role);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11010,6 +13245,17 @@ pub async fn object_accounts_object_id_admin_third_party_delete(configuration: &
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&delete_third_party_association);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11042,6 +13288,17 @@ pub async fn object_accounts_object_id_admin_third_party_put(configuration: &con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&transfer_third_party_association);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11074,6 +13331,9 @@ pub async fn object_accounts_object_id_available_roles_get(configuration: &confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11105,6 +13365,17 @@ pub async fn object_accounts_object_id_put(configuration: &configuration::Config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&account_update);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11137,6 +13408,17 @@ pub async fn object_accounts_object_id_role_delete(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&delete_role);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11169,6 +13451,17 @@ pub async fn object_accounts_object_id_role_put(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&update_role);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11201,6 +13494,17 @@ pub async fn object_accounts_object_id_role_report_get(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11232,6 +13536,17 @@ pub async fn object_announcements_object_id_claim_post(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&announcement_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11264,6 +13579,17 @@ pub async fn object_announcements_object_id_delete(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&announcement_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11299,6 +13625,17 @@ pub async fn object_announcements_object_id_get(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11330,6 +13667,17 @@ pub async fn object_announcements_object_id_raw_get(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11361,6 +13709,17 @@ pub async fn object_announcements_object_id_read_put(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&announcement_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11393,6 +13752,9 @@ pub async fn object_calendars_object_id_claim_post(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&calendar_claim_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11425,6 +13787,9 @@ pub async fn object_calendars_object_id_get(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11459,6 +13824,17 @@ pub async fn object_chat_v2_object_id_get(configuration: &configuration::Configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11490,6 +13866,17 @@ pub async fn object_chat_v2_object_id_messages_post(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&send_message_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11522,6 +13909,17 @@ pub async fn object_chat_v2_object_id_rooms_delete(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&leave_room_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11554,6 +13952,17 @@ pub async fn object_chat_v2_object_id_rooms_get(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11585,6 +13994,17 @@ pub async fn object_chat_v2_object_id_rooms_post(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&create_room_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11617,6 +14037,9 @@ pub async fn object_commerce_object_id_coupons_count_get(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11648,6 +14071,17 @@ pub async fn object_commerce_object_id_coupons_post(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&give_coupon_req);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11683,6 +14117,17 @@ pub async fn object_commerce_object_id_get(configuration: &configuration::Config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11714,6 +14159,17 @@ pub async fn object_commerce_object_id_listings_cooldown_put(configuration: &con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&cooldown_modifier_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11753,6 +14209,17 @@ pub async fn object_commerce_object_id_listings_get(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11793,6 +14260,17 @@ pub async fn object_commerce_object_id_offers_admin_get(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11833,6 +14311,17 @@ pub async fn object_commerce_object_id_offers_get(configuration: &configuration:
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -11864,6 +14353,17 @@ pub async fn object_commerce_object_id_purchase_post(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11896,6 +14396,17 @@ pub async fn object_commerce_object_id_purchase_put(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&report_purchase_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11928,6 +14439,17 @@ pub async fn object_commerce_object_id_stats_update_post(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&stat_subscription_notification);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11960,6 +14482,17 @@ pub async fn object_commerce_object_id_status_delete(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&clear_status_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -11992,6 +14525,17 @@ pub async fn object_event_players_object_id_claim_post(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&event_claim_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12024,6 +14568,17 @@ pub async fn object_event_players_object_id_get(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12055,6 +14610,9 @@ pub async fn object_event_players_object_id_score_put(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&event_score_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12087,6 +14645,17 @@ pub async fn object_events_object_id_content_delete(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12118,6 +14687,17 @@ pub async fn object_events_object_id_content_put(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&set_content_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12150,6 +14730,17 @@ pub async fn object_events_object_id_end_phase_put(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&event_phase_end_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12182,6 +14773,17 @@ pub async fn object_events_object_id_get(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12213,6 +14815,17 @@ pub async fn object_events_object_id_ping_get(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12244,6 +14857,17 @@ pub async fn object_events_object_id_refresh_put(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12285,6 +14909,9 @@ pub async fn object_group_users_object_id_availability_get(configuration: &confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12316,6 +14943,9 @@ pub async fn object_group_users_object_id_get(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12347,6 +14977,9 @@ pub async fn object_group_users_object_id_group_post(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&group_create);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12379,6 +15012,9 @@ pub async fn object_group_users_object_id_join_delete(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&group_membership_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12411,6 +15047,9 @@ pub async fn object_group_users_object_id_join_post(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&group_membership_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12443,6 +15082,9 @@ pub async fn object_group_users_object_id_recommended_get(configuration: &config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12508,6 +15150,9 @@ pub async fn object_group_users_object_id_search_get(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12539,6 +15184,17 @@ pub async fn object_groups_object_id_apply_post(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&group_application);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12571,6 +15227,9 @@ pub async fn object_groups_object_id_delete(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&disband_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12603,6 +15262,17 @@ pub async fn object_groups_object_id_donations_claim_put(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12634,6 +15304,17 @@ pub async fn object_groups_object_id_donations_post(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&create_donation_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12666,6 +15347,17 @@ pub async fn object_groups_object_id_donations_put(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&make_donation_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12698,6 +15390,9 @@ pub async fn object_groups_object_id_get(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12729,6 +15424,17 @@ pub async fn object_groups_object_id_invite_post(configuration: &configuration::
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&group_invite);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12761,6 +15467,9 @@ pub async fn object_groups_object_id_kick_post(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&kick_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12793,6 +15502,9 @@ pub async fn object_groups_object_id_member_delete(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&kick_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12825,6 +15537,17 @@ pub async fn object_groups_object_id_petition_post(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&group_application);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12857,6 +15580,9 @@ pub async fn object_groups_object_id_put(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&group_update);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12889,6 +15615,17 @@ pub async fn object_groups_object_id_role_put(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&role_change_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -12924,6 +15661,9 @@ pub async fn object_inventory_object_id_get(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12955,6 +15695,9 @@ pub async fn object_inventory_object_id_multipliers_get(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -12986,6 +15729,9 @@ pub async fn object_inventory_object_id_post(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&inventory_query_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13018,6 +15764,9 @@ pub async fn object_inventory_object_id_preview_put(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&inventory_update_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13050,6 +15799,9 @@ pub async fn object_inventory_object_id_proxy_reload_put(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13081,6 +15833,9 @@ pub async fn object_inventory_object_id_put(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&inventory_update_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13113,6 +15868,17 @@ pub async fn object_inventory_object_id_transaction_delete(configuration: &confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&end_transaction_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13145,6 +15911,17 @@ pub async fn object_inventory_object_id_transfer_put(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&transfer_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13177,6 +15954,17 @@ pub async fn object_leaderboards_object_id_assignment_delete(configuration: &con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&leaderboard_remove_cache_entry_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13209,6 +15997,17 @@ pub async fn object_leaderboards_object_id_assignment_get(configuration: &config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13240,6 +16039,17 @@ pub async fn object_leaderboards_object_id_delete(configuration: &configuration:
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13277,6 +16087,17 @@ pub async fn object_leaderboards_object_id_details_get(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13308,6 +16129,17 @@ pub async fn object_leaderboards_object_id_entries_delete(configuration: &config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13339,6 +16171,17 @@ pub async fn object_leaderboards_object_id_entry_delete(configuration: &configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&leaderboard_remove_entry_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13371,6 +16214,9 @@ pub async fn object_leaderboards_object_id_entry_put(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&leaderboard_add_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13403,6 +16249,17 @@ pub async fn object_leaderboards_object_id_freeze_put(configuration: &configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13434,6 +16291,17 @@ pub async fn object_leaderboards_object_id_friends_get(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13468,6 +16336,9 @@ pub async fn object_leaderboards_object_id_matches_get(configuration: &configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13500,6 +16371,17 @@ pub async fn object_leaderboards_object_id_membership_get(configuration: &config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13532,6 +16414,17 @@ pub async fn object_leaderboards_object_id_partition_get(configuration: &configu
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13563,6 +16456,17 @@ pub async fn object_leaderboards_object_id_post(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&leaderboard_create_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13596,6 +16500,9 @@ pub async fn object_leaderboards_object_id_ranks_get(configuration: &configurati
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13627,6 +16534,17 @@ pub async fn object_leaderboards_object_id_swap_put(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&leaderboard_swap_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13677,6 +16595,9 @@ pub async fn object_leaderboards_object_id_view_get(configuration: &configuratio
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13708,6 +16629,9 @@ pub async fn object_mail_object_id_accept_many_put(configuration: &configuration
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&accept_multiple_attachments);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13740,6 +16664,17 @@ pub async fn object_mail_object_id_bulk_post(configuration: &configuration::Conf
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&bulk_send_mail_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13772,6 +16707,9 @@ pub async fn object_mail_object_id_bulk_put(configuration: &configuration::Confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&bulk_update_mail_object_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13804,6 +16742,9 @@ pub async fn object_mail_object_id_categories_get(configuration: &configuration:
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13836,6 +16777,9 @@ pub async fn object_mail_object_id_detail_get(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13867,6 +16811,9 @@ pub async fn object_mail_object_id_get(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -13898,6 +16845,17 @@ pub async fn object_mail_object_id_post(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&send_mail_object_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13930,6 +16888,9 @@ pub async fn object_mail_object_id_put(configuration: &configuration::Configurat
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&update_mail_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13962,6 +16923,9 @@ pub async fn object_mail_object_id_search_post(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&mail_search_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -13994,6 +16958,9 @@ pub async fn object_payments_object_id_get(configuration: &configuration::Config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -14028,6 +16995,17 @@ pub async fn object_stats_object_id_client_get(configuration: &configuration::Co
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -14059,6 +17037,17 @@ pub async fn object_stats_object_id_client_post(configuration: &configuration::C
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&stat_update_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -14091,6 +17080,17 @@ pub async fn object_stats_object_id_client_stringlist_post(configuration: &confi
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&stat_update_request_string_list_format);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -14123,6 +17123,17 @@ pub async fn object_stats_object_id_delete(configuration: &configuration::Config
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&stat_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -14158,6 +17169,17 @@ pub async fn object_stats_object_id_get(configuration: &configuration::Configura
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;
@@ -14189,6 +17211,17 @@ pub async fn object_stats_object_id_post(configuration: &configuration::Configur
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_apikey) = local_var_configuration.api_key {
+        let local_var_key = local_var_apikey.key.clone();
+        let local_var_value = match local_var_apikey.prefix {
+            Some(ref local_var_prefix) => format!("{} {}", local_var_prefix, local_var_key),
+            None => local_var_key,
+        };
+        local_var_req_builder = local_var_req_builder.header("X-DE-SIGNATURE", local_var_value);
+    };
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
     local_var_req_builder = local_var_req_builder.json(&stat_update_request);
 
     let local_var_req = local_var_req_builder.build()?;
@@ -14221,6 +17254,9 @@ pub async fn object_tournaments_object_id_get(configuration: &configuration::Con
     if let Some(local_var_param_value) = x_beam_gamertag {
         local_var_req_builder = local_var_req_builder.header("X-BEAM-GAMERTAG", local_var_param_value.to_string());
     }
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
+        local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
+    };
 
     let local_var_req = local_var_req_builder.build()?;
     let local_var_resp = local_var_client.execute(local_var_req).await?;

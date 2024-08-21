@@ -82,7 +82,7 @@ impl Command for InventoryAddCommand {
             }
         }
 
-        let id = context.id().unwrap_or(0).to_string();
+        let id = context.get_gamer_tag().unwrap_or(0).to_string();
         let data = InventoryUpdateRequest {
             new_items: Some(
                 self.new_items
@@ -206,7 +206,7 @@ impl Command for InventoryGetCommand {
             }
         }
 
-        let id = context.id().unwrap_or(0).to_string();
+        let id = context.get_gamer_tag().unwrap_or(0).to_string();
         let (tx, task) = crossbeam_channel::bounded(1);
 
         thread_pool
@@ -227,7 +227,7 @@ impl Command for InventoryGetCommand {
                         &config,
                                     &x_beam_scope,
                         &id,
-                        Some(&id),
+                        None,
                         Some(&self.scope),
                     )
                     .await

@@ -36,20 +36,18 @@ pub mod macros {
                             config.bearer_access_token = Some(access_token.clone());
                         }
                     }
-                    let id = context.id().unwrap_or(0).to_string();
                     let (tx, task) = crossbeam_channel::bounded(1);
 
                     thread_pool
                         .spawn(async move {
                             let x_beam_scope = config.api_key.clone().unwrap().key;
-                            let id = id.clone();
 
                             #[cfg(target_family = "wasm")]
-                            let r = $call_from_open_api(&config, &x_beam_scope, Some(&id)).await;
+                            let r = $call_from_open_api(&config, &x_beam_scope, None).await;
 
                             #[cfg(not(target_family = "wasm"))]
                             let r = async_compat::Compat::new(async {
-                                $call_from_open_api(&config, &x_beam_scope, Some(&id)).await
+                                $call_from_open_api(&config, &x_beam_scope, None).await
                             })
                             .await;
                             println!("{:#?}", r);
@@ -248,7 +246,7 @@ pub mod macros {
                         }
                     }
                     let request_data = Some((*self).clone());
-                    let id = context.id().unwrap_or(0).to_string();
+                    let id = context.get_gamer_tag().unwrap_or(0).to_string();
                     let (tx, task) = crossbeam_channel::bounded(1);
 
                     thread_pool
