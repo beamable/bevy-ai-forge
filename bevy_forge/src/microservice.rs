@@ -1,4 +1,4 @@
-use crate::beam::utils::macros::{create_request, create_request_no_args};
+use crate::beam::utils::macros::{create_request, create_old_request_no_args};
 use beam_microservice::apis::uncategorized_api::*;
 use beam_microservice::models::*;
 use beam_microservice::*;
@@ -22,7 +22,7 @@ create_request!(
     bool,
     SellSwordPostError
 );
-create_request_no_args!(
+create_old_request_no_args!(
     RequestStartForgingTask,
     MicroserviceStartForging,
     StartForgingEventCompleted,
