@@ -60,7 +60,6 @@ Method | HTTP request | Description
 [**basic_cloudsaving_data_delete**](DefaultApi.md#basic_cloudsaving_data_delete) | **DELETE** /basic/cloudsaving/data | 
 [**basic_cloudsaving_data_download_url_from_portal_post**](DefaultApi.md#basic_cloudsaving_data_download_url_from_portal_post) | **POST** /basic/cloudsaving/data/downloadURLFromPortal | 
 [**basic_cloudsaving_data_download_url_post**](DefaultApi.md#basic_cloudsaving_data_download_url_post) | **POST** /basic/cloudsaving/data/downloadURL | 
-[**basic_cloudsaving_data_metadata_get**](DefaultApi.md#basic_cloudsaving_data_metadata_get) | **GET** /basic/cloudsaving/data/metadata | 
 [**basic_cloudsaving_data_move_from_portal_put**](DefaultApi.md#basic_cloudsaving_data_move_from_portal_put) | **PUT** /basic/cloudsaving/data/moveFromPortal | 
 [**basic_cloudsaving_data_move_put**](DefaultApi.md#basic_cloudsaving_data_move_put) | **PUT** /basic/cloudsaving/data/move | 
 [**basic_cloudsaving_data_replace_post**](DefaultApi.md#basic_cloudsaving_data_replace_post) | **POST** /basic/cloudsaving/data/replace | 
@@ -2033,37 +2032,6 @@ Name | Type | Description  | Required | Notes
 ### HTTP request headers
 
 - **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-
-## basic_cloudsaving_data_metadata_get
-
-> models::ObjectsMetadataResponse basic_cloudsaving_data_metadata_get(x_beam_scope, x_beam_gamertag, request, player_id)
-
-
-### Parameters
-
-
-Name | Type | Description  | Required | Notes
-------------- | ------------- | ------------- | ------------- | -------------
-**x_beam_scope** | **String** | Customer and project scope. This should be in the form of '<customer-id>.<project-id>'. | [required] |
-**x_beam_gamertag** | Option<**String**> | Override the Gamer Tag of the player. This is generally inferred by the auth token. |  |
-**request** | Option<[**Vec<models::ObjectRequest>**](models::ObjectRequest.md)> |  |  |
-**player_id** | Option<**i64**> |  |  |
-
-### Return type
-
-[**models::ObjectsMetadataResponse**](ObjectsMetadataResponse.md)
-
-### Authorization
-
-[server](../README.md#server), [user](../README.md#user)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
