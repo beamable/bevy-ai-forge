@@ -1,9 +1,8 @@
 use bevy::prelude::*;
 use bevy_button_released_plugin::ButtonReleasedEvent;
 use bevy_simple_text_input::{TextInputSettings, TextInputValue};
-
+use bevy_beam_sdk::{api::BeamableBasicApi, context::BeamContext};
 use crate::{
-    beam::{api::BeamableBasicApi, context::BeamContext},
     consts::{self, BORDER_COLOR, FRAME_BG_COLOR, INTERACTIVE_BG_COLOR},
     game::components::{GameRoot, LoadingIndicator, LoginScreenButton, LoginScreenObject},
     utils::despawn_recursive_by_component,
@@ -23,7 +22,7 @@ impl Plugin for LoginScreenStatePlugin {
                 despawn_recursive_by_component::<LoginScreenObject>,
             )
             .add_systems(
-                OnEnter(crate::beam::state::BeamableInitStatus::FullyInitialized),
+                OnEnter(bevy_beam_sdk::state::BeamableInitStatus::FullyInitialized),
                 (|mut next_state: ResMut<NextState<super::MainGameState>>| {
                     next_state.set(super::MainGameState::Menu);
                 })
@@ -55,10 +54,11 @@ fn handle_buttons(
         };
         match button {
             LoginScreenButton::PlayAsGuest => {
-                let mut new_user =
-                    beam_autogen_rs::models::TokenRequestWrapper::new("guest".to_string());
-                new_user.username = beam.name.clone();
-                cmd.beam_new_user(new_user);
+                // let mut new_user =
+                //     beam_autogen_rs::models::TokenRequestWrapper::new("guest".to_string());
+                // new_user.username = beam.name.clone();
+                // cmd.beam_new_user(new_user);
+                cmd.beam_play_as_guest(beam.name.clone());
                 cmd.entity(**event).remove::<Interaction>();
                 for (mut s, login, loading) in q1.iter_mut() {
                     if loading.is_some() {

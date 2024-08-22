@@ -1,10 +1,14 @@
 use beam_microservice::models::SellSwordRequestArgs;
 use bevy::{prelude::*, time::common_conditions::on_timer};
+use bevy_beam_sdk::{
+    api::BeamableBasicApi,
+    context::{BeamInventory, ItemProperty},
+    state::BeamableInitStatus,
+};
 use bevy_button_released_plugin::ButtonReleasedEvent;
 use bevy_simple_scroll_view::*;
 
 use crate::{
-    beam::{api::BeamableBasicApi, context::BeamInventory, state::BeamableInitStatus},
     consts::{self, *},
     game::components::*,
     microservice::{MicroserviceSellSword, MicroserviceStartForging},
@@ -310,7 +314,7 @@ fn update_inventory(
     if let Some(swords) = inv.items.get("items.AiItemContent.AiSword") {
         let mut it = swords.clone();
         for item in it.iter_mut() {
-            item.properties.push(crate::beam::context::ItemProperty {
+            item.properties.push(ItemProperty {
                 name: "type".to_owned(),
                 value: "sword".to_owned(),
             })
@@ -320,7 +324,7 @@ fn update_inventory(
     if let Some(shields) = inv.items.get("items.AiItemContent.AiShield") {
         let mut it = shields.clone();
         for item in it.iter_mut() {
-            item.properties.push(crate::beam::context::ItemProperty {
+            item.properties.push(ItemProperty {
                 name: "type".to_owned(),
                 value: "shield".to_owned(),
             })
@@ -335,7 +339,7 @@ fn update_inventory(
             commands.entity(e).despawn_recursive();
         }
     }
-    let binding = crate::beam::context::ItemProperty {
+    let binding = ItemProperty {
         name: "type".to_owned(),
         value: "sword".to_owned(),
     };

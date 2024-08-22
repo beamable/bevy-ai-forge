@@ -1,4 +1,4 @@
-use crate::beam::utils::macros::{create_request, create_old_request_no_args};
+use bevy_beam_sdk::utils::macros::{create_request, create_old_request_no_args};
 use beam_microservice::apis::uncategorized_api::*;
 use beam_microservice::models::*;
 use beam_microservice::*;

@@ -62,9 +62,9 @@ impl Command for InventoryAddCommand {
             .get_resource::<crate::requests::ReqwestClient>()
             .unwrap();
         let context = world
-            .get_resource::<crate::beam::context::BeamContext>()
+            .get_resource::<crate::context::BeamContext>()
             .unwrap();
-        let config = world.get_resource::<crate::beam::config::Config>().unwrap();
+        let config = world.get_resource::<crate::config::BeamableConfig>().unwrap();
         let thread_pool = bevy::tasks::IoTaskPool::get();
 
         let api_key = Some(apis::configuration::ApiKey {
@@ -186,9 +186,9 @@ impl Command for InventoryGetCommand {
             .get_resource::<crate::requests::ReqwestClient>()
             .unwrap();
         let context = world
-            .get_resource::<crate::beam::context::BeamContext>()
+            .get_resource::<crate::context::BeamContext>()
             .unwrap();
-        let config = world.get_resource::<crate::beam::config::Config>().unwrap();
+        let config = world.get_resource::<crate::config::BeamableConfig>().unwrap();
         let thread_pool = bevy::tasks::IoTaskPool::get();
 
         let api_key = Some(apis::configuration::ApiKey {

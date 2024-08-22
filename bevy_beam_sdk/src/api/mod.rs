@@ -1,12 +1,14 @@
-use beam_autogen_rs::models::TokenRequestWrapper;
 use beam_autogen_rs::models::AttachExternalIdentityApiRequest;
+use beam_autogen_rs::models::TokenRequestWrapper;
 use bevy::prelude::*;
 
 pub mod accounts;
 pub mod common;
 pub mod inventory;
 
-pub(crate) trait BeamableBasicApi {
+#[allow(dead_code)]
+pub trait BeamableBasicApi {
+    fn beam_play_as_guest<S: Into<std::string::String>>(&mut self, name: Option<S>) -> &mut Self;
     fn beam_new_user(&mut self, wrapper: TokenRequestWrapper) -> &mut Self;
     fn beam_attach_federated_identity(
         &mut self,
@@ -20,6 +22,16 @@ pub(crate) trait BeamableBasicApi {
 }
 
 impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
+    fn beam_play_as_guest<S: Into<std::string::String>>(&mut self, name: Option<S>) -> &mut Self {
+        let mut new_user = beam_autogen_rs::models::TokenRequestWrapper::new("guest".to_string());
+        new_user.username = if name.is_some() {
+            Some(name.unwrap().into())
+        } else {
+            None
+        };
+        self.add(common::CreateAnononymousUser(new_user));
+        self
+    }
     fn beam_new_user(&mut self, wrapper: TokenRequestWrapper) -> &mut Self {
         self.add(common::CreateAnononymousUser(wrapper));
         self

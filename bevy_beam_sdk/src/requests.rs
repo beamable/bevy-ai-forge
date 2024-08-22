@@ -4,6 +4,7 @@ use bevy::prelude::*;
 /// Wrapper around the ReqwestClient, that when inserted as a resource will start connection pools towards
 /// the hosts, and also allows all the configuration from the ReqwestLibrary such as setting default headers etc
 pub struct ReqwestClient(pub reqwest::Client);
+
 impl Default for ReqwestClient {
     fn default() -> Self {
         Self(reqwest::Client::new())

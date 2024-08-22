@@ -3,6 +3,7 @@ resolver = "2"
 
 members = [
     "beam_microservice",
+    "bevy_beam_sdk",
     "bevy_forge",
 ]
 

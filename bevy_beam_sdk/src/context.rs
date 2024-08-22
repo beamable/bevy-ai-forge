@@ -9,8 +9,8 @@ use serde::{Deserialize, Serialize};
 use super::api::accounts::{AttachFederatedIdentityCompletedEvent, GetAccountMeCompletedEvent};
 use super::api::common::{CreateAnononymousUserCompletedEvent, GetTokenEvent, PostTokenEvent};
 use super::api::inventory::InventoryGetCompletedEvent;
-use crate::beam::api::BeamableBasicApi;
-use crate::beam::config::BeamExternalIdentityConfig;
+use crate::api::BeamableBasicApi;
+use crate::config::BeamExternalIdentityConfig;
 use beam_autogen_rs::models::*;
 
 #[derive(Serialize, Debug, Deserialize, Resource, Reflect, Default)]

@@ -1,4 +1,4 @@
-use crate::beam::utils::macros::create_request_with_scope;
+use crate::utils::macros::create_request_with_scope;
 use beam_autogen_rs::apis::default_api::*;
 use beam_autogen_rs::*;
 use bevy::prelude::*;

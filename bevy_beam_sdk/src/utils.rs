@@ -1,4 +1,5 @@
 pub mod macros {
+    #[macro_export]
     macro_rules! create_request_no_args {
         (
             $task_name: ident,
@@ -17,9 +18,9 @@ pub mod macros {
                         .get_resource::<crate::requests::ReqwestClient>()
                         .unwrap();
                     let context = world
-                        .get_resource::<crate::beam::context::BeamContext>()
+                        .get_resource::<crate::context::BeamContext>()
                         .unwrap();
-                    let config = world.get_resource::<crate::beam::config::Config>().unwrap();
+                    let config = world.get_resource::<crate::config::BeamableConfig>().unwrap();
                     let thread_pool = bevy::tasks::IoTaskPool::get();
 
                     let api_key = Some(apis::configuration::ApiKey {
@@ -103,6 +104,7 @@ pub mod macros {
             }
         };
     }
+    #[macro_export]
     macro_rules! create_request {
         (
             $task_name: ident,
@@ -119,12 +121,12 @@ pub mod macros {
             impl bevy::ecs::world::Command for $command {
                 fn apply(self, world: &mut World) {
                     let request_client = world
-                        .get_resource::<crate::requests::ReqwestClient>()
+                        .get_resource::<bevy_beam_sdk::requests::ReqwestClient>()
                         .unwrap();
                     let context = world
-                        .get_resource::<crate::beam::context::BeamContext>()
+                        .get_resource::<bevy_beam_sdk::context::BeamContext>()
                         .unwrap();
-                    let config = world.get_resource::<crate::beam::config::Config>().unwrap();
+                    let config = world.get_resource::<bevy_beam_sdk::config::BeamableConfig>().unwrap();
                     let thread_pool = bevy::tasks::IoTaskPool::get();
 
                     let api_key = Some(apis::configuration::ApiKey {
@@ -207,6 +209,7 @@ pub mod macros {
             }
         };
     }
+    #[macro_export]
     macro_rules! create_request_with_scope {
         (
             $task_name: ident,
@@ -226,9 +229,9 @@ pub mod macros {
                         .get_resource::<crate::requests::ReqwestClient>()
                         .unwrap();
                     let context = world
-                        .get_resource::<crate::beam::context::BeamContext>()
+                        .get_resource::<crate::context::BeamContext>()
                         .unwrap();
-                    let config = world.get_resource::<crate::beam::config::Config>().unwrap();
+                    let config = world.get_resource::<crate::config::BeamableConfig>().unwrap();
                     let thread_pool = bevy::tasks::IoTaskPool::get();
 
                     let api_key = Some(apis::configuration::ApiKey {
@@ -321,6 +324,7 @@ pub mod macros {
             }
         };
     }
+    #[macro_export]
     macro_rules! create_old_request_no_args {
         (
             $task_name: ident,
@@ -336,12 +340,12 @@ pub mod macros {
             impl bevy::ecs::world::Command for $command {
                 fn apply(self, world: &mut World) {
                     let request_client = world
-                        .get_resource::<crate::requests::ReqwestClient>()
+                        .get_resource::<bevy_beam_sdk::requests::ReqwestClient>()
                         .unwrap();
                     let context = world
-                        .get_resource::<crate::beam::context::BeamContext>()
+                        .get_resource::<bevy_beam_sdk::context::BeamContext>()
                         .unwrap();
-                    let config = world.get_resource::<crate::beam::config::Config>().unwrap();
+                    let config = world.get_resource::<bevy_beam_sdk::config::BeamableConfig>().unwrap();
                     let thread_pool = bevy::tasks::IoTaskPool::get();
 
                     let api_key = Some(apis::configuration::ApiKey {
@@ -424,8 +428,8 @@ pub mod macros {
         };
     }
 
-    pub(crate) use create_old_request_no_args;
-    pub(crate) use create_request;
-    pub(crate) use create_request_no_args;
-    pub(crate) use create_request_with_scope;
+    pub use create_old_request_no_args;
+    pub use create_request;
+    pub use create_request_no_args;
+    pub use create_request_with_scope;
 }

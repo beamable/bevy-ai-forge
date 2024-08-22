@@ -37,5 +37,5 @@ mio = "1"
 [dependencies.beam_microservice]
 path = "../beam_microservice"
 
-[dependencies.beam_autogen_rs]
-git = "https://github.com/beamable/beam_autogen_rs"
+[dependencies.bevy_beam_sdk]
+path = "../bevy_beam_sdk"

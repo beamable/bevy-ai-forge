@@ -1,4 +1,3 @@
-use crate::requests::RequestsPlugin;
 use bevy::prelude::*;
 
 use self::{api::BeamableBasicApi, context::BeamContext};
@@ -6,20 +5,22 @@ use self::{api::BeamableBasicApi, context::BeamContext};
 pub mod api;
 pub mod config;
 pub mod context;
+pub mod requests;
 pub mod state;
 pub mod utils;
 
+/// A `Plugin` providing the bsystems and components required to make Beamable SDK work.
 pub struct BeamPlugin;
 
 impl Plugin for BeamPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.init_resource::<config::Config>()
-            .register_type::<config::Config>()
+        app
+            .register_type::<config::BeamableConfig>()
             .register_type::<config::BeamExternalIdentityConfig>()
             .register_type::<context::BeamContext>()
             .register_type::<context::BeamInventory>()
             .init_state::<state::BeamableInitStatus>()
-            .add_plugins(RequestsPlugin)
+            .add_plugins(crate::requests::RequestsPlugin)
             .add_systems(
                 Update,
                 context::save_user_info
@@ -30,7 +31,7 @@ impl Plugin for BeamPlugin {
                 (|mut next_state: ResMut<NextState<state::BeamableInitStatus>>| {
                     next_state.set(state::BeamableInitStatus::WaitingForCredentials);
                 })
-                .run_if(resource_added::<config::Config>),
+                .run_if(resource_added::<config::BeamableConfig>),
             )
             .add_systems(
                 OnEnter(state::BeamableInitStatus::WaitingForCredentials),

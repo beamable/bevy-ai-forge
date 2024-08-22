@@ -623,6 +623,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_beam_sdk"
+version = "0.1.0"
+dependencies = [
+ "async-compat",
+ "beam_autogen_rs",
+ "bevy",
+ "bevy_pkv",
+ "crossbeam-channel",
+ "mio 1.0.2",
+ "reqwest",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "bevy_button_released_plugin"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -805,11 +820,11 @@ name = "bevy_forge"
 version = "0.1.0"
 dependencies = [
  "async-compat",
- "beam_autogen_rs",
  "beam_microservice",
  "bevy",
  "bevy-inspector-egui",
  "bevy_args",
+ "bevy_beam_sdk",
  "bevy_button_released_plugin",
  "bevy_egui 0.29.0",
  "bevy_pkv",
