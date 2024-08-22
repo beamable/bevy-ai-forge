@@ -1,5 +1,5 @@
 use beam::BeamPlugin;
-use bevy::{asset::AssetMetaCheck, prelude::*};
+use bevy::prelude::*;
 use bevy_args::BevyArgsPlugin;
 use debug::DebugPlugin;
 use utils::GameArgs;
@@ -16,7 +16,6 @@ pub mod utils;
 fn main() {
     App::new()
         .insert_resource(ClearColor(consts::MY_BG_COLOR))
-        .insert_resource(AssetMetaCheck::Never)
         .insert_resource(beam::config::BeamExternalIdentityConfig {
             provider_service: "ForgeService".to_string(),
             provider_namespace: "OpenAI".to_string(),

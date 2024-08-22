@@ -1,6 +1,6 @@
 use beam_autogen_rs::apis::default_api::*;
 use beam_autogen_rs::*;
-use bevy::ecs::system::Command;
+use bevy::ecs::world::Command;
 use bevy::prelude::*;
 use models::{CommonResponse, InventoryUpdateRequest, InventoryView, ItemCreateRequest};
 

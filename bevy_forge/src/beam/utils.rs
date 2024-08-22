@@ -11,7 +11,7 @@ pub mod macros {
             #[derive(Debug, Default)]
             pub struct $command;
 
-            impl bevy::ecs::system::Command for $command {
+            impl bevy::ecs::world::Command for $command {
                 fn apply(self, world: &mut World) {
                     let request_client = world
                         .get_resource::<crate::requests::ReqwestClient>()
@@ -116,7 +116,7 @@ pub mod macros {
             #[derive(Debug, Deref, DerefMut)]
             pub struct $command(pub $call_args_type);
 
-            impl bevy::ecs::system::Command for $command {
+            impl bevy::ecs::world::Command for $command {
                 fn apply(self, world: &mut World) {
                     let request_client = world
                         .get_resource::<crate::requests::ReqwestClient>()
@@ -220,7 +220,7 @@ pub mod macros {
             #[derive(Debug, Deref, DerefMut)]
             pub struct $command(pub $call_args_type);
 
-            impl bevy::ecs::system::Command for $command {
+            impl bevy::ecs::world::Command for $command {
                 fn apply(self, world: &mut World) {
                     let request_client = world
                         .get_resource::<crate::requests::ReqwestClient>()
@@ -333,7 +333,7 @@ pub mod macros {
             #[derive(Debug, Default)]
             pub struct $command;
 
-            impl bevy::ecs::system::Command for $command {
+            impl bevy::ecs::world::Command for $command {
                 fn apply(self, world: &mut World) {
                     let request_client = world
                         .get_resource::<crate::requests::ReqwestClient>()

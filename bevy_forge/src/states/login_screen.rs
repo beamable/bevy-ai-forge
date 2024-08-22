@@ -158,6 +158,7 @@ fn setup(
                         .with_value("NewUser")
                         .with_settings(TextInputSettings {
                             retain_on_submit: true,
+                            mask_character: None
                         }),
                     LoginScreenObject,
                 ));
