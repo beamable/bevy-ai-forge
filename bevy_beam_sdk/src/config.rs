@@ -9,6 +9,12 @@ pub struct BeamableConfig {
     pub pid: String,
 }
 
+impl BeamableConfig{
+    pub fn get_x_beam_scope(&self) -> String {
+        format!("{}.{}", self.cid, self.pid)
+    }
+}
+
 #[derive(Deserialize, Debug, Clone, Default, Resource, Reflect)]
 #[reflect(Resource)]
 pub struct BeamExternalIdentityConfig {

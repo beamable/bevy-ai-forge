@@ -2,7 +2,7 @@ use beam_microservice::models::SellSwordRequestArgs;
 use bevy::{prelude::*, time::common_conditions::on_timer};
 use bevy_beam_sdk::{
     api::BeamableBasicApi,
-    context::{BeamInventory, ItemProperty},
+    context::{BeamContext, BeamInventory, ItemProperty},
     state::BeamableInitStatus,
 };
 use bevy_button_released_plugin::ButtonReleasedEvent;
@@ -11,7 +11,7 @@ use bevy_simple_scroll_view::*;
 use crate::{
     consts::{self, *},
     game::components::*,
-    microservice::{MicroserviceSellSword, MicroserviceStartForging},
+    microservice::MicroserviceSellSword
 };
 
 #[derive(Resource, Reflect, Default)]
@@ -37,11 +37,11 @@ impl Plugin for GameStatePlugin {
             .init_resource::<ItemsOnSale>()
             .add_systems(
                 Update,
-                (|mut cmd: Commands, init_status: Res<State<BeamableInitStatus>>| {
+                (|mut cmd: Commands, init_status: Res<State<BeamableInitStatus>>, ctx: Res<BeamContext>| {
                     if !init_status.eq(&BeamableInitStatus::FullyInitialized) {
                         return;
                     }
-                    cmd.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
+                    cmd.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()), ctx.get_gamer_tag().unwrap().to_string());
                 })
                 .run_if(on_timer(std::time::Duration::from_secs(1))),
             );
@@ -53,13 +53,13 @@ fn sell_sword_pressed(
     mut sword_sell_event: EventReader<crate::microservice::SellSwordEventCompleted>,
     q: Query<(Entity, &SellItemButton, &Parent)>,
     mut cmd: Commands,
-    mut on_sale: ResMut<ItemsOnSale>,
+    mut on_sale: ResMut<ItemsOnSale>, ctx: Res<BeamContext>,
 ) {
     for event in events.read() {
         if let Ok(button) = q.get(**event) {
-            cmd.add(MicroserviceSellSword(SellSwordRequestArgs {
+            cmd.add(MicroserviceSellSword(Some(SellSwordRequestArgs {
                 item_id: button.1 .0.clone(),
-            }));
+            })));
             cmd.entity(button.0).remove::<Interaction>();
             on_sale.0.push(button.1 .0.clone());
             if let Some(entity_commands) = cmd.get_entity(button.2.get()) {
@@ -68,7 +68,7 @@ fn sell_sword_pressed(
         };
     }
     for _ in sword_sell_event.read() {
-        cmd.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
+        cmd.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()), ctx.get_gamer_tag().unwrap().to_string());
     }
 }
 
@@ -280,7 +280,7 @@ fn add_currency_text(
 
 fn handle_buttons(
     mut reader: EventReader<ButtonReleasedEvent>,
-    q: Query<&GameplayButton>,
+    q: Query<&GameplayButton>, ctx: Res<BeamContext>,
     mut commands: Commands,
 ) {
     for event in reader.read() {
@@ -289,11 +289,11 @@ fn handle_buttons(
         };
         match button {
             GameplayButton::StartForgingSword => {
-                commands.add(MicroserviceStartForging);
-                // commands.beam_add_to_inventory(vec!["items.AiItemContent.AiSword".into()]);
+                // commands.add(MicroserviceStartForging);
+                commands.beam_add_to_inventory(vec!["items.AiItemContent.AiSword".into()], ctx.get_gamer_tag().unwrap().to_string());
             }
             GameplayButton::StartForgingShield => {
-                commands.beam_add_to_inventory(vec!["items.AiItemContent.AiShield".into()]);
+                commands.beam_add_to_inventory(vec!["items.AiItemContent.AiShield".into()], ctx.get_gamer_tag().unwrap().to_string());
             }
         }
     }

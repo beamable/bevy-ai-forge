@@ -268,7 +268,8 @@ pub fn handle_token_callbacks(
             Ok(data) => {
                 beam.token.as_mut().unwrap().access_token = Some(data.token.clone());
                 beam.gamer_tag = data.gamer_tag;
-                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
+                let target_id = beam.gamer_tag.unwrap().to_string();
+                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()), target_id);
                 commands.beam_get_user_info();
             }
             Err(_) => {
@@ -282,7 +283,8 @@ pub fn handle_token_callbacks(
         match &**event {
             Ok(data) => {
                 beam.token = Some(TokenStorage::from_token_response(data));
-                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
+                let target_id = beam.gamer_tag.unwrap().to_string();
+                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()),target_id);
                 commands.beam_get_user_info();
             }
             Err(_) => {}
