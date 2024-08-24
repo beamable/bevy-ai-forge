@@ -37,13 +37,14 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
                 .unwrap()
                 .get_x_beam_scope();
 
-            world.commands().add(common::CreateAnononymousUser(
-                beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
+            world.commands().add(common::CreateAnononymousUser {
+                data: beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
                     token_request_wrapper: Some(new_user),
                 },
-            ))
+                entity: None,
+            })
         });
         self
     }
@@ -53,13 +54,14 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(common::CreateAnononymousUser(
-                beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
+            world.commands().add(common::CreateAnononymousUser {
+                data: beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
                     token_request_wrapper: Some(wrapper),
                 },
-            ))
+                entity: None,
+            })
         });
         self
     }
@@ -72,13 +74,14 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(accounts::AttachFederatedIdentity(
-                beam_autogen_rs::apis::default_api::BasicAccountsExternalIdentityPostParams {
+            world.commands().add(accounts::AttachFederatedIdentity {
+                data: beam_autogen_rs::apis::default_api::BasicAccountsExternalIdentityPostParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
                     attach_external_identity_api_request: Some(wrapper),
                 },
-            ))
+                entity: None,
+            })
         });
         self
     }
@@ -88,12 +91,13 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(accounts::GetAccountMe(
-                beam_autogen_rs::apis::default_api::BasicAccountsMeGetParams {
+            world.commands().add(accounts::GetAccountMe {
+                data: beam_autogen_rs::apis::default_api::BasicAccountsMeGetParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
                 },
-            ))
+                entity: None,
+            })
         });
         self
     }
@@ -103,13 +107,14 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(common::GetToken(
-                beam_autogen_rs::apis::default_api::BasicAuthTokenGetParams {
+            world.commands().add(common::GetToken {
+                data: beam_autogen_rs::apis::default_api::BasicAuthTokenGetParams {
                     x_beam_scope,
                     token,
                     x_beam_gamertag: None,
                 },
-            ))
+                entity: None,
+            })
         });
         self
     }
@@ -119,8 +124,8 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(common::PostToken(
-                beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
+            world.commands().add(common::PostToken {
+                data: beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
                     token_request_wrapper: Some(TokenRequestWrapper {
@@ -128,7 +133,8 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
                         ..Default::default()
                     }),
                 },
-            ))
+                entity: None,
+            })
         });
         self
     }
@@ -139,14 +145,15 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(inventory::InventoryGet(
-                beam_autogen_rs::apis::default_api::ObjectInventoryObjectIdGetParams {
+            world.commands().add(inventory::InventoryGet {
+                data: beam_autogen_rs::apis::default_api::ObjectInventoryObjectIdGetParams {
                     x_beam_scope,
                     object_id: target_id,
                     x_beam_gamertag: None,
                     scope: Some(val),
                 },
-            ))
+                entity: None,
+            })
         });
         self
     }
@@ -176,14 +183,15 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(inventory::InventoryAdd(
-                beam_autogen_rs::apis::default_api::ObjectInventoryObjectIdPutParams {
+            world.commands().add(inventory::InventoryAdd {
+                data: beam_autogen_rs::apis::default_api::ObjectInventoryObjectIdPutParams {
                     x_beam_scope,
                     object_id: target_id,
                     x_beam_gamertag: None,
                     inventory_update_request: Some(data),
                 },
-            ))
+                entity: None,
+            })
         });
         self
     }

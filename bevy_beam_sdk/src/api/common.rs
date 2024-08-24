@@ -1,35 +1,35 @@
-use crate::utils::macros::create_request_with_args;
+use crate::utils::macros::beam_request;
 use beam_autogen_rs::apis::default_api::*;
 use beam_autogen_rs::*;
 use bevy::prelude::*;
 use models::{Token, TokenResponse};
 
-create_request_with_args!(
+beam_request!(
     CreateAnononymousUserTask,
     CreateAnononymousUser,
     CreateAnononymousUserCompletedEvent,
     beam_autogen_rs::apis::default_api::basic_auth_token_post,
-    BasicAuthTokenPostParams,
     TokenResponse,
-    BasicAuthTokenPostError
+    BasicAuthTokenPostError,
+    BasicAuthTokenPostParams
 );
 
-create_request_with_args!(
+beam_request!(
     GetTokenTask,
     GetToken,
     GetTokenEvent,
     beam_autogen_rs::apis::default_api::basic_auth_token_get,
-    BasicAuthTokenGetParams,
     Token,
-    BasicAuthTokenGetError
+    BasicAuthTokenGetError,
+    BasicAuthTokenGetParams
 );
 
-create_request_with_args!(
+beam_request!(
     PostTokenTask,
     PostToken,
     PostTokenEvent,
     beam_autogen_rs::apis::default_api::basic_auth_token_post,
-    BasicAuthTokenPostParams,
     TokenResponse,
-    BasicAuthTokenPostError
+    BasicAuthTokenPostError,
+    BasicAuthTokenPostParams
 );

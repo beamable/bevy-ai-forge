@@ -1,28 +1,28 @@
-use bevy_beam_sdk::utils::macros::{create_request_with_args, create_request_no_args};
+use bevy_beam_sdk::utils::macros::beam_request;
 use beam_microservice::apis::uncategorized_api::*;
 use beam_microservice::*;
 use bevy::prelude::*;
 use beam_microservice::models::{SayHiRequestArgs,SellSwordRequestArgs};
 
-create_request_with_args!(
+beam_request!(
     RequestSayHiTask,
     MicroserviceSayHi,
     SayHiEventCompleted,
     beam_microservice::apis::uncategorized_api::say_hi_post,
-    Option<SayHiRequestArgs>,
     String,
-    SayHiPostError
+    SayHiPostError,
+    Option<SayHiRequestArgs>
 );
-create_request_with_args!(
+beam_request!(
     RequestSellSwordTask,
     MicroserviceSellSword,
     SellSwordEventCompleted,
     beam_microservice::apis::uncategorized_api::sell_sword_post,
-    Option<SellSwordRequestArgs>,
     bool,
-    SellSwordPostError
+    SellSwordPostError,
+    Option<SellSwordRequestArgs>
 );
-create_request_no_args!(
+beam_request!(
     RequestStartForgingTask,
     MicroserviceStartForging,
     StartForgingEventCompleted,
