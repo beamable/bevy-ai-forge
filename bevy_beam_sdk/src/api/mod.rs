@@ -26,11 +26,7 @@ pub trait BeamableBasicApi {
 impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
     fn beam_play_as_guest<S: Into<std::string::String>>(&mut self, name: Option<S>) -> &mut Self {
         let mut new_user = beam_autogen_rs::models::TokenRequestWrapper::new("guest".to_string());
-        new_user.username = if name.is_some() {
-            Some(name.unwrap().into())
-        } else {
-            None
-        };
+        new_user.username = name.map(|username| username.into());
         self.add(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
