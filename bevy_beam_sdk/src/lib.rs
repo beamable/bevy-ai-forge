@@ -14,8 +14,7 @@ pub struct BeamPlugin;
 
 impl Plugin for BeamPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app
-            .register_type::<config::BeamableConfig>()
+        app.register_type::<config::BeamableConfig>()
             .register_type::<config::BeamExternalIdentityConfig>()
             .register_type::<context::BeamContext>()
             .register_type::<context::BeamInventory>()

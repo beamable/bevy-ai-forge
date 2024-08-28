@@ -1,12 +1,12 @@
-use bevy::prelude::*;
-use bevy_button_released_plugin::ButtonReleasedEvent;
-use bevy_simple_text_input::{TextInputSettings, TextInputValue};
-use bevy_beam_sdk::{api::BeamableBasicApi, context::BeamContext};
 use crate::{
     consts::{self, BORDER_COLOR, FRAME_BG_COLOR, INTERACTIVE_BG_COLOR},
     game::components::{GameRoot, LoadingIndicator, LoginScreenButton, LoginScreenObject},
     utils::despawn_recursive_by_component,
 };
+use bevy::prelude::*;
+use bevy_beam_sdk::{api::BeamableBasicApi, context::BeamContext};
+use bevy_button_released_plugin::ButtonReleasedEvent;
+use bevy_simple_text_input::{TextInputSettings, TextInputValue};
 
 pub struct LoginScreenStatePlugin;
 
@@ -158,7 +158,7 @@ fn setup(
                         .with_value("NewUser")
                         .with_settings(TextInputSettings {
                             retain_on_submit: true,
-                            mask_character: None
+                            mask_character: None,
                         }),
                     LoginScreenObject,
                 ));

@@ -1,5 +1,8 @@
 use crate::utils::macros::beam_request;
-use apis::default_api::{ObjectInventoryObjectIdGetError, ObjectInventoryObjectIdGetParams, ObjectInventoryObjectIdPutError, ObjectInventoryObjectIdPutParams};
+use apis::default_api::{
+    ObjectInventoryObjectIdGetError, ObjectInventoryObjectIdGetParams,
+    ObjectInventoryObjectIdPutError, ObjectInventoryObjectIdPutParams,
+};
 use beam_autogen_rs::*;
 use bevy::prelude::*;
 use models::{CommonResponse, InventoryView};

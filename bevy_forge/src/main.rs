@@ -12,7 +12,9 @@ pub mod states;
 pub mod utils;
 
 fn main() {
-    let config = match serde_json::from_str::<bevy_beam_sdk::config::BeamableConfig>(crate::consts::CONFIG_DEFAULTS) {
+    let config = match serde_json::from_str::<bevy_beam_sdk::config::BeamableConfig>(
+        crate::consts::CONFIG_DEFAULTS,
+    ) {
         Ok(config) => config,
         Err(_) => BeamableConfig {
             host: Default::default(),

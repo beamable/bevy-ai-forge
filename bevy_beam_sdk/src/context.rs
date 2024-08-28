@@ -19,7 +19,7 @@ pub struct BeamContext {
     pub name: Option<String>,
     pub token: Option<TokenStorage>,
     pub user: Option<UserView>,
-    pub gamer_tag: Option<i64>
+    pub gamer_tag: Option<i64>,
 }
 
 impl BeamContext {
@@ -269,7 +269,10 @@ pub fn handle_token_callbacks(
                 beam.token.as_mut().unwrap().access_token = Some(data.token.clone());
                 beam.gamer_tag = data.gamer_tag;
                 let target_id = beam.gamer_tag.unwrap().to_string();
-                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()), target_id);
+                commands.beam_get_inventory(
+                    Some("currency.coins,items.AiItemContent".to_owned()),
+                    target_id,
+                );
                 commands.beam_get_user_info();
             }
             Err(_) => {
@@ -284,7 +287,10 @@ pub fn handle_token_callbacks(
             Ok(data) => {
                 beam.token = Some(TokenStorage::from_token_response(data));
                 let target_id = beam.gamer_tag.unwrap().to_string();
-                commands.beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()),target_id);
+                commands.beam_get_inventory(
+                    Some("currency.coins,items.AiItemContent".to_owned()),
+                    target_id,
+                );
                 commands.beam_get_user_info();
             }
             Err(_) => {}

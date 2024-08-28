@@ -1,8 +1,8 @@
-use bevy_beam_sdk::utils::macros::beam_request;
 use beam_microservice::apis::uncategorized_api::*;
+use beam_microservice::models::{SayHiRequestArgs, SellSwordRequestArgs};
 use beam_microservice::*;
 use bevy::prelude::*;
-use beam_microservice::models::{SayHiRequestArgs,SellSwordRequestArgs};
+use bevy_beam_sdk::utils::macros::beam_request;
 
 beam_request!(
     RequestSayHiTask,
