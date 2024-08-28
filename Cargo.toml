@@ -2,10 +2,9 @@
 resolver = "2"
 
 members = [
-    "beam_common",
-    "beam_common_accounts",
     "beam_microservice",
-    "bevy_forge"
+    "bevy_beam_sdk",
+    "bevy_forge",
 ]
 
 # Compile with Performance Optimizations:

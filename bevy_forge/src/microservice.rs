@@ -1,28 +1,28 @@
-use crate::beam::utils::macros::{create_request, create_request_no_args};
 use beam_microservice::apis::uncategorized_api::*;
-use beam_microservice::models::*;
+use beam_microservice::models::{SayHiRequestArgs, SellSwordRequestArgs};
 use beam_microservice::*;
 use bevy::prelude::*;
+use bevy_beam_sdk::utils::macros::beam_request;
 
-create_request!(
+beam_request!(
     RequestSayHiTask,
     MicroserviceSayHi,
     SayHiEventCompleted,
     beam_microservice::apis::uncategorized_api::say_hi_post,
-    SayHiRequestArgs,
     String,
-    SayHiPostError
+    SayHiPostError,
+    Option<SayHiRequestArgs>
 );
-create_request!(
+beam_request!(
     RequestSellSwordTask,
     MicroserviceSellSword,
     SellSwordEventCompleted,
     beam_microservice::apis::uncategorized_api::sell_sword_post,
-    SellSwordRequestArgs,
     bool,
-    SellSwordPostError
+    SellSwordPostError,
+    Option<SellSwordRequestArgs>
 );
-create_request_no_args!(
+beam_request!(
     RequestStartForgingTask,
     MicroserviceStartForging,
     StartForgingEventCompleted,
@@ -35,8 +35,8 @@ pub struct MicroservicePlugin;
 
 impl Plugin for MicroservicePlugin {
     fn build(&self, app: &mut App) {
-        RequestSayHiTask::register(app);
         RequestSellSwordTask::register(app);
         RequestStartForgingTask::register(app);
+        RequestSayHiTask::register(app);
     }
 }
