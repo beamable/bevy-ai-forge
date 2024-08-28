@@ -293,7 +293,6 @@ namespace Beamable.ForgeService
                 var currency = await Services.Inventory.GetCurrency("currency.coins");
                 if (currency > currencyCost)
                 {
-                    BeamableLogger.LogWarning("Adding item");
                     await Services.Inventory.SetCurrency("currency.coins", currency - currencyCost);
                     await Services.Inventory.AddItem(SwordContentId);
                 }
