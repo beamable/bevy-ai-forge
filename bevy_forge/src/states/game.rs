@@ -1,9 +1,8 @@
 use beam_microservice::models::SellSwordRequestArgs;
-use bevy::{prelude::*, time::common_conditions::on_timer};
+use bevy::prelude::*;
 use bevy_beam_sdk::{
     api::BeamableBasicApi,
     context::{BeamContext, BeamInventory, ItemProperty},
-    state::BeamableInitStatus,
 };
 use bevy_button_released_plugin::ButtonReleasedEvent;
 use bevy_simple_scroll_view::*;
@@ -34,22 +33,7 @@ impl Plugin for GameStatePlugin {
                     .chain()
                     .run_if(in_state(super::MainGameState::Game)),
             )
-            .init_resource::<ItemsOnSale>()
-            .add_systems(
-                Update,
-                (|mut cmd: Commands,
-                  init_status: Res<State<BeamableInitStatus>>,
-                  ctx: Res<BeamContext>| {
-                    if !init_status.eq(&BeamableInitStatus::FullyInitialized) {
-                        return;
-                    }
-                    cmd.beam_get_inventory(
-                        Some("currency.coins,items.AiItemContent".to_owned()),
-                        ctx.get_gamer_tag().unwrap().to_string(),
-                    );
-                })
-                .run_if(on_timer(std::time::Duration::from_secs(1))),
-            );
+            .init_resource::<ItemsOnSale>();
     }
 }
 

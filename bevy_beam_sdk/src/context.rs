@@ -242,13 +242,26 @@ pub fn read_context(
 
 pub fn handle_inventory_get(
     mut inventory_events: EventReader<InventoryGetCompletedEvent>,
-    mut commands: Commands,
+    mut inv: ResMut<BeamInventory>,
 ) {
     for event in inventory_events.read() {
         info!("Inventory Get: {:#?}", event);
         if let Ok(event) = &**event {
             let inventory = BeamInventory::from((*event).clone());
-            commands.insert_resource(inventory);
+            for (currency, amount) in inventory.currencies {
+                if let Some(cur) = inv.currencies.get_mut(&currency) {
+                    *cur = amount;
+                } else {
+                    inv.currencies.insert(currency, amount);
+                }
+            }
+            for (item, new_items) in inventory.items {
+                if let Some(items) = inv.items.get_mut(&item) {
+                    *items = new_items;
+                } else {
+                    inv.items.insert(item, new_items);
+                }
+            }
         }
     }
 }

@@ -13,6 +13,9 @@ impl BeamableConfig {
     pub fn get_x_beam_scope(&self) -> String {
         format!("{}.{}", self.cid, self.pid)
     }
+    pub fn get_websocket_uri(&self) -> String {
+        "wss://socket.beamable.com/connect".to_owned()
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, Default, Resource, Reflect)]
