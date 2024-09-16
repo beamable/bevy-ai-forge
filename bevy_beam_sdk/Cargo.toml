@@ -22,16 +22,15 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 bevy_pkv = "0.11"
 crossbeam-channel = "0.5"
-tungstenite ={ version = "0.24", features = ["native-tls","handshake"]}
 
-[target.'cfg(target_arch = "aarch64")'.dependencies]
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tungstenite = { version = "0.24", features = ["native-tls", "handshake"] }
 async-compat = "0.2"
 mio = "1"
 
-[target.'cfg(target_arch = "x86_64")'.dependencies]
-async-compat = "0.2"
-mio = "1"
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+tokio-tungstenite-wasm = { version = "0.3.1" }
 
 [dependencies.reqwest]
 version = "^0.12"
-features = ["json", "multipart","rustls-tls"]
+features = ["json", "multipart", "rustls-tls"]

@@ -67,7 +67,6 @@ impl Plugin for BeamPlugin {
                         if let Some(access) = &token.access_token {
                             cmd.spawn(WebSocketConnection {
                                 uri: config.get_websocket_uri(),
-                                socket: None,
                                 scope: config.get_x_beam_scope(),
                                 token: access.clone(),
                             });

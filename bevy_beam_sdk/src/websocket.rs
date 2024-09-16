@@ -2,19 +2,21 @@ use std::net::TcpStream;
 
 use beam_autogen_rs::models::NotificationRequestData;
 use bevy::prelude::*;
+#[cfg(not(target_family = "wasm"))]
 use reqwest::header::HeaderValue;
+#[cfg(not(target_family = "wasm"))]
 use tungstenite::{client::IntoClientRequest, connect, stream::MaybeTlsStream, WebSocket};
 
-use crate::{notifications::Notification, state};
+use crate::notifications::Notification;
 
 #[derive(Component)]
 pub struct WebSocketConnection {
     pub uri: String,
     pub token: String,
     pub scope: String,
-    pub socket: Option<WebSocket<MaybeTlsStream<TcpStream>>>,
 }
 
+#[cfg(not(target_family = "wasm"))]
 #[derive(Component, Deref, DerefMut)]
 #[component(storage = "SparseSet")]
 pub struct WebSocketConnectionTask(
@@ -25,6 +27,10 @@ pub struct WebSocketConnectionTask(
 #[component(storage = "SparseSet")]
 pub struct WebSocketMessagerTask(pub crossbeam_channel::Receiver<NotificationRequestData>);
 
+#[cfg(target_family = "wasm")]
+pub fn on_create(){}
+
+#[cfg(not(target_family = "wasm"))]
 pub fn on_create(
     mut commands: Commands,
     q: Query<(Entity, &WebSocketConnection), Added<WebSocketConnection>>,
@@ -37,21 +43,21 @@ pub fn on_create(
         let token = format!("Bearer {}", &connection.token);
         thread_pool
             .spawn(async move {
-                let mut request = uri.into_client_request().expect("Cannot create request");
-                request
-                    .headers_mut()
-                    .append("Authorization", HeaderValue::from_str(&token).expect(""));
-                request
-                    .headers_mut()
-                    .append("X-BEAM-SCOPE", HeaderValue::from_str(&scope).expect(""));
-                info!("Connecting with {:#?}", &request);
-                let (socket, response) = connect(request).expect("Can't connect");
-                info!("Response HTTP code: {}", response.status());
-                info!("Response contains the following headers:");
-                for (header, _value) in response.headers() {
-                    info!("* {header}");
-                }
-                tx.send(socket)
+                    let mut request = uri.into_client_request().expect("Cannot create request");
+                    request
+                        .headers_mut()
+                        .append("Authorization", HeaderValue::from_str(&token).expect(""));
+                    request
+                        .headers_mut()
+                        .append("X-BEAM-SCOPE", HeaderValue::from_str(&scope).expect(""));
+                    info!("Connecting with {:#?}", &request);
+                    let (socket, response) = connect(request).expect("Can't connect");
+                    info!("Response HTTP code: {}", response.status());
+                    info!("Response contains the following headers:");
+                    for (header, _value) in response.headers() {
+                        info!("* {header}");
+                    }
+                    tx.send(socket)
             })
             .detach();
         commands.entity(e).insert(WebSocketConnectionTask(task));
@@ -70,6 +76,10 @@ pub fn messages_task_handle(
     }
 }
 
+#[cfg(target_family = "wasm")]
+pub fn task_handle(){}
+
+#[cfg(not(target_family = "wasm"))]
 pub fn task_handle(
     mut commands: Commands,
     mut next_state: ResMut<NextState<super::state::BeamableInitStatus>>,
@@ -79,7 +89,7 @@ pub fn task_handle(
         let Ok(mut connected) = task.0.try_recv() else {
             continue;
         };
-        next_state.set(state::BeamableInitStatus::FullyInitialized);
+        next_state.set(super::state::BeamableInitStatus::FullyInitialized);
         commands.entity(e).remove::<WebSocketConnectionTask>();
         let thread_pool = bevy::tasks::IoTaskPool::get();
         let (tx, task) = crossbeam_channel::unbounded();
