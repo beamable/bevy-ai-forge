@@ -70,11 +70,7 @@ pub fn messages_task_handle(
     }
 }
 
-
-pub fn task_handle(
-    mut commands: Commands,
-    mut q: Query<(Entity, &mut WebSocketConnectionTask)>,
-) {
+pub fn task_handle(mut commands: Commands, mut q: Query<(Entity, &mut WebSocketConnectionTask)>) {
     for (e, task) in q.iter_mut() {
         let Ok(mut connected) = task.0.try_recv() else {
             continue;

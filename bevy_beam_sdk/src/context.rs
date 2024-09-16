@@ -324,24 +324,25 @@ pub fn handle_accounts_callbacks(
     };
     for event in get_user_event.read() {
         info!("GetAccountMe: {:#?}", event);
-        if let Ok(event) = &**event {
-            beam.user = Some(UserView::from((*event).clone()));
-            if let Some(ref external) = &external_identity {
-                if event.external.is_some() {
-                    next_state.set(super::state::BeamableInitStatus::FullyInitialized);
-                } else {
-                    commands.beam_attach_federated_identity(
-                        beam_autogen_rs::models::AttachExternalIdentityApiRequest {
-                            provider_service: external.provider_service.clone(),
-                            external_token: "".to_owned(),
-                            challenge_solution: None,
-                            provider_namespace: Some(external.provider_namespace.clone()),
-                        },
-                    );
-                }
-            } else {
-                next_state.set(super::state::BeamableInitStatus::FullyInitialized);
-            }
+        let Ok(event) = &**event else {
+            continue;
+        };
+        beam.user = Some(UserView::from((*event).clone()));
+        let Some(ref external) = &external_identity else {
+            next_state.set(super::state::BeamableInitStatus::FullyInitialized);
+            continue;
+        };
+        if event.external.is_some() {
+            next_state.set(super::state::BeamableInitStatus::FullyInitialized);
+        } else {
+            commands.beam_attach_federated_identity(
+                beam_autogen_rs::models::AttachExternalIdentityApiRequest {
+                    provider_service: external.provider_service.clone(),
+                    external_token: "".to_owned(),
+                    challenge_solution: None,
+                    provider_namespace: Some(external.provider_namespace.clone()),
+                },
+            );
         }
     }
     for event in attach_third_party_event.read() {

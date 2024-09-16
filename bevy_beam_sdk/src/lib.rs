@@ -32,7 +32,8 @@ impl Plugin for BeamPlugin {
             )
             .add_systems(
                 Update,
-                notifications::update_inventory.run_if(resource_exists::<context::BeamContext>),
+                notifications::notification_handle::<notifications::InventoryRefreshNotify>
+                    .run_if(resource_exists::<context::BeamContext>),
             )
             .add_systems(
                 Update,
