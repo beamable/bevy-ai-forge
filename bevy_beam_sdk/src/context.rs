@@ -329,11 +329,11 @@ pub fn handle_accounts_callbacks(
         };
         beam.user = Some(UserView::from((*event).clone()));
         let Some(ref external) = &external_identity else {
-            next_state.set(super::state::BeamableInitStatus::FullyInitialized);
+            next_state.set(super::state::BeamableInitStatus::WebsocketConnection);
             continue;
         };
         if event.external.is_some() {
-            next_state.set(super::state::BeamableInitStatus::FullyInitialized);
+            next_state.set(super::state::BeamableInitStatus::WebsocketConnection);
         } else {
             commands.beam_attach_federated_identity(
                 beam_autogen_rs::models::AttachExternalIdentityApiRequest {
@@ -348,7 +348,7 @@ pub fn handle_accounts_callbacks(
     for event in attach_third_party_event.read() {
         println!("Attach third party: {:#?}", event);
         if (**event).is_ok() {
-            next_state.set(super::state::BeamableInitStatus::FullyInitialized);
+            next_state.set(super::state::BeamableInitStatus::WebsocketConnection);
         }
     }
 }

@@ -20,6 +20,7 @@ fn main() {
             host: Default::default(),
             cid: Default::default(),
             pid: Default::default(),
+            websocket_url: None,
         },
     };
     App::new()

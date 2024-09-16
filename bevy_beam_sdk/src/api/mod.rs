@@ -21,6 +21,7 @@ pub trait BeamableBasicApi {
     fn beam_post_token(&mut self, token: String) -> &mut Self;
     fn beam_get_inventory(&mut self, scope: Option<String>, target_id: String) -> &mut Self;
     fn beam_add_to_inventory(&mut self, new_items: Vec<String>, target_id: String) -> &mut Self;
+    fn beam_basic_get_realm_config(&mut self) -> &mut Self;
 }
 
 impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
@@ -191,12 +192,29 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
         });
         self
     }
+    fn beam_basic_get_realm_config(&mut self) -> &mut Self {
+        self.add(|world: &mut World| {
+            let x_beam_scope = world
+                .get_resource::<crate::config::BeamableConfig>()
+                .unwrap()
+                .get_x_beam_scope();
+            world.commands().add(common::RealmsConfig {
+                data: beam_autogen_rs::apis::default_api::BasicRealmsClientDefaultsGetParams {
+                    x_beam_scope,
+                    x_beam_gamertag: None,
+                },
+                entity: None,
+            });
+        });
+        self
+    }
 }
 
 pub fn register_types(app: &mut App) {
     common::CreateAnononymousUserTask::register(app);
     common::GetTokenTask::register(app);
     common::PostTokenTask::register(app);
+    common::RealmsConfigTask::register(app);
     accounts::GetAccountMeTask::register(app);
     accounts::AttachFederatedIdentityTask::register(app);
     inventory::InventoryGetTask::register(app);

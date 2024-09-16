@@ -8,5 +8,6 @@ pub enum BeamableInitStatus {
     // CheckInternet,
     WaitingForCredentials,
     LoggedIn,
+    WebsocketConnection,
     FullyInitialized,
 }

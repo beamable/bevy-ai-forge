@@ -19,9 +19,10 @@ pub mod macros {
             impl bevy::ecs::world::Command for $command {
                 fn apply(self, world: &mut World) {
                     let thread_pool = bevy::tasks::IoTaskPool::get();
+                    let default_context = $crate::context::BeamContext::default();
                     let context = world
                         .get_resource::<$crate::context::BeamContext>()
-                        .unwrap();
+                        .unwrap_or(&default_context);
 
                     let request_client = world
                         .get_resource::<$crate::requests::ReqwestClient>()
@@ -129,9 +130,10 @@ pub mod macros {
                     let request_client = world
                         .get_resource::<$crate::requests::ReqwestClient>()
                         .unwrap();
+                    let default_context = $crate::context::BeamContext::default();
                     let context = world
                         .get_resource::<$crate::context::BeamContext>()
-                        .unwrap();
+                        .unwrap_or(&default_context);
                     let key = world
                         .get_resource::<$crate::config::BeamableConfig>()
                         .unwrap()

@@ -41,8 +41,8 @@ impl Plugin for BeamPlugin {
             )
             .add_systems(
                 Update,
-                (|mut next_state: ResMut<NextState<state::BeamableInitStatus>>| {
-                    next_state.set(state::BeamableInitStatus::WaitingForCredentials);
+                (|mut cmd: Commands| {
+                    cmd.beam_basic_get_realm_config();
                 })
                 .run_if(resource_added::<config::BeamableConfig>),
             )
@@ -52,10 +52,19 @@ impl Plugin for BeamPlugin {
             )
             .add_systems(
                 OnEnter(state::BeamableInitStatus::LoggedIn),
-                |mut cmd: Commands, context: Res<BeamContext>, config: Res<BeamableConfig>| {
+                |mut cmd: Commands, context: Res<BeamContext>| {
                     if let Some(token) = &context.token {
                         if let Some(access) = &token.access_token {
                             cmd.beam_get_token(access.clone());
+                        }
+                    }
+                },
+            )
+            .add_systems(
+                OnEnter(state::BeamableInitStatus::WebsocketConnection),
+                |mut cmd: Commands, context: Res<BeamContext>, config: Res<BeamableConfig>| {
+                    if let Some(token) = &context.token {
+                        if let Some(access) = &token.access_token {
                             cmd.spawn(WebSocketConnection {
                                 uri: config.get_websocket_uri(),
                                 socket: None,
@@ -75,6 +84,7 @@ impl Plugin for BeamPlugin {
                     context::handle_accounts_callbacks,
                     context::handle_token_callbacks,
                     context::update_user_info,
+                    config::update_config,
                 ),
             );
         api::register_types(app);

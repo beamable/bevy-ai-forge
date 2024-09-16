@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use reqwest::header::HeaderValue;
 use tungstenite::{client::IntoClientRequest, connect, stream::MaybeTlsStream, WebSocket};
 
-use crate::notifications::Notification;
+use crate::{notifications::Notification, state};
 
 #[derive(Component)]
 pub struct WebSocketConnection {
@@ -70,11 +70,16 @@ pub fn messages_task_handle(
     }
 }
 
-pub fn task_handle(mut commands: Commands, mut q: Query<(Entity, &mut WebSocketConnectionTask)>) {
+pub fn task_handle(
+    mut commands: Commands,
+    mut next_state: ResMut<NextState<super::state::BeamableInitStatus>>,
+    mut q: Query<(Entity, &mut WebSocketConnectionTask)>,
+) {
     for (e, task) in q.iter_mut() {
         let Ok(mut connected) = task.0.try_recv() else {
             continue;
         };
+        next_state.set(state::BeamableInitStatus::FullyInitialized);
         commands.entity(e).remove::<WebSocketConnectionTask>();
         let thread_pool = bevy::tasks::IoTaskPool::get();
         let (tx, task) = crossbeam_channel::unbounded();

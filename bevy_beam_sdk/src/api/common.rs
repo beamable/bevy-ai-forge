@@ -2,7 +2,7 @@ use crate::utils::macros::beam_request;
 use beam_autogen_rs::apis::default_api::*;
 use beam_autogen_rs::*;
 use bevy::prelude::*;
-use models::{Token, TokenResponse};
+use models::{RealmConfiguration, Token, TokenResponse};
 
 beam_request!(
     CreateAnononymousUserTask,
@@ -32,4 +32,14 @@ beam_request!(
     TokenResponse,
     BasicAuthTokenPostError,
     BasicAuthTokenPostParams
+);
+
+beam_request!(
+    RealmsConfigTask,
+    RealmsConfig,
+    RealmsConfigEvent,
+    beam_autogen_rs::apis::default_api::basic_realms_client_defaults_get,
+    RealmConfiguration,
+    BasicRealmsClientDefaultsGetError,
+    BasicRealmsClientDefaultsGetParams
 );
