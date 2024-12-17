@@ -326,11 +326,17 @@ pub fn handle_accounts_callbacks(
         };
         beam.user = Some(UserView::from((*event).clone()));
         let Some(ref external) = &external_identity else {
+            #[cfg(not(target_family = "wasm"))]
             next_state.set(super::state::BeamableInitStatus::WebsocketConnection);
+            #[cfg(target_family = "wasm")]
+            next_state.set(super::state::BeamableInitStatus::FullyInitialized);
             continue;
         };
         if event.external.is_some() {
+            #[cfg(not(target_family = "wasm"))]
             next_state.set(super::state::BeamableInitStatus::WebsocketConnection);
+            #[cfg(target_family = "wasm")]
+            next_state.set(super::state::BeamableInitStatus::FullyInitialized);
         } else {
             commands.beam_attach_federated_identity(
                 beam_autogen_rs::models::AttachExternalIdentityApiRequest {

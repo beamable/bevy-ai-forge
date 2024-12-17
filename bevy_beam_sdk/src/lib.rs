@@ -1,8 +1,5 @@
-use bevy::prelude::*;
-use config::BeamableConfig;
-use websocket::WebSocketConnection;
-
 use self::{api::BeamableBasicApi, context::BeamContext};
+use bevy::prelude::*;
 
 pub mod api;
 pub mod config;
@@ -11,6 +8,8 @@ pub mod notifications;
 pub mod requests;
 pub mod state;
 pub mod utils;
+
+#[cfg(not(target_family = "wasm"))]
 pub mod websocket;
 
 /// A `Plugin` providing the bsystems and components required to make Beamable SDK work.
@@ -61,31 +60,38 @@ impl Plugin for BeamPlugin {
                 },
             )
             .add_systems(
-                OnEnter(state::BeamableInitStatus::WebsocketConnection),
-                |mut cmd: Commands, context: Res<BeamContext>, config: Res<BeamableConfig>| {
-                    if let Some(token) = &context.token {
-                        if let Some(access) = &token.access_token {
-                            cmd.spawn(WebSocketConnection {
-                                uri: config.get_websocket_uri(),
-                                scope: config.get_x_beam_scope(),
-                                token: access.clone(),
-                            });
-                        }
-                    }
-                },
-            )
-            .add_systems(
                 Update,
                 (
-                    websocket::on_create,
-                    websocket::task_handle,
-                    websocket::messages_task_handle,
                     context::handle_accounts_callbacks,
                     context::handle_token_callbacks,
                     context::update_user_info,
                     config::update_config,
                 ),
             );
+        #[cfg(not(target_family = "wasm"))]
+        app.add_systems(
+            OnEnter(state::BeamableInitStatus::WebsocketConnection),
+            |mut cmd: Commands, context: Res<BeamContext>, config: Res<config::BeamableConfig>| {
+                if let Some(token) = &context.token {
+                    if let Some(access) = &token.access_token {
+                        cmd.spawn(websocket::WebSocketConnection {
+                            uri: config.get_websocket_uri(),
+                            scope: config.get_x_beam_scope(),
+                            token: access.clone(),
+                        });
+                    }
+                }
+            },
+        );
+        #[cfg(not(target_family = "wasm"))]
+        app.add_systems(
+            Update,
+            (
+                websocket::on_create,
+                websocket::task_handle,
+                websocket::messages_task_handle,
+            ),
+        );
         api::register_types(app);
     }
 }
