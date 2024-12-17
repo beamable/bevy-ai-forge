@@ -10,15 +10,13 @@ pub struct ReqwestClient(pub reqwest::Client);
 impl ReqwestClient {
     fn from_config(config: &BeamableConfig) -> Self {
         let mut default_headers = reqwest::header::HeaderMap::new();
-        default_headers.insert("X-KS-USER-AGENT", "Bevy-0.14".parse().expect(""));
-        default_headers.insert("Access-Control-Allow-Origin", "*".parse().expect(""));
+        default_headers.insert("X-KS-USER-AGENT", "Bevy-0.15".parse().expect(""));
         default_headers.insert(
-            "X-KS-CLIENTID",
-            config.cid.parse().expect("Could not parse CID"),
-        );
-        default_headers.insert(
-            "X-KS-PROJECTID",
-            config.pid.parse().expect("Could not parse PID"),
+            "X-BEAM-SCOPE",
+            config
+                .get_x_beam_scope()
+                .parse()
+                .expect("Could not parse beam scope"),
         );
         let client = reqwest::ClientBuilder::new()
             .default_headers(default_headers)
