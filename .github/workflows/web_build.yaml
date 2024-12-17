@@ -32,7 +32,12 @@ jobs:
           components: clippy,rustfmt
       - uses: taiki-e/cache-cargo-install-action@v2
         with:
-          tool: wasm-bindgen-cli
+          tool: wasm-bindgen-cli@0.2.99
+      - name: Install Linux dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        if: ${{ runner.os == 'linux' }}
+        with:
+          packages: libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev
       - name: Check
         run: just check
       - name: Web Build
