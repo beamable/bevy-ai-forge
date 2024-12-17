@@ -9,8 +9,10 @@ pub struct ReqwestClient(pub reqwest::Client);
 
 impl ReqwestClient {
     fn from_config(config: &BeamableConfig) -> Self {
+        let beam_sdk_version = env!("CARGO_PKG_VERSION");
         let mut default_headers = reqwest::header::HeaderMap::new();
         default_headers.insert("X-KS-USER-AGENT", "Bevy-0.15".parse().expect(""));
+        default_headers.insert("X-KS-BEAM-SDK-VERSION", beam_sdk_version.parse().expect(""));
         default_headers.insert(
             "X-BEAM-SCOPE",
             config

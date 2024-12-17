@@ -37,13 +37,16 @@ pub fn on_create(
     for (e, connection) in q.iter() {
         let thread_pool = bevy::tasks::IoTaskPool::get();
         let (tx, task) = crossbeam_channel::unbounded();
-        let uri = connection.uri.clone();
+        let uri = format!("{}?access_token={}", &connection.uri, &connection.token);
         thread_pool
             .spawn(async move {
-                let ws = tokio_tungstenite_wasm::connect(uri).await.unwrap();
+                let Ok(ws) = tokio_tungstenite_wasm::connect(uri).await else {
+                    eprintln!("Failed to connect to websocket");
+                    return;
+                };
                 let (mut _write, mut receiver) = ws.split();
                 loop {
-                    let Ok(msg) = receiver.next().await.unwrap() else {
+                    let Some(Ok(msg)) = receiver.next().await else {
                         continue;
                     };
                     let Ok(message) = msg.to_text() else {
