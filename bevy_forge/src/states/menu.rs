@@ -51,31 +51,33 @@ fn setup(
         return;
     };
     commands.entity(root_entity).with_children(|parent| {
-        let text_style = TextStyle {
+        let text_style = TextFont {
             font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
             font_size: 40.0,
-            color: consts::MY_ACCENT_COLOR,
+            ..default()
         };
+        let text_color = TextColor(consts::MY_ACCENT_COLOR);
+
         parent
             .spawn((
-                ButtonBundle {
-                    background_color: INTERACTIVE_BG_COLOR.into(),
-                    border_color: BORDER_COLOR.into(),
-                    style: Style {
-                        padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
-                        border: UiRect::all(Val::Px(4.0)),
-                        margin: UiRect::top(Val::Px(30.0)),
-                        ..Default::default()
-                    },
+                BackgroundColor(INTERACTIVE_BG_COLOR),
+                BorderColor(BORDER_COLOR),
+                Button,
+                Node {
+                    padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
+                    border: UiRect::all(Val::Px(4.0)),
+                    margin: UiRect::top(Val::Px(30.0)),
                     ..Default::default()
                 },
                 MenuButton::StartGame,
             ))
             .with_children(|btn| {
-                btn.spawn(
-                    TextBundle::from_section("Start Game", text_style.clone())
-                        .with_text_justify(JustifyText::Center),
-                );
+                btn.spawn((
+                    Text::new("Start Game"),
+                    TextLayout::new_with_justify(JustifyText::Center),
+                    text_style,
+                    text_color,
+                ));
             });
     });
 }

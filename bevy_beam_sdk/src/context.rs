@@ -296,17 +296,14 @@ pub fn handle_token_callbacks(
     }
     for event in post_token_events.read() {
         info!("PostTokenEvent: {:#?}", event);
-        match &**event {
-            Ok(data) => {
-                beam.token = Some(TokenStorage::from_token_response(data));
-                let target_id = beam.gamer_tag.unwrap().to_string();
-                commands.beam_get_inventory(
-                    Some("currency.coins,items.AiItemContent".to_owned()),
-                    target_id,
-                );
-                commands.beam_get_user_info();
-            }
-            Err(_) => {}
+        if let Ok(data) = &**event {
+            beam.token = Some(TokenStorage::from_token_response(data));
+            let target_id = beam.gamer_tag.unwrap().to_string();
+            commands.beam_get_inventory(
+                Some("currency.coins,items.AiItemContent".to_owned()),
+                target_id,
+            );
+            commands.beam_get_user_info();
         }
     }
 }

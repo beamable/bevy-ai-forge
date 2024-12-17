@@ -44,7 +44,7 @@ impl Plugin for BeamPlugin {
                 (|mut cmd: Commands| {
                     cmd.beam_basic_get_realm_config();
                 })
-                .run_if(resource_added::<config::BeamableConfig>),
+                .run_if(resource_added::<requests::ReqwestClient>),
             )
             .add_systems(
                 OnEnter(state::BeamableInitStatus::WaitingForCredentials),

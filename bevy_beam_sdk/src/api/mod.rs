@@ -24,17 +24,17 @@ pub trait BeamableBasicApi {
     fn beam_basic_get_realm_config(&mut self) -> &mut Self;
 }
 
-impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
+impl BeamableBasicApi for Commands<'_, '_> {
     fn beam_play_as_guest<S: Into<std::string::String>>(&mut self, name: Option<S>) -> &mut Self {
         let mut new_user = beam_autogen_rs::models::TokenRequestWrapper::new("guest".to_string());
         new_user.username = name.map(|username| username.into());
-        self.add(|world: &mut World| {
+        self.queue(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
 
-            world.commands().add(common::CreateAnononymousUser {
+            world.commands().queue(common::CreateAnononymousUser {
                 data: beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
@@ -46,12 +46,12 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
         self
     }
     fn beam_new_user(&mut self, wrapper: TokenRequestWrapper) -> &mut Self {
-        self.add(|world: &mut World| {
+        self.queue(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(common::CreateAnononymousUser {
+            world.commands().queue(common::CreateAnononymousUser {
                 data: beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
@@ -66,12 +66,12 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
         &mut self,
         wrapper: AttachExternalIdentityApiRequest,
     ) -> &mut Self {
-        self.add(|world: &mut World| {
+        self.queue(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(accounts::AttachFederatedIdentity {
+            world.commands().queue(accounts::AttachFederatedIdentity {
                 data: beam_autogen_rs::apis::default_api::BasicAccountsExternalIdentityPostParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
@@ -83,12 +83,12 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
         self
     }
     fn beam_get_user_info(&mut self) -> &mut Self {
-        self.add(|world: &mut World| {
+        self.queue(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(accounts::GetAccountMe {
+            world.commands().queue(accounts::GetAccountMe {
                 data: beam_autogen_rs::apis::default_api::BasicAccountsMeGetParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
@@ -99,12 +99,12 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
         self
     }
     fn beam_get_token(&mut self, token: String) -> &mut Self {
-        self.add(|world: &mut World| {
+        self.queue(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(common::GetToken {
+            world.commands().queue(common::GetToken {
                 data: beam_autogen_rs::apis::default_api::BasicAuthTokenGetParams {
                     x_beam_scope,
                     token,
@@ -116,12 +116,12 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
         self
     }
     fn beam_post_token(&mut self, token: String) -> &mut Self {
-        self.add(|world: &mut World| {
+        self.queue(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(common::PostToken {
+            world.commands().queue(common::PostToken {
                 data: beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
@@ -137,12 +137,12 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
     }
     fn beam_get_inventory(&mut self, scope: Option<String>, target_id: String) -> &mut Self {
         let val = scope.unwrap_or("items".to_owned());
-        self.add(|world: &mut World| {
+        self.queue(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(inventory::InventoryGet {
+            world.commands().queue(inventory::InventoryGet {
                 data: beam_autogen_rs::apis::default_api::ObjectInventoryObjectIdGetParams {
                     x_beam_scope,
                     object_id: target_id,
@@ -175,12 +175,12 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
             item_content_ids: vec![],
             update_items: None,
         };
-        self.add(|world: &mut World| {
+        self.queue(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(inventory::InventoryAdd {
+            world.commands().queue(inventory::InventoryAdd {
                 data: beam_autogen_rs::apis::default_api::ObjectInventoryObjectIdPutParams {
                     x_beam_scope,
                     object_id: target_id,
@@ -193,12 +193,12 @@ impl<'w, 's> BeamableBasicApi for Commands<'w, 's> {
         self
     }
     fn beam_basic_get_realm_config(&mut self) -> &mut Self {
-        self.add(|world: &mut World| {
+        self.queue(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().add(common::RealmsConfig {
+            world.commands().queue(common::RealmsConfig {
                 data: beam_autogen_rs::apis::default_api::BasicRealmsClientDefaultsGetParams {
                     x_beam_scope,
                     x_beam_gamertag: None,

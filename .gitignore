@@ -4,3 +4,6 @@ ForgeService/services/ForgeService/.idea
 .idea
 target
 *.lock
+/out
+key.pem
+cert.pem

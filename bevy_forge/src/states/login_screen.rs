@@ -38,7 +38,7 @@ fn handle_buttons(
     text: Query<&TextInputValue, Changed<TextInputValue>>,
     mut beam: ResMut<BeamContext>,
     mut q1: Query<(
-        &mut Style,
+        &mut Node,
         Option<&LoginScreenObject>,
         Option<&LoadingIndicator>,
     )>,
@@ -77,8 +77,8 @@ fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<LoadingIndicato
     let Ok(mut loading) = query.get_single_mut() else {
         return;
     };
-    loading.rotate(Quat::from_rotation_z(time.delta_seconds() * 1.0));
-    loading.scale = Vec3::splat(time.elapsed_seconds().sin().abs() * 0.2 + 0.45);
+    loading.rotate(Quat::from_rotation_z(time.delta_secs() * 1.0));
+    loading.scale = Vec3::splat(time.elapsed_secs().sin().abs() * 0.2 + 0.45);
 }
 
 fn setup(
@@ -94,18 +94,15 @@ fn setup(
 
     commands.entity(root_entity).with_children(|parent| {
         parent.spawn((
-            ImageBundle {
-                image: UiImage::new(asset_server.load("gfx/gameIconTransparent.png")),
-                style: Style {
-                    display: if show_register_form {
-                        Display::None
-                    } else {
-                        Display::Flex
-                    },
-                    position_type: PositionType::Absolute,
-                    bottom: Val::Px(50.0),
-                    ..default()
+            ImageNode::new(asset_server.load("gfx/gameIconTransparent.png")),
+            Node {
+                display: if show_register_form {
+                    Display::None
+                } else {
+                    Display::Flex
                 },
+                position_type: PositionType::Absolute,
+                bottom: Val::Px(50.0),
                 ..default()
             },
             LoadingIndicator,
@@ -116,73 +113,74 @@ fn setup(
         }
         parent
             .spawn((
-                NodeBundle {
-                    style: Style {
-                        border: UiRect::all(Val::Px(5.0)),
-                        padding: UiRect::all(Val::Px(25.0)),
-                        flex_direction: bevy::ui::FlexDirection::Column,
-                        ..default()
-                    },
-                    background_color: FRAME_BG_COLOR.into(),
-                    border_color: BORDER_COLOR.into(),
+                Node {
+                    border: UiRect::all(Val::Px(5.0)),
+                    padding: UiRect::all(Val::Px(25.0)),
+                    flex_direction: bevy::ui::FlexDirection::Column,
                     ..default()
                 },
+                BackgroundColor(FRAME_BG_COLOR),
+                BorderColor(BORDER_COLOR),
                 LoginScreenObject,
             ))
             .with_children(|parent| {
-                let text_style = TextStyle {
+                let text_style = TextFont {
                     font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
                     font_size: 40.0,
-                    color: consts::MY_ACCENT_COLOR,
+                    ..default()
                 };
+                let text_color = TextColor(consts::MY_ACCENT_COLOR);
                 parent.spawn((
-                    TextBundle::from_section("User Name", text_style.clone())
-                        .with_text_justify(JustifyText::Center),
+                    Text::new("User Name"),
+                    TextLayout::new_with_justify(JustifyText::Center),
+                    text_style.clone(),
+                    text_color,
                     LoginScreenObject,
                 ));
                 parent.spawn((
-                    NodeBundle {
-                        style: Style {
-                            width: Val::Px(300.0),
-                            border: UiRect::all(Val::Px(5.0)),
-                            padding: UiRect::all(Val::Px(5.0)),
-                            margin: UiRect::top(Val::Px(30.0)),
-                            ..default()
-                        },
-                        background_color: INTERACTIVE_BG_COLOR.into(),
-                        border_color: BORDER_COLOR.into(),
+                    Node {
+                        width: Val::Px(300.0),
+                        border: UiRect::all(Val::Px(5.0)),
+                        padding: UiRect::all(Val::Px(5.0)),
+                        margin: UiRect::top(Val::Px(30.0)),
                         ..default()
                     },
-                    bevy_simple_text_input::TextInputBundle::default()
-                        .with_text_style(text_style.clone())
-                        .with_value("NewUser")
-                        .with_settings(TextInputSettings {
-                            retain_on_submit: true,
-                            mask_character: None,
-                        }),
+                    BackgroundColor(INTERACTIVE_BG_COLOR),
+                    BorderColor(BORDER_COLOR),
+                    bevy_simple_text_input::TextInput,
+                    bevy_simple_text_input::TextInputTextFont(text_style.clone()),
+                    bevy_simple_text_input::TextInputTextColor(text_color),
+                    bevy_simple_text_input::TextInputPlaceholder {
+                        value: "NewUser".to_string(),
+                        ..default()
+                    },
+                    TextInputSettings {
+                        retain_on_submit: true,
+                        mask_character: None,
+                    },
                     LoginScreenObject,
                 ));
                 parent
                     .spawn((
-                        ButtonBundle {
-                            background_color: INTERACTIVE_BG_COLOR.into(),
-                            border_color: BORDER_COLOR.into(),
-                            style: Style {
-                                padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
-                                border: UiRect::all(Val::Px(4.0)),
-                                margin: UiRect::top(Val::Px(30.0)),
-                                ..Default::default()
-                            },
+                        Button,
+                        Node {
+                            padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
+                            border: UiRect::all(Val::Px(4.0)),
+                            margin: UiRect::top(Val::Px(30.0)),
                             ..Default::default()
                         },
+                        BackgroundColor(INTERACTIVE_BG_COLOR),
+                        BorderColor(BORDER_COLOR),
                         LoginScreenButton::PlayAsGuest,
                         LoginScreenObject,
                     ))
                     .with_children(|btn| {
-                        btn.spawn(
-                            TextBundle::from_section("Play as guest", text_style.clone())
-                                .with_text_justify(JustifyText::Center),
-                        );
+                        btn.spawn((
+                            Text::new("Play as guest"),
+                            TextLayout::new_with_justify(JustifyText::Center),
+                            text_style.clone(),
+                            text_color,
+                        ));
                     });
             });
     });

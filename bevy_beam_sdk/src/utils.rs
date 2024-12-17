@@ -62,7 +62,7 @@ pub mod macros {
                         })
                         .detach();
                     if let Some(entity) = self.entity {
-                        if let Some(mut entity) = world.get_entity_mut(entity) {
+                        if let Ok(mut entity) = world.get_entity_mut(entity) {
                             entity.insert($task_name(task));
                         }
                     } else {

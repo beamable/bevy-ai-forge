@@ -30,9 +30,12 @@ fn main() {
             provider_namespace: "OpenAI".to_string(),
         })
         .insert_resource(config)
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            meta_check: bevy::asset::AssetMetaCheck::Never,
+            ..default()
+        }))
         .add_plugins(BevyArgsPlugin::<GameArgs>::default())
-        .insert_resource(bevy_pkv::PkvStore::new("Beamable", "AiForge"))
+        .insert_resource(bevy_pkv::PkvStore::new("Beamable", "AiForged"))
         // Never attempts to look up meta files. The default meta configuration will be used for each asset.
         .add_plugins((
             DebugPlugin,

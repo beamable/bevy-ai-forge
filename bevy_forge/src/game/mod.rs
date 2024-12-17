@@ -1,7 +1,6 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_button_released_plugin::ButtonReleasedEvent;
 use rand::Rng;
 
 pub mod components;
@@ -25,14 +24,11 @@ impl Plugin for GamePlugin {
             .register_type::<components::SoundEffectPlayer>()
             .register_type::<components::LoadingIndicator>()
             .register_type::<components::RequestText>()
-            .add_systems(
-                Update,
-                (sound_on_button, hide_items, show_items, timer_update),
-            );
+            .add_systems(Update, (hide_items, show_items, timer_update));
     }
 }
 
-fn hide_items(mut q: Query<&mut Style, With<components::HiddenUiElement>>) {
+fn hide_items(mut q: Query<&mut Node, With<components::HiddenUiElement>>) {
     for mut s in q.iter_mut() {
         s.display = Display::None;
     }
@@ -53,7 +49,7 @@ fn timer_update(
 
 fn show_items(
     mut removed: RemovedComponents<components::HiddenUiElement>,
-    mut query: Query<&mut Style>,
+    mut query: Query<&mut Node>,
 ) {
     for entity in removed.read() {
         if let Ok(mut style) = query.get_mut(entity) {
@@ -62,51 +58,37 @@ fn show_items(
     }
 }
 
-fn sound_on_button(
-    mut reader: EventReader<ButtonReleasedEvent>,
+pub fn sound_on_button(
+    trigger: Trigger<bevy_button_released_plugin::OnButtonReleased>,
     forge_button: Query<Entity, With<components::GameplayButton>>,
     asset_server: Res<AssetServer>,
     other_sounds: Query<Entity, With<components::SoundEffectPlayer>>,
     mut cmd: Commands,
 ) {
-    if !reader.is_empty() {
-        for e in other_sounds.iter() {
-            cmd.entity(e).despawn();
-        }
+    for e in other_sounds.iter() {
+        cmd.entity(e).despawn();
     }
-    for e in reader.read() {
-        if let Ok(button_entity) = forge_button.get(**e) {
-            cmd.spawn((
-                AudioBundle {
-                    source: asset_server.load("sfx/blacksmith.ogg".to_owned()),
-                    settings: PlaybackSettings {
-                        mode: bevy::audio::PlaybackMode::Despawn,
-                        ..default()
-                    },
-                },
-                components::SoundEffectPlayer,
-            ));
-            cmd.entity(button_entity)
-                .insert(components::HiddenUiElement(Timer::new(
-                    Duration::from_secs(3),
-                    TimerMode::Once,
-                )));
-        } else {
-            let mut rng = rand::thread_rng();
-            let number = rng.gen::<u32>();
-            cmd.spawn((
-                AudioBundle {
-                    source: asset_server.load(format!(
-                        "sfx/interface_{}.ogg",
-                        number.checked_rem_euclid(3).unwrap() + 1
-                    )),
-                    settings: PlaybackSettings {
-                        mode: bevy::audio::PlaybackMode::Despawn,
-                        ..default()
-                    },
-                },
-                components::SoundEffectPlayer,
-            ));
-        }
+    if let Ok(button_entity) = forge_button.get(trigger.entity()) {
+        cmd.spawn((
+            AudioPlayer::new(asset_server.load("sfx/blacksmith.ogg".to_owned())),
+            PlaybackSettings::DESPAWN,
+            components::SoundEffectPlayer,
+        ));
+        cmd.entity(button_entity)
+            .insert(components::HiddenUiElement(Timer::new(
+                Duration::from_secs(3),
+                TimerMode::Once,
+            )));
+    } else {
+        let mut rng = rand::thread_rng();
+        let number = rng.gen::<u32>();
+        cmd.spawn((
+            AudioPlayer::new(asset_server.load(format!(
+                "sfx/interface_{}.ogg",
+                number.checked_rem_euclid(3).unwrap() + 1
+            ))),
+            PlaybackSettings::DESPAWN,
+            components::SoundEffectPlayer,
+        ));
     }
 }

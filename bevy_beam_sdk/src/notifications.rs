@@ -26,7 +26,7 @@ pub fn notification_handle<T: NotifyBeam>(
             continue;
         };
         if context.eq(T::context_id()) {
-            let mut command = T::handle_command(&notification, &ctx);
+            let mut command = T::handle_command(notification, &ctx);
             cmd.append(&mut command);
         }
     }

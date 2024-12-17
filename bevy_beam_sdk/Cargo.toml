@@ -6,21 +6,22 @@ license = "MIT OR Apache-2.0"
 description = "Experimental implementation of Beamable SDK into Bevy engine."
 
 [dependencies.bevy]
-version = "0.14"
+version = "0.15"
 default-features = false
-features = ["bevy_ui", "bevy_asset", "bevy_text"]
+features = ["bevy_state"]
 
 [dev-dependencies.bevy]
-version = "0.14"
+version = "0.15"
 default-features = true
 
 [dependencies.beam_autogen_rs]
 git = "https://github.com/beamable/beam_autogen_rs"
+rev = "adc92aa"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-bevy_pkv = "0.11"
+bevy_pkv = "0.12"
 crossbeam-channel = "0.5"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
@@ -29,7 +30,11 @@ async-compat = "0.2"
 mio = "1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-tokio-tungstenite-wasm = { version = "0.3.1" }
+tokio-tungstenite-wasm = { version = "0.4" }
+futures-util = { version = "0.3", default-features = false, features = [
+    "sink",
+    "std",
+] }
 
 [dependencies.reqwest]
 version = "^0.12"

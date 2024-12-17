@@ -28,18 +28,15 @@ fn setup(
         info!("Removing profile");
         storage.clear().unwrap();
     }
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
     commands
         .spawn((
-            NodeBundle {
-                style: Style {
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(100.0),
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
-                    flex_direction: FlexDirection::Column,
-                    ..default()
-                },
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Column,
                 ..default()
             },
             Name::new("UI Root"),
@@ -47,36 +44,34 @@ fn setup(
         ))
         .with_children(|parent| {
             parent
-                .spawn(ImageBundle {
-                    style: Style {
+                .spawn((
+                    Node {
                         width: Val::Percent(66.0),
                         height: Val::Percent(100.0),
                         position_type: PositionType::Absolute,
                         ..default()
                     },
-                    background_color: BackgroundColor(Color::WHITE),
-                    z_index: ZIndex::Global(-1),
-                    image: UiImage::new(asset_server.load("gfx/steampunk_bg_robot.png")),
-                    ..default()
-                })
+                    BackgroundColor(Color::WHITE),
+                    ZIndex(-1),
+                    ImageNode::new(asset_server.load("gfx/steampunk_bg_robot.png")),
+                ))
                 .insert(crate::game::components::GameBackground);
             parent
-                .spawn(
-                    TextBundle::from_section(
-                        "Artificial Forge",
-                        TextStyle {
-                            font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
-                            font_size: 150.0,
-                            color: consts::MY_ACCENT_COLOR,
-                        },
-                    )
-                    .with_text_justify(JustifyText::Center)
-                    .with_style(Style {
+                .spawn((
+                    Text::new("Artificial Forge"),
+                    TextLayout::new_with_justify(JustifyText::Center),
+                    TextFont {
+                        font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
+                        font_size: 150.0,
+                        ..default()
+                    },
+                    TextColor(consts::MY_ACCENT_COLOR),
+                    Node {
                         position_type: PositionType::Absolute,
                         top: Val::Px(0.0),
                         ..default()
-                    }),
-                )
+                    },
+                ))
                 .insert(Name::new("GameLogo"))
                 .insert(GameLogoText);
         });
