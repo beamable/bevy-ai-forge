@@ -2,7 +2,6 @@ use crate::consts::{BORDER_COLOR, INTERACTIVE_BG_COLOR};
 use crate::utils::despawn_recursive_by_component;
 use crate::{consts, game::components::*};
 use bevy::prelude::*;
-use bevy_button_released_plugin::ButtonReleasedEvent;
 
 pub struct MenuStatePlugin;
 
@@ -10,36 +9,19 @@ impl Plugin for MenuStatePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(super::MainGameState::Menu), setup)
             .add_systems(
-                Update,
-                handle_buttons.run_if(in_state(super::MainGameState::Menu)),
-            )
-            .add_systems(
                 OnExit(super::MainGameState::Menu),
-                (
-                    despawn_recursive_by_component::<MenuButton>,
-                    despawn_recursive_by_component::<GameLogoText>,
-                ),
+                (despawn_recursive_by_component::<GameLogoText>,),
             );
     }
 }
 
-fn handle_buttons(
-    mut reader: EventReader<ButtonReleasedEvent>,
-    q: Query<&MenuButton>,
+fn on_start_game_pressed(
+    t: Trigger<Pointer<Up>>,
     mut next_state: ResMut<NextState<super::MainGameState>>,
     mut cmd: Commands,
 ) {
-    for event in reader.read() {
-        let Ok(button) = q.get(**event) else {
-            continue;
-        };
-        match button {
-            MenuButton::StartGame => {
-                next_state.set(super::MainGameState::Game);
-                cmd.entity(**event).remove::<Interaction>();
-            }
-        }
-    }
+    next_state.set(super::MainGameState::Game);
+    cmd.entity(t.entity()).remove::<Interaction>();
 }
 
 fn setup(
@@ -69,8 +51,9 @@ fn setup(
                     margin: UiRect::top(Val::Px(30.0)),
                     ..Default::default()
                 },
-                MenuButton::StartGame,
+                StateScoped(super::MainGameState::Menu),
             ))
+            .observe(on_start_game_pressed)
             .with_children(|btn| {
                 btn.spawn((
                     Text::new("Start Game"),

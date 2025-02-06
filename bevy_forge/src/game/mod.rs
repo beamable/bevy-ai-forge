@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use bevy::prelude::*;
 use rand::Rng;
 
@@ -12,10 +10,7 @@ impl Plugin for GamePlugin {
         app.register_type::<components::GameRoot>()
             .register_type::<components::GameBackground>()
             .register_type::<components::LoginScreenObject>()
-            .register_type::<components::LoginScreenButton>()
-            .register_type::<components::MenuButton>()
             .register_type::<components::GameplayObject>()
-            .register_type::<components::GameplayButton>()
             .register_type::<components::ItemDisplay>()
             .register_type::<components::SellItemButton>()
             .register_type::<components::InventoryContainer>()
@@ -59,8 +54,7 @@ fn show_items(
 }
 
 pub fn sound_on_button(
-    trigger: Trigger<bevy_button_released_plugin::OnButtonReleased>,
-    forge_button: Query<Entity, With<components::GameplayButton>>,
+    _trigger: Trigger<Pointer<Up>>,
     asset_server: Res<AssetServer>,
     other_sounds: Query<Entity, With<components::SoundEffectPlayer>>,
     mut cmd: Commands,
@@ -68,27 +62,14 @@ pub fn sound_on_button(
     for e in other_sounds.iter() {
         cmd.entity(e).despawn();
     }
-    if let Ok(button_entity) = forge_button.get(trigger.entity()) {
-        cmd.spawn((
-            AudioPlayer::new(asset_server.load("sfx/blacksmith.ogg".to_owned())),
-            PlaybackSettings::DESPAWN,
-            components::SoundEffectPlayer,
-        ));
-        cmd.entity(button_entity)
-            .insert(components::HiddenUiElement(Timer::new(
-                Duration::from_secs(3),
-                TimerMode::Once,
-            )));
-    } else {
-        let mut rng = rand::thread_rng();
-        let number = rng.gen::<u32>();
-        cmd.spawn((
-            AudioPlayer::new(asset_server.load(format!(
-                "sfx/interface_{}.ogg",
-                number.checked_rem_euclid(3).unwrap() + 1
-            ))),
-            PlaybackSettings::DESPAWN,
-            components::SoundEffectPlayer,
-        ));
-    }
+    let mut rng = rand::thread_rng();
+    let number = rng.gen::<u32>();
+    cmd.spawn((
+        AudioPlayer::new(asset_server.load(format!(
+            "sfx/interface_{}.ogg",
+            number.checked_rem_euclid(3).unwrap() + 1
+        ))),
+        PlaybackSettings::DESPAWN,
+        components::SoundEffectPlayer,
+    ));
 }

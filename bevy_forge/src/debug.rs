@@ -1,5 +1,6 @@
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
+use bevy_inspector_egui::quick::ResourceInspectorPlugin;
 use bevy_inspector_egui::quick::StateInspectorPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
@@ -19,6 +20,10 @@ impl Plugin for DebugPlugin {
             )
             .add_plugins(
                 StateInspectorPlugin::<crate::states::MainGameState>::default()
+                    .run_if(input_toggle_active(false, KeyCode::F1)),
+            )
+            .add_plugins(
+                ResourceInspectorPlugin::<bevy_beam_sdk::context::BeamContext>::default()
                     .run_if(input_toggle_active(false, KeyCode::F1)),
             );
     }

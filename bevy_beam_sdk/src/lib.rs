@@ -21,18 +21,12 @@ impl Plugin for BeamPlugin {
             .register_type::<config::BeamExternalIdentityConfig>()
             .register_type::<context::BeamContext>()
             .register_type::<context::BeamInventory>()
-            .add_event::<notifications::Notification>()
             .init_state::<state::BeamableInitStatus>()
             .add_plugins(crate::requests::RequestsPlugin)
             .add_systems(
                 Update,
                 context::save_user_info
                     .run_if(in_state(state::BeamableInitStatus::WaitingForCredentials)),
-            )
-            .add_systems(
-                Update,
-                notifications::notification_handle::<notifications::InventoryRefreshNotify>
-                    .run_if(resource_exists::<context::BeamContext>),
             )
             .add_systems(
                 Update,
@@ -78,20 +72,14 @@ impl Plugin for BeamPlugin {
                             uri: config.get_websocket_uri(),
                             scope: config.get_x_beam_scope(),
                             token: access.clone(),
+                            ..Default::default()
                         });
                     }
                 }
             },
         );
-        #[cfg(not(target_family = "wasm"))]
-        app.add_systems(
-            Update,
-            (
-                websocket::on_create,
-                websocket::task_handle,
-                websocket::messages_task_handle,
-            ),
-        );
+        app.add_plugins(websocket::websocket_plugin);
+
         api::register_types(app);
     }
 }

@@ -21,7 +21,7 @@ impl BeamableConfig {
     pub fn get_websocket_uri(&self) -> String {
         match &self.websocket_url {
             Some(s) => format!("{}/connect", &s),
-            None => "wss://socket.beamable.com/connect".to_owned(),
+            None => "wss://api.beamable.com/api/connect".to_owned(),
         }
     }
 }

@@ -1,0 +1,12 @@
+{
+    "federations": {
+        "OpenAI": [
+            {
+                "interface": "IFederatedInventory"
+            },
+            {
+                "interface": "IFederatedLogin"
+            }
+        ]
+    }
+}

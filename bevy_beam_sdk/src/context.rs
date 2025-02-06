@@ -245,7 +245,7 @@ pub fn handle_inventory_get(
     mut inv: ResMut<BeamInventory>,
 ) {
     for event in inventory_events.read() {
-        info!("Inventory Get: {:#?}", event);
+        // info!("Inventory Get: {:#?}", event);
         if let Ok(event) = &**event {
             let inventory = BeamInventory::from((*event).clone());
             for (currency, amount) in inventory.currencies {

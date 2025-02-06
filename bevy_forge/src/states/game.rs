@@ -1,15 +1,19 @@
+use std::time::Duration;
+
 use beam_microservice::models::SellSwordRequestArgs;
 use bevy::prelude::*;
 use bevy_beam_sdk::{
     api::BeamableBasicApi,
     context::{BeamContext, BeamInventory, ItemProperty},
 };
-use bevy_button_released_plugin::ButtonReleasedEvent;
 use bevy_simple_scroll_view::*;
 
 use crate::{
     consts::{self, *},
-    game::{components::*, sound_on_button},
+    game::{
+        components::{self, *},
+        sound_on_button,
+    },
     microservice::MicroserviceSellSword,
 };
 
@@ -26,9 +30,8 @@ impl Plugin for GameStatePlugin {
                 (
                     add_currency_text,
                     update_currency_text,
-                    handle_buttons,
                     update_inventory,
-                    sell_sword_pressed,
+                    update_inventory_on_sell,
                 )
                     .chain()
                     .run_if(in_state(super::MainGameState::Game)),
@@ -37,34 +40,37 @@ impl Plugin for GameStatePlugin {
     }
 }
 
-fn sell_sword_pressed(
-    mut events: EventReader<ButtonReleasedEvent>,
-    mut sword_sell_event: EventReader<crate::microservice::SellSwordEventCompleted>,
-    q: Query<(Entity, &SellItemButton, &Parent)>,
+fn update_inventory_on_sell(
+    sword_sell_event: EventReader<crate::microservice::SellSwordEventCompleted>,
     mut cmd: Commands,
-    mut on_sale: ResMut<ItemsOnSale>,
     ctx: Res<BeamContext>,
 ) {
-    for event in events.read() {
-        if let Ok(button) = q.get(**event) {
-            cmd.queue(MicroserviceSellSword {
-                data: Some(SellSwordRequestArgs {
-                    item_id: button.1 .0.clone(),
-                }),
-                entity: None,
-            });
-            cmd.entity(button.0).remove::<Interaction>();
-            on_sale.0.push(button.1 .0.clone());
-            if let Some(entity_commands) = cmd.get_entity(button.2.get()) {
-                entity_commands.despawn_recursive();
-            }
-        };
-    }
-    for _ in sword_sell_event.read() {
+    if !sword_sell_event.is_empty() {
         cmd.beam_get_inventory(
             Some("currency.coins,items.AiItemContent".to_owned()),
             ctx.get_gamer_tag().unwrap().to_string(),
         );
+    }
+}
+
+fn sell_sword_pressed(
+    t: Trigger<Pointer<Up>>,
+    q: Query<(&SellItemButton, &Parent)>,
+    mut cmd: Commands,
+    mut on_sale: ResMut<ItemsOnSale>,
+) {
+    let Ok((sell_item_info, parent)) = q.get(t.entity()) else {
+        return;
+    };
+    cmd.queue(MicroserviceSellSword {
+        data: Some(SellSwordRequestArgs {
+            item_id: sell_item_info.0.clone(),
+        }),
+        entity: None,
+    });
+    on_sale.0.push(sell_item_info.0.clone());
+    if let Some(entity_commands) = cmd.get_entity(parent.get()) {
+        entity_commands.try_despawn_recursive();
     }
 }
 
@@ -90,47 +96,31 @@ fn setup(
             .spawn((
                 Node {
                     border: UiRect::all(Val::Px(5.0)),
-                    padding: UiRect::all(Val::Px(10.0)),
                     position_type: PositionType::Absolute,
                     flex_direction: bevy::ui::FlexDirection::Column,
-                    justify_content: JustifyContent::SpaceBetween,
                     max_height: Val::Vh(90.0),
                     height: Val::Vh(90.0),
                     left: Val::Px(0.0),
                     width: Val::Percent(40.0),
                     margin: UiRect::all(Val::Px(30.)),
-                    ..default()
+                    ..scroll_view_node()
                 },
+                ScrollView::default(),
                 BackgroundColor(FRAME_BG_COLOR),
                 BorderColor(BORDER_COLOR),
                 GameplayObject,
                 Name::new("InventoryRoot"),
             ))
-            .with_children(|inventory| {
-                inventory
-                    .spawn((
-                        Node {
-                            overflow: Overflow::clip(),
-                            max_height: Val::Percent(100.0),
-                            ..default()
-                        },
-                        ScrollView::default(),
-                        Name::new("InventoryContainerClip"),
-                    ))
-                    .with_children(|container| {
-                        container.spawn((
-                            ScrollableContent::default(),
-                            InventoryContainer,
-                            Node {
-                                padding: UiRect::axes(Val::Px(5.0), Val::Px(80.0)),
-                                flex_direction: bevy::ui::FlexDirection::ColumnReverse,
-                                align_items: AlignItems::Start,
-                                width: Val::Percent(100.0),
-                                ..default()
-                            },
-                        ));
-                    });
-            });
+            .with_child((
+                ScrollableContent::default(),
+                InventoryContainer,
+                Node {
+                    margin: UiRect::all(Val::Px(10.0)),
+                    padding: UiRect::bottom(Val::Px(50.0)),
+                    flex_direction: bevy::ui::FlexDirection::ColumnReverse,
+                    ..scroll_content_node()
+                },
+            ));
         parent
             .spawn((
                 BackgroundColor(FRAME_BG_COLOR),
@@ -180,8 +170,8 @@ fn setup(
                     ..Default::default()
                 },
                 GameplayObject,
-                GameplayButton::StartForgingSword,
             ))
+            .observe(on_start_forging_sword_pressed)
             .with_children(|btn| {
                 let text_style = TextFont {
                     font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
@@ -194,8 +184,7 @@ fn setup(
                     font_color,
                     TextLayout::new_with_justify(JustifyText::Center),
                 ));
-            })
-            .observe(sound_on_button);
+            });
         parent
             .spawn((
                 BackgroundColor(INTERACTIVE_BG_COLOR),
@@ -213,8 +202,8 @@ fn setup(
                     ..Default::default()
                 },
                 GameplayObject,
-                GameplayButton::StartForgingShield,
             ))
+            .observe(on_start_forging_shield_pressed)
             .with_children(|btn| {
                 let text_style = TextFont {
                     font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
@@ -227,8 +216,7 @@ fn setup(
                     font_color,
                     TextLayout::new_with_justify(JustifyText::Center),
                 ));
-            })
-            .observe(sound_on_button);
+            });
     });
     let Ok(mut background) = game_bg.get_single_mut() else {
         return;
@@ -259,32 +247,50 @@ fn add_currency_text(
     }
 }
 
-fn handle_buttons(
-    mut reader: EventReader<ButtonReleasedEvent>,
-    q: Query<&GameplayButton>,
+fn on_start_forging_sword_pressed(
+    t: Trigger<Pointer<Up>>,
     ctx: Res<BeamContext>,
+    asset_server: Res<AssetServer>,
     mut commands: Commands,
 ) {
-    for event in reader.read() {
-        let Ok(button) = q.get(**event) else {
-            continue;
-        };
-        match button {
-            GameplayButton::StartForgingSword => {
-                // commands.add(MicroserviceStartForging);
-                commands.beam_add_to_inventory(
-                    vec!["items.AiItemContent.AiSword".into()],
-                    ctx.get_gamer_tag().unwrap().to_string(),
-                );
-            }
-            GameplayButton::StartForgingShield => {
-                commands.beam_add_to_inventory(
-                    vec!["items.AiItemContent.AiShield".into()],
-                    ctx.get_gamer_tag().unwrap().to_string(),
-                );
-            }
-        }
-    }
+    commands.beam_add_to_inventory(
+        vec!["items.AiItemContent.AiSword".into()],
+        ctx.get_gamer_tag().unwrap().to_string(),
+    );
+    commands.spawn((
+        AudioPlayer::new(asset_server.load("sfx/blacksmith.ogg".to_owned())),
+        PlaybackSettings::DESPAWN,
+        SoundEffectPlayer,
+    ));
+    commands
+        .entity(t.entity())
+        .insert(components::HiddenUiElement(Timer::new(
+            Duration::from_secs(3),
+            TimerMode::Once,
+        )));
+}
+
+fn on_start_forging_shield_pressed(
+    t: Trigger<Pointer<Up>>,
+    ctx: Res<BeamContext>,
+    asset_server: Res<AssetServer>,
+    mut commands: Commands,
+) {
+    commands.beam_add_to_inventory(
+        vec!["items.AiItemContent.AiShield".into()],
+        ctx.get_gamer_tag().unwrap().to_string(),
+    );
+    commands.spawn((
+        AudioPlayer::new(asset_server.load("sfx/blacksmith.ogg".to_owned())),
+        PlaybackSettings::DESPAWN,
+        SoundEffectPlayer,
+    ));
+    commands
+        .entity(t.entity())
+        .insert(components::HiddenUiElement(Timer::new(
+            Duration::from_secs(3),
+            TimerMode::Once,
+        )));
 }
 
 fn update_inventory(
@@ -407,6 +413,7 @@ fn update_inventory(
                                 },
                                 SellItemButton(proxy_id.clone()),
                             ))
+                            .observe(sell_sword_pressed)
                             .with_children(|btn| {
                                 btn.spawn((
                                     Text::new(format!("Sell it for {}", &price.value)),

@@ -1,3 +1,4 @@
+use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy_args::BevyArgsPlugin;
 use bevy_beam_sdk::{config::BeamableConfig, BeamPlugin};
@@ -32,6 +33,10 @@ fn main() {
         .insert_resource(config)
         .add_plugins(DefaultPlugins.set(AssetPlugin {
             meta_check: bevy::asset::AssetMetaCheck::Never,
+            ..default()
+        }).set(LogPlugin {
+            level: bevy::log::Level::DEBUG,
+            filter: "debug,wgpu_core=warn,wgpu_hal=warn,mygame=debug,cosmic_text=warn,naga=warn,bevy_eventwork=trace".into(),
             ..default()
         }))
         .add_plugins(BevyArgsPlugin::<GameArgs>::default())

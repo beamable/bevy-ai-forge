@@ -57,7 +57,7 @@ pub mod macros {
                                 $call_from_open_api(&config, request_data).await
                             })
                             .await;
-                            println!("{:#?}", r);
+                            // println!("{:#?}", r);
                             tx.send(r).ok();
                         })
                         .detach();
@@ -165,7 +165,7 @@ pub mod macros {
                                 $call_from_open_api(&config).await
                             })
                             .await;
-                            println!("{:#?}", r);
+                            // println!("{:#?}", r);
                             tx.send(r).ok();
                         })
                         .detach();

@@ -1,5 +1,5 @@
 /ai-forge
-ForgeService/services/ForgeService/.idea
+services/ForgeService/.idea
 /oapi
 .idea
 target
@@ -7,3 +7,5 @@ target
 /out
 key.pem
 cert.pem
+services/**/bin
+services/**/obj
