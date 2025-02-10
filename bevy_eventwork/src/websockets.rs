@@ -105,7 +105,7 @@ mod native_websocket {
             _network_settings: Self::NetworkSettings,
         ) -> Result<Self::Socket, NetworkError> {
             info!("Beginning connection");
-            let (stream, response) =
+            let (stream, _response) =
                 async_tungstenite::async_std::connect_async_with_tls_connector_and_config(
                     connect_info,
                     Some(Default::default()),
