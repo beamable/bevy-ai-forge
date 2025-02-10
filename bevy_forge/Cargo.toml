@@ -6,8 +6,6 @@ license = "MIT OR Apache-2.0 OR CC0-1.0"
 
 
 [dependencies]
-console_error_panic_hook = "0.1"
-futures-lite = "2.2.0"
 bevy_pkv = "0.12"
 bevy_simple_text_input = "0.10"
 bevy_args = "1.7"
@@ -23,10 +21,6 @@ serde_json = "1.0"
 
 [dependencies.bevy]
 version = "0.15"
-
-[dependencies.reqwest]
-version = "^0.12"
-features = ["json", "multipart", "rustls-tls"]
 
 [target.'cfg(target_arch = "aarch64")'.dependencies]
 async-compat = "0.2"

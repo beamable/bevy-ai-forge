@@ -176,6 +176,10 @@ use std::ops::Deref;
 /// A default tcp provider to help get you started.
 pub mod tcp;
 
+#[cfg(feature = "websocket")]
+/// A default websocket provider to help get you started.
+pub mod websockets;
+
 struct AsyncChannel<T> {
     pub(crate) sender: Sender<T>,
     pub(crate) receiver: Receiver<T>,
@@ -202,20 +206,21 @@ impl Display for ConnectionId {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 /// [`NetworkPacket`]s are untyped packets to be sent over the wire
 pub struct NetworkPacket {
-    kind: String,
-    data: Vec<u8>,
+    /// The key of the packet.
+    pub kind: String,
+    /// The data of the packet.
+    pub data: Vec<u8>,
 }
-//
-// impl Debug for NetworkPacket {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         f.debug_struct("NetworkPacket")
-//             .field("kind", &self.kind)
-//             .finish()
-//     }
-// }
+impl Debug for NetworkPacket {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("NetworkPacket")
+            .field("kind", &self.kind)
+            .finish()
+    }
+}
 
 #[derive(Debug, Event)]
 /// A network event originating from another eventwork app

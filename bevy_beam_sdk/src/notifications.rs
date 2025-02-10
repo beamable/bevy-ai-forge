@@ -1,11 +1,9 @@
 use crate::api::BeamableBasicApi;
 use crate::context::BeamContext;
-use beam_autogen_rs::models::InventoryQueryRequest;
 use bevy::prelude::*;
 use bevy_eventwork::{AppNetworkMessage, NetworkData, NetworkMessage};
-use bevy_eventwork_mod_websockets::WebSocketProvider;
 use serde::{Deserialize, Serialize};
-use serde::de::DeserializeOwned;
+use bevy_eventwork::websockets::WebSocketProvider;
 
 pub(crate) fn plugin(app: &mut App) {
     app.listen_for_message::<InventoryRefreshNotify, WebSocketProvider>();
@@ -35,7 +33,7 @@ fn handle_inventory_refresh_notify(
     mut commands: Commands,
 ) {
     for e in ev.read() {
-        // warn!("GOT MESSAGE: {e:?}");
+        warn!("GOT MESSAGE: {e:?}");
         let scope = e.scopes.as_ref().map(|array| array.join(","));
         let gamer_tag = context.get_gamer_tag().unwrap().to_string();
         commands.beam_get_inventory(scope, gamer_tag);

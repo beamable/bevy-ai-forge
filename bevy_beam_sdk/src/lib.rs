@@ -4,15 +4,16 @@ use bevy::prelude::*;
 pub mod api;
 pub mod config;
 pub mod context;
+#[cfg(feature = "websocket")]
 pub mod notifications;
 pub mod requests;
 pub mod state;
 pub mod utils;
 
-#[cfg(not(target_family = "wasm"))]
+#[cfg(feature = "websocket")]
 pub mod websocket;
 
-/// A `Plugin` providing the bsystems and components required to make Beamable SDK work.
+/// A `Plugin` providing the systems and components required to make Beamable SDK work.
 pub struct BeamPlugin;
 
 impl Plugin for BeamPlugin {
@@ -37,7 +38,7 @@ impl Plugin for BeamPlugin {
                 (|mut cmd: Commands| {
                     cmd.beam_basic_get_realm_config();
                 })
-                .run_if(resource_added::<requests::ReqwestClient>),
+                    .run_if(resource_added::<requests::ReqwestClient>),
             )
             .add_systems(
                 OnEnter(state::BeamableInitStatus::WaitingForCredentials),
@@ -62,23 +63,25 @@ impl Plugin for BeamPlugin {
                     config::update_config,
                 ),
             );
-        #[cfg(not(target_family = "wasm"))]
-        app.add_systems(
-            OnEnter(state::BeamableInitStatus::WebsocketConnection),
-            |mut cmd: Commands, context: Res<BeamContext>, config: Res<config::BeamableConfig>| {
-                if let Some(token) = &context.token {
-                    if let Some(access) = &token.access_token {
-                        cmd.spawn(websocket::WebSocketConnection {
-                            uri: config.get_websocket_uri(),
-                            scope: config.get_x_beam_scope(),
-                            token: access.clone(),
-                            ..Default::default()
-                        });
+        #[cfg(feature = "websocket")]
+        {
+            app.add_systems(
+                OnEnter(state::BeamableInitStatus::WebsocketConnection),
+                |mut cmd: Commands, context: Res<BeamContext>, config: Res<config::BeamableConfig>| {
+                    if let Some(token) = &context.token {
+                        if let Some(access) = &token.access_token {
+                            cmd.spawn(websocket::WebSocketConnection {
+                                uri: config.get_websocket_uri(),
+                                scope: config.get_x_beam_scope(),
+                                token: access.clone(),
+                                ..Default::default()
+                            });
+                        }
                     }
-                }
-            },
-        );
-        app.add_plugins(websocket::websocket_plugin);
+                },
+            );
+            app.add_plugins(websocket::websocket_plugin);
+        }
 
         api::register_types(app);
     }
