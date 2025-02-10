@@ -136,7 +136,7 @@ impl BeamableBasicApi for Commands<'_, '_> {
         self
     }
     fn beam_get_inventory(&mut self, scope: Option<String>, target_id: String) -> &mut Self {
-        let val = scope.unwrap_or("items".to_owned());
+
         self.queue(|world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfig>()
@@ -147,7 +147,7 @@ impl BeamableBasicApi for Commands<'_, '_> {
                     x_beam_scope,
                     object_id: target_id,
                     x_beam_gamertag: None,
-                    scope: Some(val),
+                    scope,
                 },
                 entity: None,
             })

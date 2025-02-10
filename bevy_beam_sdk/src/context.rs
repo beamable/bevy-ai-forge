@@ -29,6 +29,14 @@ impl BeamContext {
         }
         self.user.as_ref().map(|view| view.id)
     }
+
+    pub fn access_token(&self) -> Option<String> {
+        if let Some(Some(s)) = self.token.as_ref().map(|t| &t.access_token) {
+            s.to_owned().into()
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Reflect, Deserialize)]
@@ -245,7 +253,7 @@ pub fn handle_inventory_get(
     mut inv: ResMut<BeamInventory>,
 ) {
     for event in inventory_events.read() {
-        // info!("Inventory Get: {:#?}", event);
+        info!("Inventory Got: {:#?}", event);
         if let Ok(event) = &**event {
             let inventory = BeamInventory::from((*event).clone());
             for (currency, amount) in inventory.currencies {

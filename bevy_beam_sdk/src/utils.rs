@@ -38,10 +38,8 @@ pub mod macros {
                         api_key,
                         ..Default::default()
                     };
-                    if let Some(token) = &context.token {
-                        if let Some(access_token) = &token.access_token {
-                            config.bearer_access_token = Some(access_token.clone());
-                        }
+                    if let Some(access_token) = context.access_token() {
+                        config.bearer_access_token = access_token.into();
                     }
                     let request_data = self.data.clone();
 
@@ -146,10 +144,8 @@ pub mod macros {
                         api_key,
                         ..Default::default()
                     };
-                    if let Some(token) = &context.token {
-                        if let Some(access_token) = &token.access_token {
-                            config.bearer_access_token = Some(access_token.clone());
-                        }
+                    if let Some(Some(access_token)) = &context.token.as_ref().map(|t| t.access_token.clone()) {
+                        config.bearer_access_token = access_token.to_string().into();
                     }
                     let (tx, task) = crossbeam_channel::bounded(1);
 
