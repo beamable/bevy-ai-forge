@@ -387,7 +387,11 @@ mod wasm_websocket {
                     tokio_tungstenite_wasm::Error::UnknownFormat => {
                         NetworkError::Error(format!("Invalid Format"))
                     }
-                })?;
+                });
+            if let Err(s) = &stream {
+                error!("Failed to create ws connection: {:?}", s);
+            }
+            let stream = stream?;
             info!("Connected!");
             return Ok(SendWrapper::new(stream));
         }
