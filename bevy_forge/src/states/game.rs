@@ -34,10 +34,9 @@ impl Plugin for GameStatePlugin {
         #[cfg(target_arch = "wasm32")]
         app.add_systems(
             FixedUpdate,
-            call_update_inventory.run_if(
-                in_state(super::MainGameState::Game)
-                    .and(time::common_conditions::on_timer(Duration::from_secs(5))),
-            ),
+            call_update_inventory.run_if(in_state(super::MainGameState::Game).and(
+                bevy::time::common_conditions::on_timer(Duration::from_secs(5)),
+            )),
         );
     }
 }
