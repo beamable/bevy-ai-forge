@@ -16,12 +16,18 @@ pub struct BeamableConfigResource {
 #[reflect(Resource)]
 pub struct BeamableWebsocketUrl(pub String);
 
+#[cfg(not(target_arch = "wasm32"))]
+const CONNECT_URI: &str = "/connect?send-session-start=true";
+
+#[cfg(target_arch = "wasm32")]
+const CONNECT_URI: &str = "/connect";
+
 impl BeamableWebsocketUrl {
     pub fn uri(&self) -> String {
         if self.is_empty() {
-            "wss://api.beamable.com/api/connect?send-session-start=true".to_owned()
+            format!("wss://api.beamable.com/api{}", CONNECT_URI)
         } else {
-            format!("{}/connect?send-session-start=true", &**self)
+            format!("{}{}", &**self, CONNECT_URI)
         }
     }
 }
