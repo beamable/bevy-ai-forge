@@ -33,7 +33,7 @@ fn handle_inventory_refresh_notify(
     mut commands: Commands,
 ) {
     for e in ev.read() {
-        warn!("GOT MESSAGE: {e:?}");
+        trace!("InventoryRefreshNotify: {e:?}");
         let scope = e.scopes.as_ref().map(|array| array.join(","));
         for ctx in q.iter() {
             let gamer_tag = ctx.slot.get_gamer_tag().unwrap().to_string();
