@@ -64,7 +64,7 @@ mod native_websocket {
         tungstenite::{protocol::WebSocketConfig, Message},
         WebSocketStream,
     };
-    
+
     use bevy::prelude::{error, info, trace, Deref, DerefMut, Resource};
     use futures::{
         stream::{SplitSink, SplitStream},
