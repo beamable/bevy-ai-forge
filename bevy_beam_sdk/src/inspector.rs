@@ -51,9 +51,14 @@ fn bevy_inspector(world: &mut World) {
             ui.separator();
             ui.collapsing("Configuration", |ui| {
                 ui.vertical_centered_justified(|ui| {
+                    ui.label("Base config");
                     bevy_inspector_egui::bevy_inspector::ui_for_resource::<BeamableConfigResource>(
                         world, ui,
                     );
+                    ui.label("Routing key for microservices");
+                    bevy_inspector_egui::bevy_inspector::ui_for_resource::<
+                        crate::config::RoutingMapKey,
+                    >(world, ui);
                 });
             });
             ui.separator();

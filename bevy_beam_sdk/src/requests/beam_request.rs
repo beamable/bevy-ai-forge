@@ -84,7 +84,8 @@ where
         let config = world
             .get_resource::<BeamableConfigResource>()
             .expect("No Beamable Config available");
+        let routing = world.get_resource::<crate::config::RoutingMapKey>();
 
-        super::client::ReqwestClient::new(config, gamer_tag, &token)
+        super::client::ReqwestClient::new(config, routing, gamer_tag, &token)
     }
 }

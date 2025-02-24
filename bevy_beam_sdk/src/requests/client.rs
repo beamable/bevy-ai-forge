@@ -29,6 +29,7 @@ impl ReqwestClient {
 
     pub fn new(
         config: &BeamableConfigResource,
+        routing: Option<&crate::config::RoutingMapKey>,
         gamer_tag: Option<i64>,
         token: &TokenStorage,
     ) -> Self {
@@ -41,6 +42,11 @@ impl ReqwestClient {
                 format!("Bearer {}", &token).parse().expect(""),
             );
             access_token = Some(token.to_owned().clone());
+        }
+        if let Some(route) = routing {
+            if !route.is_empty() {
+                headers.insert("X-BEAM-SERVICE-ROUTING-KEY", route.parse().expect(""));
+            }
         }
 
         let client = reqwest::ClientBuilder::new()

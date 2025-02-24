@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 
 use crate::api::common::{self, RealmsConfigEvent};
@@ -12,9 +12,14 @@ pub struct BeamableConfigResource {
     pub pid: String,
 }
 
-#[derive(Deserialize, Debug, Resource, Reflect, Deref)]
+#[derive(Deserialize, Serialize, Debug, Resource, Reflect, Deref)]
 #[reflect(Resource)]
 pub struct BeamableWebsocketUrl(pub String);
+
+/// Should be in format: "micro_{serviceName}:{key_value}"
+#[derive(Deserialize, Serialize, Debug, Resource, Reflect, Deref, Default, DerefMut)]
+#[reflect(Resource)]
+pub struct RoutingMapKey(pub String);
 
 #[cfg(not(target_arch = "wasm32"))]
 const CONNECT_URI: &str = "/connect?send-session-start=true";
@@ -84,6 +89,8 @@ impl Plugin for ConfigPlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<BeamableConfigResource>()
             .register_type::<BeamExternalIdentityConfig>()
+            .register_type::<RoutingMapKey>()
+            .init_resource::<RoutingMapKey>()
             .add_observer(update_config)
             .add_systems(
                 Update,
