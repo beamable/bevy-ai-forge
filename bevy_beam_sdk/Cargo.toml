@@ -6,8 +6,9 @@ license = "MIT OR Apache-2.0"
 description = "Experimental implementation of Beamable SDK into Bevy engine."
 
 [features]
-default = ["websocket"]
+default = ["websocket", "inspector"]
 websocket = ["dep:bevy_eventwork"]
+inspector = ["dep:bevy-inspector-egui"]
 
 [dependencies.bevy]
 version = "0.15"
@@ -20,15 +21,13 @@ default-features = true
 
 [dependencies.beam_autogen_rs]
 git = "https://github.com/beamable/beam_autogen_rs"
-rev = "2db93ad"
+rev = "017b755"
 
 [dependencies]
 bevy_pkv = "0.12"
 crossbeam-channel = "0.5"
 bevy_eventwork = { optional = true, version = "0.11", path = "../bevy_eventwork", default-features = false, features = ["websocket"] }
-#bevy-inspector-egui = { version = "0.29", default-features = false, features = [
-#    "bevy_render",
-#] }
+bevy-inspector-egui = { version = "0.29", optional = true}
 url = { version = "2.5.4" }
 serde = { version = "1.0", features = ["derive"] }
 bevy_beam_sdk_derive = { path = "../bevy_beam_sdk_derive", version = "0.1.0" }

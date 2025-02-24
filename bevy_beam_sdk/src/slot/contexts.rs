@@ -15,12 +15,13 @@ pub struct BeamableContexts {
     pub entity: Entity,
     pub slot: &'static mut BeamSlot,
     pub inventory: &'static mut BeamInventory,
+    pub stats: &'static mut BeamStats,
     pub token: Option<&'static mut TokenStorage>,
 }
 
 #[derive(SystemParam)]
 pub struct BeamableConfiguration<'w, 's> {
-    pub config: Res<'w, crate::config::BeamableConfig>,
+    pub config: Res<'w, crate::config::BeamableConfigResource>,
     #[cfg(feature = "websocket")]
     pub ws_config: Option<Res<'w, crate::config::BeamableWebsocketUrl>>,
     commands: Commands<'w, 's>,
@@ -39,6 +40,7 @@ impl BeamableConfiguration<'_, '_> {
             .observe(handle_post_token)
             .observe(handle_get_user_info)
             .observe(handle_get_external_user_info)
+            .observe(handle_stats_got)
             .beam_play_as_guest(name);
     }
 
@@ -52,7 +54,9 @@ impl BeamableConfiguration<'_, '_> {
             .observe(handle_post_token)
             .observe(handle_get_user_info)
             .observe(handle_get_external_user_info)
+            .observe(handle_stats_got)
             .beam_get_user_info()
+            .beam_get_stats(target_id.clone())
             .beam_get_inventory(None, target_id);
     }
 

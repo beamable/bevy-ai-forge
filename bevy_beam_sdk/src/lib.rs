@@ -4,7 +4,8 @@ use bevy::prelude::*;
 
 pub mod api;
 pub mod config;
-// pub mod context;
+#[cfg(feature = "websocket")]
+mod inspector;
 #[cfg(feature = "websocket")]
 pub mod notifications;
 pub mod requests;
@@ -31,6 +32,10 @@ impl Plugin for BeamPlugin {
         #[cfg(feature = "websocket")]
         {
             app.add_plugins(websocket::websocket_plugin);
+        }
+        #[cfg(feature = "inspector")]
+        {
+            app.add_plugins(inspector::InspectorPlugin);
         }
 
         api::register_types(app);

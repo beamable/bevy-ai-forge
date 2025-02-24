@@ -1,4 +1,4 @@
-use crate::config::BeamableConfig;
+use crate::config::BeamableConfigResource;
 use crate::slot::prelude::{BeamSlot, TokenStorage};
 use bevy::prelude::*;
 use std::fmt::Debug;
@@ -82,7 +82,7 @@ where
             _ => Default::default(),
         };
         let config = world
-            .get_resource::<BeamableConfig>()
+            .get_resource::<BeamableConfigResource>()
             .expect("No Beamable Config available");
 
         super::client::ReqwestClient::new(config, gamer_tag, &token)

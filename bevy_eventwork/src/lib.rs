@@ -193,7 +193,7 @@ impl<T> AsyncChannel<T> {
     }
 }
 
-#[derive(Hash, PartialEq, Eq, Clone, Copy, Debug)]
+#[derive(Hash, PartialEq, Eq, Clone, Copy, Debug, Reflect)]
 /// A [`ConnectionId`] denotes a single connection
 pub struct ConnectionId {
     /// The key of the connection.

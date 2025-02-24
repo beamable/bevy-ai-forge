@@ -6,4 +6,5 @@ pub enum BeamableInitStatus {
     None,
     UpdatingConfiguration,
     FullyInitialized,
+    ConfigError,
 }

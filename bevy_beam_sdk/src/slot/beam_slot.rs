@@ -1,10 +1,11 @@
 use crate::api::accounts::{AttachFederatedIdentityCompletedEvent, GetAccountMeCompletedEvent};
 use crate::api::common::{CreateAnononymousUserCompletedEvent, GetTokenEvent, PostTokenEvent};
 use crate::api::inventory::InventoryGetCompletedEvent;
+use crate::api::stats::StatsGetEvent;
 use crate::api::BeamableBasicApi;
 use crate::config::BeamExternalIdentityConfig;
 use crate::slot::prelude::*;
-use bevy::log::{debug, error, info};
+use bevy::log::error;
 use bevy::prelude::*;
 use bevy_pkv::PkvStore;
 use serde::{Deserialize, Serialize};
@@ -19,7 +20,7 @@ pub struct GamerTag(Option<i64>);
 
 #[derive(Serialize, Debug, Deserialize, Component, Reflect, Default)]
 #[reflect(Component, Default)]
-#[require(BeamInventory, StateScoped::<crate::state::BeamableInitStatus>(|| StateScoped(crate::state::BeamableInitStatus::FullyInitialized)))]
+#[require(BeamInventory, Name(|| Name::new("BeamSlot")), BeamStats, StateScoped::<crate::state::BeamableInitStatus>(|| StateScoped(crate::state::BeamableInitStatus::FullyInitialized)))]
 pub struct BeamSlot {
     pub name: Option<String>,
     pub user: Option<UserView>,
@@ -35,10 +36,12 @@ impl BeamSlot {
     }
 }
 
+#[derive(Serialize, Debug, Deserialize, Component, Reflect, Default, Deref, DerefMut)]
+#[reflect(Component, Default)]
+pub struct BeamStats(std::collections::HashMap<String, String>);
+
 pub fn save_user_info(ev: Trigger<CreateAnononymousUserCompletedEvent>, mut commands: Commands) {
     let event = ev.event().deref();
-    // let Ok((_,mut slot,_,mut token)) = beam.q.get(ev.entity()) else {return;};
-    // token
     match event {
         Ok(token) => {
             let access_token = token.access_token.clone().unwrap_or_default();
@@ -57,7 +60,7 @@ pub fn save_token(
     mut pkv: ResMut<PkvStore>,
 ) {
     for (token, slot) in q.iter() {
-        info!("SAVING TOKEN");
+        trace!("SAVING TOKEN");
         pkv.set("user_token", &token).expect("Failed to save user");
         pkv.set("user_slot", &slot).expect("Failed to save user");
     }
@@ -94,8 +97,9 @@ pub fn handle_get_token(
                 .entity(ev.entity())
                 .beam_get_inventory(
                     Some("currency.coins,items.AiItemContent".to_owned()),
-                    target_id,
+                    target_id.clone(),
                 )
+                .beam_get_stats(target_id)
                 .beam_get_user_info();
         }
         Err(_) => {
@@ -114,7 +118,7 @@ pub fn handle_inventory_get(
     let Ok(mut ctx) = q.get_mut(ev.entity()) else {
         return;
     };
-    debug!("Inventory update: {:#?}", event);
+    trace!("Inventory update: {:#?}", event);
     if let Ok(event) = event {
         let inventory = BeamInventory::from((*event).clone());
         for (currency, amount) in inventory.currencies {
@@ -143,7 +147,7 @@ pub fn handle_post_token(
     let Ok(ctx) = q.get_mut(ev.entity()) else {
         return;
     };
-    info!("PostTokenEvent: {:#?}", event);
+    trace!("PostTokenEvent: {:#?}", event);
     if let Ok(data) = &**event {
         let new_token = TokenStorage::from_token_response(data);
         let target_id = ctx.slot.gamer_tag.unwrap().to_string();
@@ -152,8 +156,9 @@ pub fn handle_post_token(
             .insert(new_token)
             .beam_get_inventory(
                 Some("currency.coins,items.AiItemContent".to_owned()),
-                target_id,
+                target_id.clone(),
             )
+            .beam_get_stats(target_id)
             .beam_get_user_info();
     }
 }
@@ -163,11 +168,26 @@ pub fn handle_get_external_user_info(
     mut commands: Commands,
 ) {
     let event = ev.event();
-    info!("AttachFederatedIdentityCompletedEvent: {:#?}", event);
+    trace!("AttachFederatedIdentityCompletedEvent: {:#?}", event);
     let Ok(_) = &**event else {
         return;
     };
     commands.entity(ev.entity()).beam_get_user_info();
+}
+
+pub fn handle_stats_got(ev: Trigger<StatsGetEvent>, mut q: Query<BeamableContexts>) {
+    let event = ev.event();
+    trace!("Stats: {:#?}", event);
+    let Ok(event) = &**event else {
+        return;
+    };
+
+    let Ok(mut ctx) = q.get_mut(ev.entity()) else {
+        return;
+    };
+    for (key, value) in event.stats.iter() {
+        ctx.stats.insert(key.to_string(), value.to_string());
+    }
 }
 
 pub fn handle_get_user_info(
@@ -178,7 +198,7 @@ pub fn handle_get_user_info(
     #[cfg(feature = "websocket")] config: BeamableConfiguration,
 ) {
     let event = ev.event();
-    info!("GetAccountMe: {:#?}", event);
+    trace!("GetAccountMe: {:#?}", event);
     let Ok(event) = &**event else {
         return;
     };

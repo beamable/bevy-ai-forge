@@ -12,11 +12,13 @@ pub(crate) fn websocket_plugin(app: &mut App) {
     ));
 
     app.add_plugins(crate::notifications::plugin);
-    app.init_resource::<NetworkSettings>();
+    app.init_resource::<NetworkSettings>()
+        .register_type::<WebSocketConnection>();
     app.add_systems(Update, (on_create, handle_network_events));
 }
 
-#[derive(Component, Default, Debug)]
+#[derive(Component, Default, Debug, Reflect)]
+#[reflect(Component)]
 pub struct WebSocketConnection {
     pub uri: String,
     pub token: String,
@@ -55,16 +57,14 @@ pub fn on_create(
 
 fn handle_network_events(
     mut new_network_events: EventReader<bevy_eventwork::NetworkEvent>,
-    mut next_state: ResMut<NextState<super::state::BeamableInitStatus>>,
     mut q: Query<&mut WebSocketConnection>,
 ) {
     for event in new_network_events.read() {
-        info!("EVENT {:?}", &event);
+        trace!("EVENT {:?}", &event);
         if let bevy_eventwork::NetworkEvent::Connected(connection_id) = event {
             for mut conn in q.iter_mut() {
                 conn.id = Some(*connection_id);
             }
-            next_state.set(super::state::BeamableInitStatus::FullyInitialized);
         }
     }
 }

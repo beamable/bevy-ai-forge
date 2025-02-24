@@ -6,7 +6,7 @@ use crate::api::common::{self, RealmsConfigEvent};
 
 #[derive(Deserialize, Debug, Resource, Reflect)]
 #[reflect(Resource)]
-pub struct BeamableConfig {
+pub struct BeamableConfigResource {
     pub host: String,
     pub cid: String,
     pub pid: String,
@@ -19,13 +19,13 @@ pub struct BeamableWebsocketUrl(pub String);
 impl BeamableWebsocketUrl {
     pub fn uri(&self) -> String {
         if self.is_empty() {
-            "wss://api.beamable.com/api/connect".to_owned()
+            "wss://api.beamable.com/api/connect?send-session-start=true".to_owned()
         } else {
-            format!("{}/connect", &**self)
+            format!("{}/connect?send-session-start=true", &**self)
         }
     }
 }
-impl BeamableConfig {
+impl BeamableConfigResource {
     pub fn get_x_beam_scope(&self) -> String {
         format!("{}.{}", self.cid, self.pid)
     }
@@ -44,7 +44,8 @@ pub fn update_config(
     mut next_state: ResMut<NextState<crate::state::BeamableInitStatus>>,
 ) {
     let Ok(response) = realm_config_response.event().deref() else {
-        panic!("Should not happened");
+        next_state.set(crate::state::BeamableInitStatus::ConfigError);
+        return;
     };
     info!("{:#?}", response);
     let url = match &response.websocket_config.uri {
@@ -57,10 +58,9 @@ pub fn update_config(
 
 pub fn get_config_defaults(
     mut commands: Commands,
-    config: Res<BeamableConfig>,
+    config: Res<BeamableConfigResource>,
     mut next_state: ResMut<NextState<crate::state::BeamableInitStatus>>,
 ) {
-    // commands.remove_resource::<BeamableWebsocketUrl>();
     let x_beam_scope = config.get_x_beam_scope();
     commands.queue(common::RealmsConfig(
         beam_autogen_rs::apis::default_api::BasicRealmsClientDefaultsGetParams {
@@ -76,32 +76,15 @@ pub struct ConfigPlugin;
 
 impl Plugin for ConfigPlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<BeamableConfig>()
+        app.register_type::<BeamableConfigResource>()
             .register_type::<BeamExternalIdentityConfig>()
             .add_observer(update_config)
             .add_systems(
                 Update,
-                get_config_defaults.run_if(resource_added::<BeamableConfig>),
+                get_config_defaults.run_if(
+                    resource_added::<BeamableConfigResource>
+                        .or(resource_exists_and_changed::<BeamableConfigResource>),
+                ),
             );
     }
 }
-
-//
-// pub fn spawn_websocket_connection(
-//     mut cmd: Commands,
-//     context: Res<crate::context::BeamGlobalContext>,
-//     config: Res<BeamableConfig>,
-//     web_config: Res<BeamableWebsocketUrl>,
-// ) {
-//     if let Some(Some(access)) = &context.token.as_ref().map(|s| &s.access_token) {
-//         cmd.spawn(crate::websocket::WebSocketConnection {
-//             uri: web_config.uri(),
-//             scope: config.get_x_beam_scope(),
-//             token: access.clone(),
-//             ..Default::default()
-//         });
-//         info!("spawn_websocket_connection Success");
-//     } else {
-//         error!("spawn_websocket_connection FAIL");
-//     }
-// }

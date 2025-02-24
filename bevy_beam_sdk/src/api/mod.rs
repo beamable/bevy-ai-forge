@@ -2,17 +2,12 @@ use beam_autogen_rs::models::AttachExternalIdentityApiRequest;
 use beam_autogen_rs::models::InventoryUpdateRequest;
 use beam_autogen_rs::models::ItemCreateRequest;
 use beam_autogen_rs::models::TokenRequestWrapper;
-// use bevy::ecs::system::SystemParam;
 use bevy::prelude::*;
 
 pub mod accounts;
 pub mod common;
 pub mod inventory;
-
-// #[derive(SystemParam)]
-// pub struct BeamContexts<'w, 's> {
-//     pub config: Res<'w, crate::config::BeamableConfig>
-// }
+pub mod stats;
 
 #[allow(dead_code)]
 pub trait BeamableBasicApi {
@@ -27,6 +22,7 @@ pub trait BeamableBasicApi {
     fn beam_post_token(&mut self, token: String) -> &mut Self;
     fn beam_get_inventory(&mut self, scope: Option<String>, target_id: String) -> &mut Self;
     fn beam_add_to_inventory(&mut self, new_items: Vec<String>, target_id: String) -> &mut Self;
+    fn beam_get_stats(&mut self, target_id: String) -> &mut Self;
 }
 
 impl BeamableBasicApi for EntityCommands<'_> {
@@ -37,7 +33,7 @@ impl BeamableBasicApi for EntityCommands<'_> {
 
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
-                .get_resource::<crate::config::BeamableConfig>()
+                .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
 
@@ -56,7 +52,7 @@ impl BeamableBasicApi for EntityCommands<'_> {
         let id = self.id();
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
-                .get_resource::<crate::config::BeamableConfig>()
+                .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
             world.commands().queue(common::CreateAnononymousUser(
@@ -77,7 +73,7 @@ impl BeamableBasicApi for EntityCommands<'_> {
         let id = self.id();
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
-                .get_resource::<crate::config::BeamableConfig>()
+                .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
             world.commands().queue(accounts::AttachFederatedIdentity(
@@ -95,7 +91,7 @@ impl BeamableBasicApi for EntityCommands<'_> {
         let id = self.id();
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
-                .get_resource::<crate::config::BeamableConfig>()
+                .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
             world.commands().queue(accounts::GetAccountMe(
@@ -112,7 +108,7 @@ impl BeamableBasicApi for EntityCommands<'_> {
         let id = self.id();
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
-                .get_resource::<crate::config::BeamableConfig>()
+                .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
             world.commands().queue(common::GetToken(
@@ -130,7 +126,7 @@ impl BeamableBasicApi for EntityCommands<'_> {
         let id = self.id();
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
-                .get_resource::<crate::config::BeamableConfig>()
+                .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
             world.commands().queue(common::PostToken(
@@ -151,7 +147,7 @@ impl BeamableBasicApi for EntityCommands<'_> {
         let id = self.id();
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
-                .get_resource::<crate::config::BeamableConfig>()
+                .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
             world.commands().queue(inventory::InventoryGet(
@@ -182,7 +178,7 @@ impl BeamableBasicApi for EntityCommands<'_> {
         };
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
-                .get_resource::<crate::config::BeamableConfig>()
+                .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
             world.commands().queue(inventory::InventoryAdd(
@@ -191,6 +187,27 @@ impl BeamableBasicApi for EntityCommands<'_> {
                     object_id: target_id,
                     x_beam_gamertag: None,
                     inventory_update_request: Some(data),
+                },
+                id,
+            ))
+        });
+        self
+    }
+
+    fn beam_get_stats(&mut self, target_id: String) -> &mut Self {
+        let id = self.id();
+        self.commands().queue(move |world: &mut World| {
+            let x_beam_scope = world
+                .get_resource::<crate::config::BeamableConfigResource>()
+                .unwrap()
+                .get_x_beam_scope();
+            let object_id = format!("game.public.player.{}", target_id);
+            world.commands().queue(stats::StatsGet(
+                beam_autogen_rs::apis::default_api::ObjectStatsObjectIdClientGetParams {
+                    stats: None,
+                    x_beam_scope,
+                    object_id,
+                    x_beam_gamertag: None,
                 },
                 id,
             ))
@@ -209,4 +226,5 @@ pub fn register_types(app: &mut App) {
     accounts::AttachFederatedIdentityCompletedEvent::register(app);
     inventory::InventoryGetCompletedEvent::register(app);
     inventory::InventoryAddCompletedEvent::register(app);
+    stats::StatsGetEvent::register(app);
 }

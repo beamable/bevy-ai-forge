@@ -1,7 +1,7 @@
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy_args::BevyArgsPlugin;
-use bevy_beam_sdk::{config::BeamableConfig, BeamPlugin};
+use bevy_beam_sdk::{config::BeamableConfigResource, BeamPlugin};
 use debug::DebugPlugin;
 use utils::GameArgs;
 
@@ -13,9 +13,9 @@ pub mod states;
 pub mod utils;
 
 fn main() {
-    let config = match serde_json::from_str::<BeamableConfig>(consts::CONFIG_DEFAULTS) {
+    let config = match serde_json::from_str::<BeamableConfigResource>(consts::CONFIG_DEFAULTS) {
         Ok(config) => config,
-        Err(_) => BeamableConfig {
+        Err(_) => BeamableConfigResource {
             host: Default::default(),
             cid: Default::default(),
             pid: Default::default(),

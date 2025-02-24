@@ -14,10 +14,6 @@ impl Plugin for DebugPlugin {
                 WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F1)),
             )
             .add_plugins(
-                StateInspectorPlugin::<bevy_beam_sdk::state::BeamableInitStatus>::default()
-                    .run_if(input_toggle_active(false, KeyCode::F1)),
-            )
-            .add_plugins(
                 StateInspectorPlugin::<crate::states::MainGameState>::default()
                     .run_if(input_toggle_active(false, KeyCode::F1)),
             );
@@ -27,7 +23,7 @@ impl Plugin for DebugPlugin {
 fn git_info(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    beam_config: Res<bevy_beam_sdk::config::BeamableConfig>,
+    beam_config: Res<bevy_beam_sdk::config::BeamableConfigResource>,
 ) {
     commands
         .spawn((

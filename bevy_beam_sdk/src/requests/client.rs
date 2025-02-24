@@ -1,4 +1,4 @@
-use crate::config::BeamableConfig;
+use crate::config::BeamableConfigResource;
 use crate::slot::prelude::*;
 
 #[derive(Clone)]
@@ -12,7 +12,7 @@ pub struct ReqwestClient {
 }
 
 impl ReqwestClient {
-    pub fn with_default_headers(config: &BeamableConfig) -> reqwest::header::HeaderMap {
+    pub fn with_default_headers(config: &BeamableConfigResource) -> reqwest::header::HeaderMap {
         let beam_sdk_version = env!("CARGO_PKG_VERSION");
         let mut default_headers = reqwest::header::HeaderMap::new();
         default_headers.insert("X-KS-USER-AGENT", "Bevy-0.15".parse().expect(""));
@@ -27,7 +27,11 @@ impl ReqwestClient {
         default_headers
     }
 
-    pub fn new(config: &BeamableConfig, gamer_tag: Option<i64>, token: &TokenStorage) -> Self {
+    pub fn new(
+        config: &BeamableConfigResource,
+        gamer_tag: Option<i64>,
+        token: &TokenStorage,
+    ) -> Self {
         let x_beam_scope = config.get_x_beam_scope();
         let mut headers = ReqwestClient::with_default_headers(config);
         let mut access_token = None;
