@@ -3,8 +3,9 @@ resolver = "2"
 
 members = [
     "beam_microservice",
+    "bevy_eventwork",
     "bevy_beam_sdk",
-    "bevy_forge",
+    "bevy_forge", "bevy_beam_sdk_derive",
 ]
 
 # Compile with Performance Optimizations:

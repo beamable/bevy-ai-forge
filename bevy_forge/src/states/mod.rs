@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_button_released_plugin::*;
 
 pub mod game;
 pub mod init;
@@ -24,9 +23,9 @@ impl Plugin for GameStatesPlugin {
             init::InitStatePlugin,
             login_screen::LoginScreenStatePlugin,
             menu::MenuStatePlugin,
-            ButtonsReleasedPlugin,
             bevy_simple_text_input::TextInputPlugin,
         ))
-        .init_state::<MainGameState>();
+        .init_state::<MainGameState>()
+        .enable_state_scoped_entities::<MainGameState>();
     }
 }

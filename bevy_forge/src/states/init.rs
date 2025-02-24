@@ -9,7 +9,7 @@ impl Plugin for InitStatePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(super::MainGameState::Init), setup)
             .add_systems(
-                OnEnter(bevy_beam_sdk::state::BeamableInitStatus::WaitingForCredentials),
+                OnEnter(bevy_beam_sdk::state::BeamableInitStatus::FullyInitialized),
                 (|mut next_state: ResMut<NextState<super::MainGameState>>| {
                     next_state.set(super::MainGameState::LoginScreen);
                 })

@@ -2,41 +2,24 @@ use beam_microservice::apis::uncategorized_api::*;
 use beam_microservice::models::{SayHiRequestArgs, SellSwordRequestArgs};
 use beam_microservice::*;
 use bevy::prelude::*;
-use bevy_beam_sdk::utils::macros::beam_request;
+use bevy_beam_sdk::prelude::*;
 
-beam_request!(
-    RequestSayHiTask,
-    MicroserviceSayHi,
-    SayHiEventCompleted,
-    beam_microservice::apis::uncategorized_api::say_hi_post,
-    String,
-    SayHiPostError,
-    Option<SayHiRequestArgs>
-);
-beam_request!(
-    RequestSellSwordTask,
-    MicroserviceSellSword,
-    SellSwordEventCompleted,
-    beam_microservice::apis::uncategorized_api::sell_sword_post,
-    bool,
-    SellSwordPostError,
-    Option<SellSwordRequestArgs>
-);
-beam_request!(
-    RequestStartForgingTask,
-    MicroserviceStartForging,
-    StartForgingEventCompleted,
-    beam_microservice::apis::uncategorized_api::start_forging_sword_post,
-    bool,
-    StartForgingSwordPostError
-);
+#[derive(Debug, BeamCommand)]
+#[beam_command(SayHiEventCompleted, String, apis::Error<SayHiPostError>, say_hi_post)]
+pub struct MicroserviceSayHi(pub Option<SayHiRequestArgs>, pub Entity);
+#[derive(Debug, BeamCommand)]
+#[beam_command(SellSwordEventCompleted, bool, apis::Error<SellSwordPostError>, sell_sword_post)]
+pub struct MicroserviceSellSword(pub Option<SellSwordRequestArgs>, pub Entity);
+#[derive(Debug, BeamCommand)]
+#[beam_command(StartForgingEventCompleted, bool, apis::Error<StartForgingSwordPostError>, start_forging_sword_post)]
+pub struct MicroserviceStartForging(pub Entity);
 
 pub struct MicroservicePlugin;
 
 impl Plugin for MicroservicePlugin {
     fn build(&self, app: &mut App) {
-        RequestSellSwordTask::register(app);
-        RequestStartForgingTask::register(app);
-        RequestSayHiTask::register(app);
+        SellSwordEventCompleted::register(app);
+        StartForgingEventCompleted::register(app);
+        SayHiEventCompleted::register(app);
     }
 }

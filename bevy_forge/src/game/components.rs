@@ -10,6 +10,7 @@ pub struct GameBackground;
 
 #[derive(Debug, Reflect, Component, Default, Clone)]
 #[reflect(Component)]
+#[require(StateScoped<crate::states::MainGameState>(||StateScoped(crate::states::MainGameState::Menu)))]
 pub struct GameLogoText;
 
 #[derive(Debug, Reflect, Component, Default, Clone)]
@@ -18,6 +19,7 @@ pub struct RequestText;
 
 #[derive(Debug, Reflect, Component, Default, Clone)]
 #[reflect(Component)]
+#[require(StateScoped<crate::states::MainGameState>(||StateScoped(crate::states::MainGameState::Game)))]
 pub struct GameplayObject;
 
 #[derive(Debug, Reflect, Component, Default, Clone)]
@@ -42,24 +44,8 @@ pub struct SellItemButton(pub String);
 
 #[derive(Debug, Reflect, Component, Default, Clone)]
 #[reflect(Component)]
+#[require(StateScoped<crate::states::MainGameState>(||StateScoped(crate::states::MainGameState::LoginScreen)))]
 pub struct LoginScreenObject;
-
-#[derive(Clone, Debug, Hash, Eq, Component, PartialEq, Reflect)]
-pub enum LoginScreenButton {
-    PlayAsGuest,
-    Login,
-}
-
-#[derive(Clone, Debug, Hash, Eq, Component, PartialEq, Reflect)]
-pub enum MenuButton {
-    StartGame,
-}
-
-#[derive(Clone, Debug, Hash, Eq, Component, PartialEq, Reflect)]
-pub enum GameplayButton {
-    StartForgingSword,
-    StartForgingShield,
-}
 
 #[derive(Clone, Debug, Component, PartialEq, Reflect)]
 pub struct HiddenUiElement(pub Timer);

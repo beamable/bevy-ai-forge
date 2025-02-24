@@ -5,6 +5,10 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "Experimental implementation of Beamable SDK into Bevy engine."
 
+[features]
+default = ["websocket"]
+websocket = ["dep:bevy_eventwork"]
+
 [dependencies.bevy]
 version = "0.15"
 default-features = false
@@ -16,26 +20,26 @@ default-features = true
 
 [dependencies.beam_autogen_rs]
 git = "https://github.com/beamable/beam_autogen_rs"
-rev = "adc92aa"
+rev = "2db93ad"
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
 bevy_pkv = "0.12"
 crossbeam-channel = "0.5"
+bevy_eventwork = { optional = true, version = "0.11", path = "../bevy_eventwork", default-features = false, features = ["websocket"] }
+#bevy-inspector-egui = { version = "0.29", default-features = false, features = [
+#    "bevy_render",
+#] }
+url = { version = "2.5.4" }
+serde = { version = "1.0", features = ["derive"] }
+bevy_beam_sdk_derive = { path = "../bevy_beam_sdk_derive", version = "0.1.0" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tungstenite = { version = "0.24", features = ["native-tls", "handshake"] }
 async-compat = "0.2"
 mio = "1"
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-tokio-tungstenite-wasm = { version = "0.4" }
-futures-util = { version = "0.3", default-features = false, features = [
-    "sink",
-    "std",
-] }
+[dependencies.serde_json]
+version = "1.0"
 
 [dependencies.reqwest]
 version = "^0.12"
-features = ["json", "multipart", "rustls-tls"]
+features = ["json", "multipart"]

@@ -31,23 +31,47 @@ fn git_info(
 ) {
     commands
         .spawn((
-            Text::new(format!(
-                "Made with Bevy and Beamable\ngit:{} ({})\nCID.PID:{}.{}",
-                GIT_HASH, GIT_DATE, beam_config.cid, beam_config.pid
-            )),
-            TextFont {
-                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                font_size: 16.0,
-                ..default()
-            },
-            TextColor(MY_ACCENT_COLOR),
-            TextLayout::new_with_justify(JustifyText::Right),
             Node {
                 position_type: PositionType::Absolute,
                 bottom: Val::Px(15.0),
                 right: Val::Px(15.0),
+                flex_direction: FlexDirection::Column,
+                row_gap: Val::Px(5.0),
                 ..default()
             },
+            ZIndex(5),
         ))
-        .insert(Name::new("Debug Info UI"));
+        .insert(Name::new("Debug Info UI"))
+        .with_children(|p| {
+            p.spawn((
+                Text::new("Made with Beamable"),
+                TextFont {
+                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(MY_ACCENT_COLOR),
+                TextLayout::new_with_justify(JustifyText::Right),
+            ));
+            p.spawn((
+                Text::new(format!("git:{} ({})", GIT_HASH, GIT_DATE)),
+                TextFont {
+                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(MY_ACCENT_COLOR),
+                TextLayout::new_with_justify(JustifyText::Right),
+            ));
+            p.spawn((
+                Text::new(format!("CID.PID: {}.{}", beam_config.cid, beam_config.pid)),
+                TextFont {
+                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(MY_ACCENT_COLOR),
+                TextLayout::new_with_justify(JustifyText::Right),
+            ));
+        });
 }

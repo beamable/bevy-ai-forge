@@ -1,25 +1,13 @@
-use super::super::utils::macros::beam_request;
+use crate::prelude::*;
 use beam_autogen_rs::apis::default_api::*;
 use beam_autogen_rs::*;
 use bevy::prelude::*;
 use models::{AccountPlayerView, AttachExternalIdentityApiResponse};
 
-beam_request!(
-    GetAccountMeTask,
-    GetAccountMe,
-    GetAccountMeCompletedEvent,
-    beam_autogen_rs::apis::default_api::basic_accounts_me_get,
-    AccountPlayerView,
-    BasicAccountsMeGetError,
-    BasicAccountsMeGetParams
-);
+#[derive(Debug, BeamCommand)]
+#[beam_command(GetAccountMeCompletedEvent, AccountPlayerView, apis::Error<BasicAccountsMeGetError>, basic_accounts_me_get)]
+pub struct GetAccountMe(pub BasicAccountsMeGetParams, pub Entity);
 
-beam_request!(
-    AttachFederatedIdentityTask,
-    AttachFederatedIdentity,
-    AttachFederatedIdentityCompletedEvent,
-    beam_autogen_rs::apis::default_api::basic_accounts_external_identity_post,
-    AttachExternalIdentityApiResponse,
-    BasicAccountsExternalIdentityPostError,
-    BasicAccountsExternalIdentityPostParams
-);
+#[derive(Debug, BeamCommand)]
+#[beam_command(AttachFederatedIdentityCompletedEvent, AttachExternalIdentityApiResponse, apis::Error<BasicAccountsExternalIdentityPostError>, basic_accounts_external_identity_post)]
+pub struct AttachFederatedIdentity(pub BasicAccountsExternalIdentityPostParams, pub Entity);

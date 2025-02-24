@@ -4,10 +4,6 @@ use bevy::prelude::*;
 pub enum BeamableInitStatus {
     #[default]
     None,
-    // TODO add health endpoint
-    // CheckInternet,
-    WaitingForCredentials,
-    LoggedIn,
-    WebsocketConnection,
+    UpdatingConfiguration,
     FullyInitialized,
 }

@@ -1,97 +1,38 @@
-use self::{api::BeamableBasicApi, context::BeamContext};
+use crate::config::ConfigPlugin;
+use crate::slot::BeamSlotPlugin;
 use bevy::prelude::*;
 
 pub mod api;
 pub mod config;
-pub mod context;
+// pub mod context;
+#[cfg(feature = "websocket")]
 pub mod notifications;
 pub mod requests;
+pub mod slot;
 pub mod state;
-pub mod utils;
 
-#[cfg(not(target_family = "wasm"))]
+#[cfg(feature = "websocket")]
 pub mod websocket;
 
-/// A `Plugin` providing the bsystems and components required to make Beamable SDK work.
+pub mod prelude {
+    pub use crate::requests::prelude::*;
+    pub use crate::BeamPlugin;
+    pub use bevy_beam_sdk_derive::BeamCommand;
+}
+
+/// A `Plugin` providing the systems and components required to make Beamable SDK work.
 pub struct BeamPlugin;
 
 impl Plugin for BeamPlugin {
-    fn build(&self, app: &mut bevy::prelude::App) {
-        app.register_type::<config::BeamableConfig>()
-            .register_type::<config::BeamExternalIdentityConfig>()
-            .register_type::<context::BeamContext>()
-            .register_type::<context::BeamInventory>()
-            .add_event::<notifications::Notification>()
-            .init_state::<state::BeamableInitStatus>()
-            .add_plugins(crate::requests::RequestsPlugin)
-            .add_systems(
-                Update,
-                context::save_user_info
-                    .run_if(in_state(state::BeamableInitStatus::WaitingForCredentials)),
-            )
-            .add_systems(
-                Update,
-                notifications::notification_handle::<notifications::InventoryRefreshNotify>
-                    .run_if(resource_exists::<context::BeamContext>),
-            )
-            .add_systems(
-                Update,
-                context::handle_inventory_get.run_if(resource_exists::<context::BeamInventory>),
-            )
-            .add_systems(
-                Update,
-                (|mut cmd: Commands| {
-                    cmd.beam_basic_get_realm_config();
-                })
-                .run_if(resource_added::<requests::ReqwestClient>),
-            )
-            .add_systems(
-                OnEnter(state::BeamableInitStatus::WaitingForCredentials),
-                context::read_context,
-            )
-            .add_systems(
-                OnEnter(state::BeamableInitStatus::LoggedIn),
-                |mut cmd: Commands, context: Res<BeamContext>| {
-                    if let Some(token) = &context.token {
-                        if let Some(access) = &token.access_token {
-                            cmd.beam_get_token(access.clone());
-                        }
-                    }
-                },
-            )
-            .add_systems(
-                Update,
-                (
-                    context::handle_accounts_callbacks,
-                    context::handle_token_callbacks,
-                    context::update_user_info,
-                    config::update_config,
-                ),
-            );
-        #[cfg(not(target_family = "wasm"))]
-        app.add_systems(
-            OnEnter(state::BeamableInitStatus::WebsocketConnection),
-            |mut cmd: Commands, context: Res<BeamContext>, config: Res<config::BeamableConfig>| {
-                if let Some(token) = &context.token {
-                    if let Some(access) = &token.access_token {
-                        cmd.spawn(websocket::WebSocketConnection {
-                            uri: config.get_websocket_uri(),
-                            scope: config.get_x_beam_scope(),
-                            token: access.clone(),
-                        });
-                    }
-                }
-            },
-        );
-        #[cfg(not(target_family = "wasm"))]
-        app.add_systems(
-            Update,
-            (
-                websocket::on_create,
-                websocket::task_handle,
-                websocket::messages_task_handle,
-            ),
-        );
+    fn build(&self, app: &mut App) {
+        app.init_state::<state::BeamableInitStatus>()
+            .add_plugins(ConfigPlugin)
+            .add_plugins(BeamSlotPlugin);
+        #[cfg(feature = "websocket")]
+        {
+            app.add_plugins(websocket::websocket_plugin);
+        }
+
         api::register_types(app);
     }
 }

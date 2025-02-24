@@ -8,4 +8,4 @@ pub const FRAME_BG_COLOR: Color = Color::srgb(53_f32 / 255.0, 45_f32 / 255.0, 55
 pub const BORDER_COLOR: Color = Color::srgb(39_f32 / 255.0, 17_f32 / 255.0, 40_f32 / 255.0);
 pub const INTERACTIVE_BG_COLOR: Color = Color::srgb(62.0 / 255.0, 32.0 / 255.0, 64.0 / 255.0);
 
-pub const CONFIG_DEFAULTS: &str = include_str!("../../.beamable/config-defaults.json");
+pub const CONFIG_DEFAULTS: &str = include_str!("../../.beamable/connection-configuration.json");
