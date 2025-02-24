@@ -30,6 +30,23 @@ impl Plugin for GameStatePlugin {
             )
             .add_observer(on_currency_text_add)
             .init_resource::<ItemsOnSale>();
+
+        #[cfg(target_arch = "wasm32")]
+        app.add_systems(
+            FixedUpdate,
+            call_update_inventory.run_if(
+                in_state(super::MainGameState::Game)
+                    .and(time::common_conditions::on_timer(Duration::from_secs(5))),
+            ),
+        );
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+fn call_update_inventory(ctx: Query<BeamableContexts>, mut cmd: Commands) {
+    for ctx in ctx.iter() {
+        let gamer_tag = ctx.slot.get_gamer_tag().unwrap().to_string();
+        cmd.entity(ctx.entity).beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()), gamer_tag);
     }
 }
 
