@@ -301,7 +301,6 @@ mod wasm_websocket {
     use crate::{error::NetworkError, managers::NetworkProvider, NetworkPacket};
     use async_channel::{Receiver, Sender};
     use async_trait::async_trait;
-    use async_tungstenite::tungstenite::Message;
     use bevy::prelude::{error, info, trace, Deref, DerefMut, Resource};
     use futures::{
         stream::{SplitSink, SplitStream},
