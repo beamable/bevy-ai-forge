@@ -46,7 +46,10 @@ impl Plugin for GameStatePlugin {
 fn call_update_inventory(ctx: Query<BeamableContexts>, mut cmd: Commands) {
     for ctx in ctx.iter() {
         let gamer_tag = ctx.slot.get_gamer_tag().unwrap().to_string();
-        cmd.entity(ctx.entity).beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()), gamer_tag);
+        cmd.entity(ctx.entity).beam_get_inventory(
+            Some("currency.coins,items.AiItemContent".to_owned()),
+            gamer_tag,
+        );
     }
 }
 
