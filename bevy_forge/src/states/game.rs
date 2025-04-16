@@ -24,9 +24,7 @@ impl Plugin for GameStatePlugin {
         app.add_systems(OnEnter(super::MainGameState::Game), setup)
             .add_systems(
                 Update,
-                (on_inv_changed, update_inventory)
-                    .chain()
-                    .run_if(in_state(super::MainGameState::Game)),
+                (on_inv_changed, update_inventory).run_if(in_state(super::MainGameState::Game)),
             )
             .add_observer(on_currency_text_add)
             .init_resource::<ItemsOnSale>();
@@ -267,11 +265,9 @@ fn on_start_forging_sword_pressed(
     let Ok(ctx) = q.get_single() else {
         return;
     };
-    let gamer_tag = ctx.slot.get_gamer_tag();
-    commands.entity(ctx.entity).beam_add_to_inventory(
-        vec!["items.AiItemContent.AiSword".into()],
-        gamer_tag.unwrap_or_default().to_string(),
-    );
+    commands
+        .entity(ctx.entity)
+        .beam_add_to_inventory(vec!["items.AiItemContent.AiSword".into()]);
     commands.spawn((
         AudioPlayer::new(asset_server.load("sfx/blacksmith.ogg".to_owned())),
         PlaybackSettings::DESPAWN,
@@ -294,11 +290,9 @@ fn on_start_forging_shield_pressed(
     let Ok(ctx) = q.get_single() else {
         return;
     };
-    let gamer_tag = ctx.slot.get_gamer_tag();
-    commands.entity(ctx.entity).beam_add_to_inventory(
-        vec!["items.AiItemContent.AiShield".into()],
-        gamer_tag.unwrap_or_default().to_string(),
-    );
+    commands
+        .entity(ctx.entity)
+        .beam_add_to_inventory(vec!["items.AiItemContent.AiShield".into()]);
     commands.spawn((
         AudioPlayer::new(asset_server.load("sfx/blacksmith.ogg".to_owned())),
         PlaybackSettings::DESPAWN,
@@ -321,9 +315,11 @@ fn update_inventory(
     mut commands: Commands,
 ) {
     let Ok(ctx) = q.get_single() else {
+        println!("NO CONTEXT");
         return;
     };
     let Ok(container_entity) = inv_container_q.get_single() else {
+        println!("NO CONTAINER");
         return;
     };
     let mut items = Vec::new();
@@ -333,7 +329,13 @@ fn update_inventory(
             item.properties.push(ItemProperty {
                 name: "type".to_owned(),
                 value: "sword".to_owned(),
-            })
+            });
+            if !item.properties.iter().any(|e| e.name == "name") {
+                item.properties.push(ItemProperty {
+                    name: "name".to_owned(),
+                    value: "Sword".to_owned(),
+                });
+            }
         }
         items.append(&mut it);
     };
@@ -343,7 +345,13 @@ fn update_inventory(
             item.properties.push(ItemProperty {
                 name: "type".to_owned(),
                 value: "shield".to_owned(),
-            })
+            });
+            if !item.properties.iter().any(|e| e.name == "name") {
+                item.properties.push(ItemProperty {
+                    name: "name".to_owned(),
+                    value: "Shield".to_owned(),
+                });
+            }
         }
         items.append(&mut it);
     }

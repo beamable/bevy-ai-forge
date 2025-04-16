@@ -9,6 +9,7 @@ pub struct BeamReceiver<S, E>
 where
     S: Debug + Send + 'static,
     E: Debug + Send + 'static,
+    // R: Clone + Send + 'static,
 {
     #[deref]
     pub receiver: crossbeam_channel::Receiver<Result<S, E>>,
@@ -40,7 +41,7 @@ where
     fn handle_requests(mut commands: Commands, mut r: ResMut<Self>) {
         r.retain_mut(|request| {
             if let Ok(result) = request.try_recv() {
-                warn!("{:?}: {:?}", &request.user_tag, &result);
+                trace!("{:?}: {:?}", &request.user_tag, &result);
                 let event = Self::Event::from(result);
                 if request.entity != Entity::PLACEHOLDER {
                     commands.trigger_targets(event, request.entity);

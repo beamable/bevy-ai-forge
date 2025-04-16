@@ -14,7 +14,8 @@ pub(crate) fn websocket_plugin(app: &mut App) {
     app.add_plugins(crate::notifications::plugin);
     app.init_resource::<NetworkSettings>()
         .register_type::<WebSocketConnection>();
-    app.add_systems(Update, (on_create, handle_network_events));
+    app.add_systems(Update, (on_create, handle_network_events))
+        .add_observer(disconnect_on_removal);
 }
 
 #[derive(Component, Default, Debug, Reflect)]
@@ -24,6 +25,22 @@ pub struct WebSocketConnection {
     pub token: String,
     pub scope: String,
     pub id: Option<ConnectionId>,
+}
+
+fn disconnect_on_removal(
+    _trigger: Trigger<OnRemove, WebSocketConnection>,
+    q: Query<&WebSocketConnection>,
+    net: ResMut<Network<WebSocketProvider>>,
+) {
+    let connections = net.list_connection_ids();
+    trace!("DROPPING CONNECTION START {:?}", &connections);
+    for con in connections.iter() {
+        if q.iter().any(|f| f.id.is_some_and(|f| f.eq(con))) {
+            continue;
+        }
+        trace!("DROPPING CONNECTION {:?}", con);
+        let _ = net.disconnect(*con);
+    }
 }
 
 pub fn on_create(
@@ -42,14 +59,14 @@ pub fn on_create(
             let build = ClientRequestBuilder::new(uri.try_into().unwrap())
                 .with_header("Authorization", token)
                 .with_header("X-BEAM-SCOPE", scope);
-            dbg!("CONNECTING TO {:?}", &build);
+            trace!("CONNECTING TO {:?}", &build);
             net.connect(build, &task_pool.0, &settings);
         }
         #[cfg(target_arch = "wasm32")]
         {
             let build = format!("{}?access_token={}", uri, connection.token);
             let uri = url::Url::parse(&build).expect("Could not parse url");
-            warn!("CONNECTING TO {:?}", &build);
+            trace!("CONNECTING TO {:?}", &build);
             net.connect(uri, &task_pool.0, &settings);
         }
     }
@@ -60,10 +77,22 @@ fn handle_network_events(
     mut q: Query<&mut WebSocketConnection>,
 ) {
     for event in new_network_events.read() {
-        trace!("EVENT {:?}", &event);
-        if let bevy_eventwork::NetworkEvent::Connected(connection_id) = event {
-            for mut conn in q.iter_mut() {
-                conn.id = Some(*connection_id);
+        warn!("EVENT {:?}", &event);
+        match event {
+            bevy_eventwork::NetworkEvent::Connected(connection_id) => {
+                for mut conn in q.iter_mut() {
+                    if conn.id.is_none() {
+                        conn.id = Some(*connection_id);
+                    }
+                }
+            }
+            bevy_eventwork::NetworkEvent::Disconnected(connection_id) => {
+                if let Some(_item) = q.iter().find(|e| e.id.eq(&Some(*connection_id))) {
+                    warn!("WEBSOCKET DISCONNECTED");
+                }
+            }
+            bevy_eventwork::NetworkEvent::Error(network_error) => {
+                error!("ERROR {:?}", network_error)
             }
         }
     }

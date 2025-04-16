@@ -3,7 +3,11 @@ use crate::{
     game::components::{GameRoot, LoadingIndicator, LoginScreenObject},
 };
 use bevy::prelude::*;
-use bevy_beam_sdk::slot::prelude::{BeamSlot, BeamableConfiguration, UserLoggedIn};
+use bevy_beam_sdk::{
+    api::BeamableBasicApi,
+    config::BeamExternalIdentityConfig,
+    slot::prelude::{AttachCredential, BeamSlot, BeamableConfiguration, UserInfoUpdated},
+};
 use bevy_simple_text_input::{TextInputSettings, TextInputValue};
 
 pub struct LoginScreenStatePlugin;
@@ -49,8 +53,42 @@ fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<LoadingIndicato
     loading.scale = Vec3::splat(time.elapsed_secs().sin().abs() * 0.2 + 0.45);
 }
 
-fn go_to_menu(_t: Trigger<UserLoggedIn>, mut next_state: ResMut<NextState<super::MainGameState>>) {
-    next_state.set(super::MainGameState::Menu);
+fn handle_user_info_updated(
+    t: Trigger<UserInfoUpdated>,
+    q: Query<&BeamSlot>,
+    mut commands: Commands,
+    external: Res<BeamExternalIdentityConfig>,
+    mut next_state: ResMut<NextState<super::MainGameState>>,
+) {
+    let Ok(slot) = q.get(t.entity()) else {
+        return;
+    };
+    let Some(info) = &slot.user else {
+        return;
+    };
+    if info.external.as_ref().is_some_and(|f| !f.is_empty()) {
+        next_state.set(super::MainGameState::Menu);
+    } else {
+        commands
+            .entity(t.entity())
+            .beam_attach_federated_identity(external.make_attach_request(info.id.to_string()));
+    }
+}
+
+fn attach_credential_result(
+    t: Trigger<AttachCredential>,
+    mut commands: Commands,
+    external: Res<BeamExternalIdentityConfig>,
+    q: Query<&BeamSlot>,
+) {
+    let Ok(slot) = q.get(t.entity()) else {
+        return;
+    };
+    if t.event().eq(&AttachCredential::AlreadyInUse) {
+        commands
+            .entity(t.entity())
+            .beam_new_user(external.auth(slot.get_gamer_tag().unwrap().to_string()));
+    }
 }
 
 fn setup(
@@ -63,8 +101,12 @@ fn setup(
         return;
     };
     let show_register_form = q.is_empty();
-
-    commands.add_observer(go_to_menu);
+    commands
+        .add_observer(handle_user_info_updated)
+        .insert(StateScoped(super::MainGameState::LoginScreen));
+    commands
+        .add_observer(attach_credential_result)
+        .insert(StateScoped(super::MainGameState::LoginScreen));
     commands.entity(root_entity).with_children(|parent| {
         parent.spawn((
             ImageNode::new(asset_server.load("gfx/gameIconTransparent.png")),

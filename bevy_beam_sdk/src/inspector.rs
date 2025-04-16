@@ -15,7 +15,7 @@ impl Plugin for InspectorPlugin {
         app.add_systems(Startup, configure_egui);
         app.add_systems(
             Update,
-            bevy_inspector.run_if(input_toggle_active(false, KeyCode::F2)),
+            bevy_inspector.run_if(input_toggle_active(false, KeyCode::Backslash)),
         );
     }
 }
@@ -32,7 +32,7 @@ fn bevy_inspector(world: &mut World) {
     egui::SidePanel::right("Bevy State")
         .frame(
             egui::Frame::canvas(&egui_context.get_mut().style())
-                .inner_margin(egui::Margin::same(10.0)),
+                .inner_margin(egui::Margin::same(10)),
         )
         .show_animated(egui_context.get_mut(), true, |ui| {
             ui.add_space(10.0);

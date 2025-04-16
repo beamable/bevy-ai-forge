@@ -209,6 +209,14 @@ impl<NP: NetworkProvider> Network<NP> {
 
         Ok(())
     }
+
+    /// returns list of established connections ids
+    pub fn list_connection_ids(&self) -> Vec<ConnectionId> {
+        self.established_connections
+            .iter()
+            .map(|s| *s.key())
+            .collect()
+    }
 }
 
 pub(crate) fn handle_new_incoming_connections<NP: NetworkProvider, RT: Runtime>(

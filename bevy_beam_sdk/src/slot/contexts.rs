@@ -1,4 +1,5 @@
 use crate::api::BeamableBasicApi;
+use crate::data::auth::BeamAuth;
 use crate::slot::beam_slot::*;
 use crate::slot::inventory::BeamInventory;
 use crate::slot::prelude::*;
@@ -17,6 +18,8 @@ pub struct BeamableContexts {
     pub inventory: &'static mut BeamInventory,
     pub stats: &'static mut BeamStats,
     pub token: Option<&'static mut TokenStorage>,
+    #[cfg(feature = "websocket")]
+    pub connection: Option<&'static WebSocketConnection>,
 }
 
 #[derive(SystemParam)]
@@ -34,30 +37,11 @@ impl BeamableConfiguration<'_, '_> {
                 name: name.clone(),
                 ..default()
             })
-            .observe(save_user_info)
-            .observe(handle_get_token)
-            .observe(handle_inventory_get)
-            .observe(handle_post_token)
-            .observe(handle_get_user_info)
-            .observe(handle_get_external_user_info)
-            .observe(handle_stats_got)
-            .beam_play_as_guest(name);
+            .beam_new_user(BeamAuth::Anonymous);
     }
 
     pub fn context_from(&mut self, slot: BeamSlot, storage: TokenStorage) {
-        let target_id = (*slot.gamer_tag).unwrap_or_default().to_string();
-        self.commands
-            .spawn((slot, storage))
-            .observe(save_user_info)
-            .observe(handle_get_token)
-            .observe(handle_inventory_get)
-            .observe(handle_post_token)
-            .observe(handle_get_user_info)
-            .observe(handle_get_external_user_info)
-            .observe(handle_stats_got)
-            .beam_get_user_info()
-            .beam_get_stats(target_id.clone())
-            .beam_get_inventory(None, target_id);
+        self.commands.spawn((slot, storage)).beam_get_user_info();
     }
 
     #[cfg(feature = "websocket")]

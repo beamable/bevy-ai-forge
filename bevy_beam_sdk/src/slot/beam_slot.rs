@@ -1,9 +1,9 @@
 use crate::api::accounts::{AttachFederatedIdentityCompletedEvent, GetAccountMeCompletedEvent};
-use crate::api::common::{CreateAnononymousUserCompletedEvent, GetTokenEvent, PostTokenEvent};
+use crate::api::common::{GetTokenEvent, UserAuthenticationEvent};
 use crate::api::inventory::InventoryGetCompletedEvent;
 use crate::api::stats::StatsGetEvent;
 use crate::api::BeamableBasicApi;
-use crate::config::BeamExternalIdentityConfig;
+use crate::data::auth::BeamAuth;
 use crate::slot::prelude::*;
 use bevy::log::error;
 use bevy::prelude::*;
@@ -12,8 +12,24 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::ops::Deref;
 
-#[derive(Event)]
-pub struct UserLoggedIn;
+#[derive(Event, Debug, Clone, Reflect, PartialEq, Eq)]
+pub enum UserLoggedIn {
+    Success,
+    Fail { status_code: u16, value: String },
+}
+
+#[derive(Event, Debug, Clone, Reflect, PartialEq, Eq)]
+pub enum UserInfoUpdated {
+    Success,
+    Fail { status_code: u16, value: String },
+}
+
+#[derive(Event, Debug, Clone, Reflect, PartialEq, Eq)]
+pub enum AttachCredential {
+    Success,
+    AlreadyInUse,
+    Fail { status_code: u16, value: String },
+}
 
 #[derive(Serialize, Debug, Deserialize, Reflect, Default, Deref)]
 pub struct GamerTag(Option<i64>);
@@ -25,6 +41,18 @@ pub struct BeamSlot {
     pub name: Option<String>,
     pub user: Option<UserView>,
     pub gamer_tag: GamerTag,
+}
+
+pub fn on_slot_added(ev: Trigger<OnAdd, BeamSlot>, mut commands: Commands) {
+    commands
+        .entity(ev.entity())
+        .observe(save_user_info)
+        .observe(handle_get_token)
+        .observe(handle_inventory_get)
+        .observe(handle_post_token)
+        .observe(handle_get_user_info)
+        .observe(handle_get_external_user_info)
+        .observe(handle_stats_got);
 }
 
 impl BeamSlot {
@@ -40,7 +68,7 @@ impl BeamSlot {
 #[reflect(Component, Default)]
 pub struct BeamStats(std::collections::HashMap<String, String>);
 
-pub fn save_user_info(ev: Trigger<CreateAnononymousUserCompletedEvent>, mut commands: Commands) {
+pub fn save_user_info(ev: Trigger<UserAuthenticationEvent>, mut commands: Commands) {
     let event = ev.event().deref();
     match event {
         Ok(token) => {
@@ -91,22 +119,14 @@ pub fn handle_get_token(
                 .expect("Should have token at this point")
                 .access_token = Some(data.token.clone());
             ctx.slot.gamer_tag = GamerTag(data.gamer_tag);
-            let target_id = data.gamer_tag.unwrap().to_string();
 
-            commands
-                .entity(ev.entity())
-                .beam_get_inventory(
-                    Some("currency.coins,items.AiItemContent".to_owned()),
-                    target_id.clone(),
-                )
-                .beam_get_stats(target_id)
-                .beam_get_user_info();
+            commands.entity(ev.entity()).beam_get_user_info();
         }
         Err(_) => {
             let token = ctx.token.expect("Should have token at this point");
             commands
                 .entity(ev.entity())
-                .beam_post_token(token.refresh_token.clone().unwrap());
+                .beam_new_user(BeamAuth::RefreshToken(token.refresh_token.clone().unwrap()));
         }
     }
 }
@@ -138,28 +158,36 @@ pub fn handle_inventory_get(
     }
 }
 
-pub fn handle_post_token(
-    ev: Trigger<PostTokenEvent>,
-    mut q: Query<BeamableContexts>,
-    mut commands: Commands,
-) {
+pub fn handle_post_token(ev: Trigger<UserAuthenticationEvent>, mut commands: Commands) {
     let event = ev.event();
-    let Ok(ctx) = q.get_mut(ev.entity()) else {
-        return;
-    };
     trace!("PostTokenEvent: {:#?}", event);
-    if let Ok(data) = &**event {
-        let new_token = TokenStorage::from_token_response(data);
-        let target_id = ctx.slot.gamer_tag.unwrap().to_string();
-        commands
-            .entity(ev.entity())
-            .insert(new_token)
-            .beam_get_inventory(
-                Some("currency.coins,items.AiItemContent".to_owned()),
-                target_id.clone(),
-            )
-            .beam_get_stats(target_id)
-            .beam_get_user_info();
+    match &**event {
+        Ok(data) => {
+            let new_token = TokenStorage::from_token_response(data);
+            commands
+                .entity(ev.entity())
+                .insert(new_token)
+                .trigger(UserLoggedIn::Success);
+        }
+        Err(beam_autogen_rs::apis::Error::ResponseError(e)) => {
+            let status_code = e.status.as_u16();
+            let value = e.content.clone();
+            let error = UserLoggedIn::Fail { status_code, value };
+            commands.trigger_targets(error, ev.entity());
+        }
+        Err(beam_autogen_rs::apis::Error::Reqwest(e)) => {
+            let status_code = e.status().map_or(997, |f| f.as_u16());
+            let value = e.to_string();
+            let error = UserLoggedIn::Fail { status_code, value };
+            commands.trigger_targets(error, ev.entity());
+        }
+        Err(_) => {
+            let error = UserLoggedIn::Fail {
+                status_code: 997,
+                value: "Unknown error".to_owned(),
+            };
+            commands.trigger_targets(error, ev.entity());
+        }
     }
 }
 
@@ -169,10 +197,45 @@ pub fn handle_get_external_user_info(
 ) {
     let event = ev.event();
     trace!("AttachFederatedIdentityCompletedEvent: {:#?}", event);
-    let Ok(_) = &**event else {
-        return;
-    };
-    commands.entity(ev.entity()).beam_get_user_info();
+    match &**event {
+        Ok(info) => match info.result.as_str() {
+            "ok" => {
+                commands.trigger_targets(AttachCredential::Success, ev.entity());
+                commands.entity(ev.entity()).beam_get_user_info();
+            }
+            "challenge" => {
+                let error = AttachCredential::Fail {
+                    status_code: 997,
+                    value: "Challenge, not supported yet on rust SDK side.".into(),
+                };
+                commands.trigger_targets(error, ev.entity());
+            }
+            r => {
+                let error = AttachCredential::Fail {
+                    status_code: 997,
+                    value: format!("Unsupported value: {}", r),
+                };
+                commands.trigger_targets(error, ev.entity());
+            }
+        },
+        Err(beam_autogen_rs::apis::Error::ResponseError(e)) => {
+            let error = if e.content.contains("ExternalIdentityUnavailable") {
+                AttachCredential::AlreadyInUse
+            } else {
+                let status_code = e.status.as_u16();
+                let value = e.content.clone();
+                AttachCredential::Fail { status_code, value }
+            };
+            commands.trigger_targets(error, ev.entity());
+        }
+        Err(err) => {
+            let error = AttachCredential::Fail {
+                status_code: 997,
+                value: err.to_string(),
+            };
+            commands.trigger_targets(error, ev.entity());
+        }
+    }
 }
 
 pub fn handle_stats_got(ev: Trigger<StatsGetEvent>, mut q: Query<BeamableContexts>) {
@@ -194,46 +257,49 @@ pub fn handle_get_user_info(
     ev: Trigger<GetAccountMeCompletedEvent>,
     mut q: Query<BeamableContexts>,
     mut commands: Commands,
-    external_identity: Option<Res<BeamExternalIdentityConfig>>,
     #[cfg(feature = "websocket")] config: BeamableConfiguration,
 ) {
     let event = ev.event();
-    trace!("GetAccountMe: {:#?}", event);
-    let Ok(event) = &**event else {
+    let Ok(mut ctx) = q.get_mut(ev.entity()) else {
         return;
     };
-    {
-        let Ok(mut ctx) = q.get_mut(ev.entity()) else {
-            return;
-        };
-        ctx.slot.user = Some(UserView::from((*event).clone()));
+    match &**event {
+        Ok(e) => {
+            ctx.slot.user = Some(e.into());
 
-        #[cfg(feature = "websocket")]
-        {
-            let t = ctx.token.expect("Failed to get token").clone();
-            if let Some(connection) = config.websocket_connection(&t) {
-                commands.entity(ev.entity()).insert_if_new(connection);
+            #[cfg(feature = "websocket")]
+            {
+                let t = ctx.token.expect("Failed to get token").clone();
+                if let Some(connection) = config.websocket_connection(&t) {
+                    commands.entity(ev.entity()).insert_if_new(connection);
+                }
             }
+            commands
+                .entity(ev.entity())
+                .trigger(UserInfoUpdated::Success)
+                .beam_get_stats(
+                    Default::default(),
+                    crate::data::stats::StatAccessType::Public,
+                )
+                .beam_get_stats(
+                    Default::default(),
+                    crate::data::stats::StatAccessType::Private,
+                )
+                .beam_get_inventory(None);
+        }
+        Err(beam_autogen_rs::apis::Error::ResponseError(e)) => {
+            let status_code = e.status.as_u16();
+            let value = e.content.clone();
+            commands
+                .entity(ev.entity())
+                .trigger(UserInfoUpdated::Fail { status_code, value });
+        }
+        Err(e) => {
+            let status_code = 997;
+            let value = e.to_string();
+            commands
+                .entity(ev.entity())
+                .trigger(UserInfoUpdated::Fail { status_code, value });
         }
     }
-    if event.external.is_some() {
-        commands.trigger(UserLoggedIn);
-        commands.trigger_targets(UserLoggedIn, ev.entity());
-        return;
-    }
-
-    let Some(external) = &external_identity else {
-        commands.trigger(UserLoggedIn);
-        commands.trigger_targets(UserLoggedIn, ev.entity());
-        return;
-    };
-    let external = beam_autogen_rs::models::AttachExternalIdentityApiRequest {
-        provider_service: external.provider_service.clone(),
-        external_token: "".to_owned(),
-        challenge_solution: None,
-        provider_namespace: Some(external.provider_namespace.clone()),
-    };
-    commands
-        .entity(ev.entity())
-        .beam_attach_federated_identity(external);
 }

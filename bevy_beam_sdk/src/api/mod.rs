@@ -4,6 +4,11 @@ use beam_autogen_rs::models::ItemCreateRequest;
 use beam_autogen_rs::models::TokenRequestWrapper;
 use bevy::prelude::*;
 
+use crate::data::stats::StatAccessType;
+use crate::data::stats::StatDomainType;
+use crate::slot::prelude::BeamSlot;
+use crate::slot::prelude::TokenStorage;
+
 pub mod accounts;
 pub mod common;
 pub mod inventory;
@@ -11,55 +16,37 @@ pub mod stats;
 
 #[allow(dead_code)]
 pub trait BeamableBasicApi {
-    fn beam_play_as_guest<S: Into<std::string::String>>(&mut self, name: Option<S>) -> &mut Self;
-    fn beam_new_user(&mut self, wrapper: TokenRequestWrapper) -> &mut Self;
+    fn beam_new_user(&mut self, wrapper: impl Into<TokenRequestWrapper>) -> &mut Self;
     fn beam_attach_federated_identity(
         &mut self,
         wrapper: AttachExternalIdentityApiRequest,
     ) -> &mut Self;
     fn beam_get_user_info(&mut self) -> &mut Self;
     fn beam_get_token(&mut self, token: String) -> &mut Self;
-    fn beam_post_token(&mut self, token: String) -> &mut Self;
-    fn beam_get_inventory(&mut self, scope: Option<String>, target_id: String) -> &mut Self;
-    fn beam_add_to_inventory(&mut self, new_items: Vec<String>, target_id: String) -> &mut Self;
-    fn beam_get_stats(&mut self, target_id: String) -> &mut Self;
+    fn beam_get_inventory(&mut self, scope: Option<String>) -> &mut Self;
+    fn beam_add_to_inventory(&mut self, new_items: Vec<String>) -> &mut Self;
+    fn beam_get_stats(&mut self, domain: StatDomainType, access: StatAccessType) -> &mut Self;
 }
 
 impl BeamableBasicApi for EntityCommands<'_> {
-    fn beam_play_as_guest<S: Into<String>>(&mut self, name: Option<S>) -> &mut Self {
+    fn beam_new_user(&mut self, wrapper: impl Into<TokenRequestWrapper>) -> &mut Self {
         let id = self.id();
-        let mut new_user = beam_autogen_rs::models::TokenRequestWrapper::new("guest".to_string());
-        new_user.username = name.map(|username| username.into());
-
+        let token_request_wrapper = Some(wrapper.into());
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
-
-            world.commands().queue(common::CreateAnononymousUser(
+            if let Ok(mut entity) = world.get_entity_mut(id) {
+                entity.remove::<TokenStorage>();
+                #[cfg(feature = "websocket")]
+                entity.remove::<crate::websocket::WebSocketConnection>();
+            }
+            world.commands().queue(common::AuthenticateUser(
                 beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
                     x_beam_scope,
                     x_beam_gamertag: None,
-                    token_request_wrapper: Some(new_user),
-                },
-                id,
-            ))
-        });
-        self
-    }
-    fn beam_new_user(&mut self, wrapper: TokenRequestWrapper) -> &mut Self {
-        let id = self.id();
-        self.commands().queue(move |world: &mut World| {
-            let x_beam_scope = world
-                .get_resource::<crate::config::BeamableConfigResource>()
-                .unwrap()
-                .get_x_beam_scope();
-            world.commands().queue(common::CreateAnononymousUser(
-                beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
-                    x_beam_scope,
-                    x_beam_gamertag: None,
-                    token_request_wrapper: Some(wrapper),
+                    token_request_wrapper,
                 },
                 id,
             ))
@@ -122,38 +109,20 @@ impl BeamableBasicApi for EntityCommands<'_> {
         });
         self
     }
-    fn beam_post_token(&mut self, token: String) -> &mut Self {
+    fn beam_get_inventory(&mut self, scope: Option<String>) -> &mut Self {
         let id = self.id();
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
-            world.commands().queue(common::PostToken(
-                beam_autogen_rs::apis::default_api::BasicAuthTokenPostParams {
-                    x_beam_scope,
-                    x_beam_gamertag: None,
-                    token_request_wrapper: Some(TokenRequestWrapper {
-                        refresh_token: Some(token),
-                        ..Default::default()
-                    }),
-                },
-                id,
-            ))
-        });
-        self
-    }
-    fn beam_get_inventory(&mut self, scope: Option<String>, target_id: String) -> &mut Self {
-        let id = self.id();
-        self.commands().queue(move |world: &mut World| {
-            let x_beam_scope = world
-                .get_resource::<crate::config::BeamableConfigResource>()
-                .unwrap()
-                .get_x_beam_scope();
+            let Some(object_id) = world.get_beam_id(id) else {
+                return;
+            };
             world.commands().queue(inventory::InventoryGet(
                 beam_autogen_rs::apis::default_api::ObjectInventoryObjectIdGetParams {
                     x_beam_scope,
-                    object_id: target_id,
+                    object_id,
                     x_beam_gamertag: None,
                     scope,
                 },
@@ -162,7 +131,7 @@ impl BeamableBasicApi for EntityCommands<'_> {
         });
         self
     }
-    fn beam_add_to_inventory(&mut self, new_items: Vec<String>, target_id: String) -> &mut Self {
+    fn beam_add_to_inventory(&mut self, new_items: Vec<String>) -> &mut Self {
         let id = self.id();
         let data = InventoryUpdateRequest {
             new_items: Some(
@@ -181,10 +150,13 @@ impl BeamableBasicApi for EntityCommands<'_> {
                 .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
+            let Some(object_id) = world.get_beam_id(id) else {
+                return;
+            };
             world.commands().queue(inventory::InventoryAdd(
                 beam_autogen_rs::apis::default_api::ObjectInventoryObjectIdPutParams {
                     x_beam_scope,
-                    object_id: target_id,
+                    object_id,
                     x_beam_gamertag: None,
                     inventory_update_request: Some(data),
                 },
@@ -194,14 +166,17 @@ impl BeamableBasicApi for EntityCommands<'_> {
         self
     }
 
-    fn beam_get_stats(&mut self, target_id: String) -> &mut Self {
+    fn beam_get_stats(&mut self, domain: StatDomainType, access: StatAccessType) -> &mut Self {
         let id = self.id();
         self.commands().queue(move |world: &mut World| {
             let x_beam_scope = world
                 .get_resource::<crate::config::BeamableConfigResource>()
                 .unwrap()
                 .get_x_beam_scope();
-            let object_id = format!("game.public.player.{}", target_id);
+            let Some(the_id) = world.get_beam_id(id) else {
+                return;
+            };
+            let object_id = format!("{}.{}.player.{}", domain, access, the_id);
             world.commands().queue(stats::StatsGet(
                 beam_autogen_rs::apis::default_api::ObjectStatsObjectIdClientGetParams {
                     stats: None,
@@ -218,13 +193,24 @@ impl BeamableBasicApi for EntityCommands<'_> {
 
 pub fn register_types(app: &mut App) {
     // use crate::requests::prelude::BeamRequestResource;
-    common::CreateAnononymousUserCompletedEvent::register(app);
     common::GetTokenEvent::register(app);
-    common::PostTokenEvent::register(app);
+    common::UserAuthenticationEvent::register(app);
     common::RealmsConfigEvent::register(app);
     accounts::GetAccountMeCompletedEvent::register(app);
     accounts::AttachFederatedIdentityCompletedEvent::register(app);
     inventory::InventoryGetCompletedEvent::register(app);
     inventory::InventoryAddCompletedEvent::register(app);
     stats::StatsGetEvent::register(app);
+}
+
+trait BeamIdHelper {
+    fn get_beam_id(self, entity: Entity) -> Option<String>;
+}
+
+impl BeamIdHelper for &World {
+    fn get_beam_id(self, entity: Entity) -> Option<String> {
+        let e = self.get_entity(entity).ok()?;
+        let slot = e.get::<BeamSlot>()?;
+        slot.get_gamer_tag().map(|e| e.to_string())
+    }
 }

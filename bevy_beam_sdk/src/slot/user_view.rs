@@ -22,12 +22,12 @@ pub struct ExternalIdentity {
     pub provider_namespace: String,
 }
 
-impl From<beam_autogen_rs::models::AccountPlayerView> for UserView {
-    fn from(value: beam_autogen_rs::models::AccountPlayerView) -> Self {
+impl From<&beam_autogen_rs::models::AccountPlayerView> for UserView {
+    fn from(value: &beam_autogen_rs::models::AccountPlayerView) -> Self {
         UserView {
-            device_ids: value.device_ids,
-            email: value.email,
-            external: value.external.map(|v| {
+            device_ids: value.device_ids.clone(),
+            email: value.email.clone(),
+            external: value.external.clone().map(|v| {
                 v.iter()
                     .map(|v| ExternalIdentity {
                         provider_namespace: v.provider_namespace.clone(),
@@ -37,9 +37,9 @@ impl From<beam_autogen_rs::models::AccountPlayerView> for UserView {
                     .collect()
             }),
             id: value.id,
-            language: value.language,
-            scopes: value.scopes,
-            third_party_app_associations: value.third_party_app_associations,
+            language: value.language.clone(),
+            scopes: value.scopes.clone(),
+            third_party_app_associations: value.third_party_app_associations.clone(),
         }
     }
 }

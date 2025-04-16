@@ -1,8 +1,12 @@
+use beam_autogen_rs::models::AttachExternalIdentityApiRequest;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 
-use crate::api::common::{self, RealmsConfigEvent};
+use crate::{
+    api::common::{self, RealmsConfigEvent},
+    data::auth::BeamAuth,
+};
 
 #[derive(Deserialize, Debug, Resource, Reflect)]
 #[reflect(Resource)]
@@ -47,6 +51,28 @@ impl BeamableConfigResource {
 pub struct BeamExternalIdentityConfig {
     pub provider_service: String,
     pub provider_namespace: String,
+}
+
+impl BeamExternalIdentityConfig {
+    pub fn make_attach_request(
+        &self,
+        token: impl Into<String>,
+    ) -> AttachExternalIdentityApiRequest {
+        AttachExternalIdentityApiRequest {
+            provider_service: self.provider_service.clone(),
+            provider_namespace: self.provider_namespace.clone().into(),
+            external_token: token.into(),
+            challenge_solution: None,
+        }
+    }
+
+    pub fn auth(&self, token: impl Into<String>) -> BeamAuth {
+        BeamAuth::ExternalIdentity {
+            provider_service: self.provider_service.clone(),
+            provider_namespace: self.provider_namespace.clone(),
+            external_token: token.into(),
+        }
+    }
 }
 
 pub fn update_config(

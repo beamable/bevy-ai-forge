@@ -12,6 +12,7 @@ pub mod requests;
 pub mod slot;
 pub mod state;
 
+pub mod data;
 #[cfg(feature = "websocket")]
 pub mod websocket;
 

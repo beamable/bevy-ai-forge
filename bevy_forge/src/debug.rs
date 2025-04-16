@@ -11,11 +11,11 @@ impl Plugin for DebugPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, git_info)
             .add_plugins(
-                WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::F1)),
+                WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::Backspace)),
             )
             .add_plugins(
                 StateInspectorPlugin::<crate::states::MainGameState>::default()
-                    .run_if(input_toggle_active(false, KeyCode::F1)),
+                    .run_if(input_toggle_active(false, KeyCode::Backspace)),
             );
     }
 }
