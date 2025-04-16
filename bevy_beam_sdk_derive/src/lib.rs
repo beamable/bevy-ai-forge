@@ -3,7 +3,7 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
-use syn::{parse_macro_input, Data, DeriveInput, Expr, Fields, Ident, Token, Type};
+use syn::{parse_macro_input, Data, DeriveInput, Expr, Fields, Ident, Lit, LitStr, Token, Type};
 
 /// A helper structure to parse the attribute arguments.
 /// We expect the attribute to have the syntax:
@@ -141,7 +141,7 @@ pub fn beam_command(input: TokenStream) -> TokenStream {
         impl bevy::ecs::world::Command for #name {
             fn apply(self, world: &mut World) {
                 #entity_assign
-                let request_client = #name::make_request_client(&world, token);
+                let request_client = Self::make_request_client(&world, token);
                 if let Some(mut s) = world.get_resource_mut::<#task_name>() {
                     #call_expr
                 }
@@ -192,4 +192,63 @@ fn types_from_struct_definition_data(data: &Data) -> Option<Type> {
         },
         _ => None,
     }
+}
+
+/// The derive macro implementation.
+/// It looks for a helper attribute `#[beam_notify(...)]` and uses its argument
+/// to generate an implementation of `BeamNotify`.
+#[proc_macro_derive(BeamNotify, attributes(beam_notify))]
+pub fn beam_notify_command(input: TokenStream) -> TokenStream {
+    // Parse the input tokens into a syntax tree
+    let input = parse_macro_input!(input as DeriveInput);
+
+    let Some(attr) = input
+        .attrs
+        .iter()
+        .find(|a| a.path().is_ident("beam_notify"))
+    else {
+        return syn::Error::new(
+            input.ident.span(),
+            "Missing attribute: #[beam_notify(\"notification.id\")]",
+        )
+        .to_compile_error()
+        .into();
+    };
+    let error = syn::Error::new_spanned(attr, "Expected #[beam_notify(\"notification.id\")]")
+        .to_compile_error()
+        .into();
+    // Parse the attribute to ensure it's a string literal
+
+    let meta: LitStr = match attr.parse_args() {
+        Ok(Expr::Lit(expr)) => {
+            if let Lit::Str(lit_str) = &expr.lit {
+                lit_str.clone()
+            } else {
+                return error;
+            }
+        }
+        _ => {
+            return error;
+        }
+    };
+
+    let command_str = meta.value();
+
+    // You can now use `command_str` as needed to generate your code
+    let name = &input.ident;
+
+    let gen = quote! {
+        impl NetworkMessage for #name {
+            const NAME: &'static str = #command_str;
+
+            fn deserialize_message<T>(bytes: &[u8]) -> Option<T>
+            where
+                T: NetworkMessage,
+            {
+                serde_json::from_slice::<T>(bytes).ok()
+            }
+        }
+    };
+
+    gen.into()
 }
