@@ -4,6 +4,7 @@ use bevy::prelude::*;
 
 pub mod api;
 pub mod config;
+pub mod content;
 #[cfg(feature = "websocket")]
 mod inspector;
 #[cfg(feature = "websocket")]

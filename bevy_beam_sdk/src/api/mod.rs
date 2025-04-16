@@ -197,7 +197,7 @@ pub fn register_types(app: &mut App) {
     common::GetTokenEvent::register(app);
     common::UserAuthenticationEvent::register(app);
     common::RealmsConfigEvent::register(app);
-    content::GetManifestEvent::register(app);
+    content::GotManifestEvent::register(app);
     accounts::GetAccountMeCompletedEvent::register(app);
     accounts::AttachFederatedIdentityCompletedEvent::register(app);
     inventory::InventoryGetCompletedEvent::register(app);

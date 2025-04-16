@@ -127,6 +127,7 @@ impl Plugin for ConfigPlugin {
             .register_type::<RoutingMapKey>()
             .init_resource::<RoutingMapKey>()
             .add_observer(update_config)
+            .add_observer(crate::content::on_manifest_got)
             .add_systems(
                 Update,
                 get_config_defaults.run_if(
