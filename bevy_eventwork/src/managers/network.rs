@@ -45,7 +45,7 @@ impl<NP: NetworkProvider> Network<NP> {
     /// Returns true if there are any active connections
     #[inline(always)]
     pub fn has_connections(&self) -> bool {
-        self.established_connections.len() > 0
+        !self.established_connections.is_empty()
     }
 
     /// Start listening for new clients
