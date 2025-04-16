@@ -1,3 +1,6 @@
+# list available commands
+default:
+  @just --list
 
 # build web version and put it out directory
 web_build:
@@ -15,6 +18,11 @@ web_host:
 check:
 	cargo fmt --all -- --check
 	cargo clippy -- -D warnings
+
+# validate the code for wasm
+web_check:
+	cargo clippy --target wasm32-unknown-unknown -- -D warnings
+	cargo fmt --all -- --check
 
 # installs cli tools used in the project
 prepare:

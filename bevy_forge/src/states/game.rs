@@ -33,7 +33,7 @@ impl Plugin for GameStatePlugin {
         app.add_systems(
             FixedUpdate,
             call_update_inventory.run_if(in_state(super::MainGameState::Game).and(
-                bevy::time::common_conditions::on_timer(Duration::from_secs(5)),
+                bevy::time::common_conditions::on_timer(Duration::from_secs(10)),
             )),
         );
     }
@@ -42,11 +42,8 @@ impl Plugin for GameStatePlugin {
 #[cfg(target_arch = "wasm32")]
 fn call_update_inventory(ctx: Query<BeamableContexts>, mut cmd: Commands) {
     for ctx in ctx.iter() {
-        let gamer_tag = ctx.slot.get_gamer_tag().unwrap().to_string();
-        cmd.entity(ctx.entity).beam_get_inventory(
-            Some("currency.coins,items.AiItemContent".to_owned()),
-            gamer_tag,
-        );
+        cmd.entity(ctx.entity)
+            .beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
     }
 }
 
