@@ -19,7 +19,7 @@ pub mod websocket;
 pub mod prelude {
     pub use crate::requests::prelude::*;
     pub use crate::BeamPlugin;
-    pub use bevy_beam_sdk_derive::BeamCommand;
+    pub use bevy_beam_sdk_derive::{BeamCommand, BeamNotify};
 }
 
 /// A `Plugin` providing the systems and components required to make Beamable SDK work.

@@ -106,6 +106,15 @@ pub fn get_config_defaults(
         },
         Entity::PLACEHOLDER,
     ));
+    let x_beam_scope = config.get_x_beam_scope();
+    commands.queue(crate::api::content::GetManifest(
+        beam_autogen_rs::apis::default_api::BasicContentManifestPublicJsonGetParams {
+            x_beam_scope,
+            x_beam_gamertag: None,
+            id: None,
+        },
+        Entity::PLACEHOLDER,
+    ));
     next_state.set(crate::state::BeamableInitStatus::UpdatingConfiguration);
 }
 
