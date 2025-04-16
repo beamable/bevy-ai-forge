@@ -346,10 +346,10 @@ mod wasm_websocket {
                 .await
                 .map_err(|error| match error {
                     tokio_tungstenite_wasm::Error::ConnectionClosed => {
-                        NetworkError::Error(format!("Connection Closed"))
+                        NetworkError::Error("Connection Closed".to_string())
                     }
                     tokio_tungstenite_wasm::Error::AlreadyClosed => {
-                        NetworkError::Error(format!("Connection Already Closed"))
+                        NetworkError::Error("Connection Already Closed".to_string())
                     }
                     tokio_tungstenite_wasm::Error::Io(err) => {
                         NetworkError::Error(format!("IO Error: {}", err))
@@ -367,10 +367,10 @@ mod wasm_websocket {
                         NetworkError::Error(format!("Write Buffer Full: {}", err))
                     }
                     tokio_tungstenite_wasm::Error::Utf8 => {
-                        NetworkError::Error(format!("UTF8 Encoding Error"))
+                        NetworkError::Error("UTF8 Encoding Error".to_string())
                     }
                     tokio_tungstenite_wasm::Error::AttackAttempt => {
-                        NetworkError::Error(format!("Attack Attempt Detected"))
+                        NetworkError::Error("Attack Attempt Detected".to_string())
                     }
                     tokio_tungstenite_wasm::Error::Url(err) => {
                         NetworkError::Error(format!("Url Error: {}", err))
@@ -385,7 +385,7 @@ mod wasm_websocket {
                         NetworkError::Error("Blob Format Unsupported".to_string())
                     }
                     tokio_tungstenite_wasm::Error::UnknownFormat => {
-                        NetworkError::Error(format!("Invalid Format"))
+                        NetworkError::Error("Invalid Format".to_string())
                     }
                 });
             if let Err(s) = &stream {
@@ -430,7 +430,7 @@ mod wasm_websocket {
                                 let data = s.message_full.unwrap_or_default().as_bytes().to_vec();
                                 let beam = NetworkPacket { kind, data };
                                 if let Ok(Ok(s)) = serde_json::to_value(&beam)
-                                    .map(|e| serde_json::from_value::<NetworkPacket>(e))
+                                    .map(serde_json::from_value::<NetworkPacket>)
                                 {
                                     Ok(s)
                                 } else {
