@@ -21,7 +21,7 @@ default-features = true
 
 [dependencies.beam_autogen_rs]
 git = "https://github.com/beamable/beam_autogen_rs"
-rev = "889212a"
+rev = "71271db2d55030ca1fd00657b3d4912cb2470b06"
 
 [dependencies]
 bevy_pkv = "0.13"

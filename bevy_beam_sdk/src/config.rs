@@ -112,6 +112,7 @@ pub fn get_config_defaults(
             x_beam_scope,
             x_beam_gamertag: None,
             id: None,
+            uid: None,
         },
         Entity::PLACEHOLDER,
     ));
