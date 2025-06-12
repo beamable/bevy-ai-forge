@@ -272,14 +272,14 @@ pub(crate) fn handle_new_incoming_connections<NP: NetworkProvider, RT: Runtime>(
                 },
             );
 
-        network_events.send(NetworkEvent::Connected(conn_id));
+        network_events.write(NetworkEvent::Connected(conn_id));
     }
 
     while let Ok(disconnected_connection) = server.disconnected_connections.receiver.try_recv() {
         server
             .established_connections
             .remove(&disconnected_connection);
-        network_events.send(NetworkEvent::Disconnected(disconnected_connection));
+        network_events.write(NetworkEvent::Disconnected(disconnected_connection));
     }
 }
 
@@ -323,7 +323,7 @@ pub(crate) fn register_message<T, NP: NetworkProvider>(
         None => return,
     };
 
-    events.send_batch(messages.drain(..).filter_map(|(source, msg)| {
+    events.write_batch(messages.drain(..).filter_map(|(source, msg)| {
         T::deserialize_message(&msg).map(|inner| NetworkData { source, inner })
     }));
 }

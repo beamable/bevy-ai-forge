@@ -1,6 +1,5 @@
 use beam_autogen_rs::models::InventoryView;
-use bevy::prelude::*;
-use bevy::utils::hashbrown::HashMap;
+use bevy::{platform::collections::HashMap, prelude::*};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Debug, Deserialize, Component, Reflect, Default)]

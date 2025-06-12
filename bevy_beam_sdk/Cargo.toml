@@ -11,12 +11,12 @@ websocket = ["dep:bevy_eventwork"]
 inspector = ["dep:bevy-inspector-egui"]
 
 [dependencies.bevy]
-version = "0.15"
+version = "0.16"
 default-features = false
-features = ["bevy_state"]
+features = ["bevy_state", "bevy_window"]
 
 [dev-dependencies.bevy]
-version = "0.15"
+version = "0.16"
 default-features = true
 
 [dependencies.beam_autogen_rs]
@@ -24,12 +24,12 @@ git = "https://github.com/beamable/beam_autogen_rs"
 rev = "889212a"
 
 [dependencies]
-bevy_pkv = "0.12"
+bevy_pkv = "0.13"
 crossbeam-channel = "0.5"
 bevy_eventwork = { optional = true, version = "0.11", path = "../bevy_eventwork", default-features = false, features = [
     "websocket",
 ] }
-bevy-inspector-egui = { version = "0.30", optional = true }
+bevy-inspector-egui = { version = "0.31", optional = true }
 url = { version = "2.5" }
 serde = { version = "1.0", features = ["derive"] }
 bevy_beam_sdk_derive = { path = "../bevy_beam_sdk_derive", version = "0.1.0" }

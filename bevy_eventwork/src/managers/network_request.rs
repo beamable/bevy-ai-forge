@@ -44,7 +44,7 @@
 //!     /// The type of message that the server will send back to the client.
 //!     /// It must implement [`NetworkMessage`]
 //!    type ResponseMessage = StatusResponse;
-//!    
+//!
 //!     /// A unique identifying name for the request message.
 //!    const REQUEST_NAME: &'static str = "client_request_status";
 //! }
@@ -103,7 +103,7 @@
 //!         app.add_systems(Update, poll_responses);
 //!     }
 //!
-//! }        
+//! }
 //!
 //! /// A resource that will hold our response object so we can poll it every frame
 //! #[derive(Resource)]
@@ -186,7 +186,7 @@
 //!         app.add_systems(Update, handle_request_status);
 //!     }
 //!
-//! }        
+//! }
 //!
 //! /// A system that will read status requests and return the current status of the app.
 //! fn handle_request_status(
@@ -194,9 +194,9 @@
 //! ){
 //!     for event in network_events.read() {
 //!         let _ = event.clone().respond(StatusResponse{
-//!             response: true    
+//!             response: true
 //!         });
-//!         
+//!
 //!     }
 //! }
 //! ```
@@ -220,7 +220,6 @@ use super::{network::register_message, Network, NetworkProvider};
 pub struct Requester<'w, 's, T: RequestMessage, NP: NetworkProvider> {
     server: Res<'w, Network<NP>>,
     response_map: Res<'w, ResponseMap<T>>,
-    #[system_param(ignore)]
     marker: PhantomData<&'s usize>,
 }
 
@@ -399,7 +398,7 @@ fn create_request_handlers<T: RequestMessage, NP: NetworkProvider>(
 ) {
     for request in requests.read() {
         if let Some(connection) = &network.established_connections.get(request.source()) {
-            requests_wrapped.send(Request {
+            requests_wrapped.write(Request {
                 request: request.request.clone(),
                 request_id: request.id,
                 response_tx: connection.send_message.clone(),

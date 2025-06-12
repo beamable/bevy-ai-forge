@@ -11,12 +11,12 @@ impl Plugin for MenuStatePlugin {
 }
 
 fn on_start_game_pressed(
-    t: Trigger<Pointer<Up>>,
+    t: Trigger<Pointer<Released>>,
     mut next_state: ResMut<NextState<super::MainGameState>>,
     mut cmd: Commands,
 ) {
     next_state.set(super::MainGameState::Game);
-    cmd.entity(t.entity()).remove::<Interaction>();
+    cmd.entity(t.target()).remove::<Interaction>();
 }
 
 fn setup(
@@ -24,7 +24,7 @@ fn setup(
     asset_server: Res<AssetServer>,
     query: Query<Entity, With<GameRoot>>,
 ) {
-    let Ok(root_entity) = query.get_single() else {
+    let Ok(root_entity) = query.single() else {
         return;
     };
     commands.entity(root_entity).with_children(|parent| {

@@ -23,12 +23,12 @@ impl Plugin for LoginScreenStatePlugin {
 }
 
 fn play_as_guest_pressed(
-    _t: Trigger<Pointer<Up>>,
+    _t: Trigger<Pointer<Released>>,
     text: Query<&TextInputValue>,
     mut q1: Query<(&mut Node, Option<&LoadingIndicator>), With<LoginScreenObject>>,
     mut beam_config: BeamableConfiguration,
 ) {
-    let name: Option<String> = text.get_single().ok().and_then(|text| {
+    let name: Option<String> = text.single().ok().and_then(|text| {
         if !text.0.is_empty() {
             Some(text.0.clone())
         } else {
@@ -46,7 +46,7 @@ fn play_as_guest_pressed(
 }
 
 fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<LoadingIndicator>>) {
-    let Ok(mut loading) = query.get_single_mut() else {
+    let Ok(mut loading) = query.single_mut() else {
         return;
     };
     loading.rotate(Quat::from_rotation_z(time.delta_secs() * 1.0));
@@ -60,7 +60,7 @@ fn handle_user_info_updated(
     external: Res<BeamExternalIdentityConfig>,
     mut next_state: ResMut<NextState<super::MainGameState>>,
 ) {
-    let Ok(slot) = q.get(t.entity()) else {
+    let Ok(slot) = q.get(t.target()) else {
         return;
     };
     let Some(info) = &slot.user else {
@@ -70,7 +70,7 @@ fn handle_user_info_updated(
         next_state.set(super::MainGameState::Menu);
     } else {
         commands
-            .entity(t.entity())
+            .entity(t.target())
             .beam_attach_federated_identity(external.make_attach_request(info.id.to_string()));
     }
 }
@@ -81,12 +81,12 @@ fn attach_credential_result(
     external: Res<BeamExternalIdentityConfig>,
     q: Query<&BeamSlot>,
 ) {
-    let Ok(slot) = q.get(t.entity()) else {
+    let Ok(slot) = q.get(t.target()) else {
         return;
     };
     if t.event().eq(&AttachCredential::AlreadyInUse) {
         commands
-            .entity(t.entity())
+            .entity(t.target())
             .beam_new_user(external.auth(slot.get_gamer_tag().unwrap().to_string()));
     }
 }
@@ -97,7 +97,7 @@ fn setup(
     asset_server: Res<AssetServer>,
     query: Query<Entity, With<GameRoot>>,
 ) {
-    let Ok(root_entity) = query.get_single() else {
+    let Ok(root_entity) = query.single() else {
         return;
     };
     let show_register_form = q.is_empty();

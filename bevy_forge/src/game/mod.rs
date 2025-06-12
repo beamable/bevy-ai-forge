@@ -54,7 +54,7 @@ fn show_items(
 }
 
 pub fn sound_on_button(
-    _trigger: Trigger<Pointer<Up>>,
+    _trigger: Trigger<Pointer<Released>>,
     asset_server: Res<AssetServer>,
     other_sounds: Query<Entity, With<components::SoundEffectPlayer>>,
     mut cmd: Commands,

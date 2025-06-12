@@ -48,16 +48,16 @@ fn call_update_inventory(ctx: Query<BeamableContexts>, mut cmd: Commands) {
 }
 
 fn sell_sword_pressed(
-    t: Trigger<Pointer<Up>>,
-    q: Query<(&SellItemButton, &Parent)>,
+    t: Trigger<Pointer<Released>>,
+    q: Query<(&SellItemButton, &ChildOf)>,
     ctx: Query<BeamableContexts>,
     mut cmd: Commands,
     mut on_sale: ResMut<ItemsOnSale>,
 ) {
-    let Ok((sell_item_info, parent)) = q.get(t.entity()) else {
+    let Ok((sell_item_info, child_of)) = q.get(t.target()) else {
         return;
     };
-    let Ok(ctx) = ctx.get_single() else {
+    let Ok(ctx) = ctx.single() else {
         return;
     };
     cmd.queue(MicroserviceSellSword(
@@ -67,8 +67,8 @@ fn sell_sword_pressed(
         ctx.entity,
     ));
     on_sale.0.push(sell_item_info.0.clone());
-    if let Some(entity_commands) = cmd.get_entity(parent.get()) {
-        entity_commands.try_despawn_recursive();
+    if let Ok(mut entity_commands) = cmd.get_entity(child_of.parent()) {
+        entity_commands.despawn();
     }
 }
 
@@ -85,7 +85,7 @@ fn setup(
     };
     let font_color = TextColor(consts::MY_ACCENT_COLOR);
 
-    let Ok(root_entity) = query.get_single() else {
+    let Ok(root_entity) = query.single() else {
         return;
     };
 
@@ -216,7 +216,7 @@ fn setup(
                 ));
             });
     });
-    let Ok(mut background) = game_bg.get_single_mut() else {
+    let Ok(mut background) = game_bg.single_mut() else {
         return;
     };
     *background.0 = ImageNode::new(asset_server.load("gfx/steampunk_bg_forge.png"));
@@ -228,11 +228,11 @@ fn on_currency_text_add(
     mut total_query: Query<(&mut Text, &CurrencyText)>,
     q: Query<&BeamInventory>,
 ) {
-    let Ok(inv) = q.get_single() else {
+    let Ok(inv) = q.single() else {
         return;
     };
 
-    let Ok((mut text, currency)) = total_query.get_mut(t.entity()) else {
+    let Ok((mut text, currency)) = total_query.get_mut(t.target()) else {
         return;
     };
     let value = inv.currencies.get(&currency.0).unwrap_or(&-1);
@@ -243,7 +243,7 @@ fn on_inv_changed(
     q: Query<&BeamInventory, Changed<BeamInventory>>,
     mut total_query: Query<(&mut Text, &CurrencyText)>,
 ) {
-    let Ok(inv) = q.get_single() else {
+    let Ok(inv) = q.single() else {
         return;
     };
 
@@ -254,12 +254,12 @@ fn on_inv_changed(
 }
 
 fn on_start_forging_sword_pressed(
-    t: Trigger<Pointer<Up>>,
+    t: Trigger<Pointer<Released>>,
     asset_server: Res<AssetServer>,
     q: Query<BeamableContexts>,
     mut commands: Commands,
 ) {
-    let Ok(ctx) = q.get_single() else {
+    let Ok(ctx) = q.single() else {
         return;
     };
     commands
@@ -271,7 +271,7 @@ fn on_start_forging_sword_pressed(
         SoundEffectPlayer,
     ));
     commands
-        .entity(t.entity())
+        .entity(t.target())
         .insert(components::HiddenUiElement(Timer::new(
             Duration::from_secs(3),
             TimerMode::Once,
@@ -279,12 +279,12 @@ fn on_start_forging_sword_pressed(
 }
 
 fn on_start_forging_shield_pressed(
-    t: Trigger<Pointer<Up>>,
+    t: Trigger<Pointer<Released>>,
     asset_server: Res<AssetServer>,
     q: Query<BeamableContexts>,
     mut commands: Commands,
 ) {
-    let Ok(ctx) = q.get_single() else {
+    let Ok(ctx) = q.single() else {
         return;
     };
     commands
@@ -296,7 +296,7 @@ fn on_start_forging_shield_pressed(
         SoundEffectPlayer,
     ));
     commands
-        .entity(t.entity())
+        .entity(t.target())
         .insert(components::HiddenUiElement(Timer::new(
             Duration::from_secs(3),
             TimerMode::Once,
@@ -311,11 +311,11 @@ fn update_inventory(
     on_sale: Res<ItemsOnSale>,
     mut commands: Commands,
 ) {
-    let Ok(ctx) = q.get_single() else {
+    let Ok(ctx) = q.single() else {
         println!("NO CONTEXT");
         return;
     };
-    let Ok(container_entity) = inv_container_q.get_single() else {
+    let Ok(container_entity) = inv_container_q.single() else {
         println!("NO CONTAINER");
         return;
     };
@@ -357,7 +357,7 @@ fn update_inventory(
         if let Some(index) = find {
             items.remove(index);
         } else {
-            commands.entity(e).despawn_recursive();
+            commands.entity(e).despawn();
         }
     }
     let binding = ItemProperty {

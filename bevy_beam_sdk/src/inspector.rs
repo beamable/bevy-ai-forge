@@ -21,11 +21,10 @@ impl Plugin for InspectorPlugin {
 }
 
 fn bevy_inspector(world: &mut World) {
-    let egui_context = world
+    let Ok(egui_context) = world
         .query_filtered::<&mut EguiContext, With<PrimaryWindow>>()
-        .get_single(world);
-
-    let Ok(egui_context) = egui_context else {
+        .single(world)
+    else {
         return;
     };
     let mut egui_context = egui_context.clone();

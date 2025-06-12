@@ -1,5 +1,6 @@
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
+use bevy_inspector_egui::bevy_egui::EguiPlugin;
 use bevy_inspector_egui::quick::StateInspectorPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
@@ -10,6 +11,9 @@ pub struct DebugPlugin;
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, git_info)
+            .add_plugins(EguiPlugin {
+                enable_multipass_for_primary_context: true,
+            })
             .add_plugins(
                 WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::Backspace)),
             )
