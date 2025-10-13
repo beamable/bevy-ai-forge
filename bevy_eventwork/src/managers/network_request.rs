@@ -205,7 +205,10 @@ use std::{fmt::Debug, marker::PhantomData, sync::atomic::AtomicU64};
 
 use async_channel::{Receiver, Sender};
 use bevy::{
-    ecs::system::SystemParam,
+    ecs::{
+        message::{Message, MessageWriter},
+        system::SystemParam,
+    },
     prelude::{debug, App, Event, EventReader, EventWriter, PreUpdate, Res, ResMut, Resource},
 };
 use dashmap::DashMap;
@@ -316,7 +319,7 @@ impl<T: RequestMessage> NetworkMessage for RequestInternal<T> {
 
 /// A wrapper around a request that allows sending a response that will automatically be written
 ///  to eventwork for network transmission.
-#[derive(Debug, Event, Clone)]
+#[derive(Debug, Message, Clone)]
 pub struct Request<T: RequestMessage> {
     request: T,
     source: ConnectionId,
@@ -393,7 +396,7 @@ impl AppNetworkRequestMessage for App {
 
 fn create_request_handlers<T: RequestMessage, NP: NetworkProvider>(
     mut requests: EventReader<NetworkData<RequestInternal<T>>>,
-    mut requests_wrapped: EventWriter<Request<T>>,
+    mut requests_wrapped: MessageWriter<Request<T>>,
     network: Res<Network<NP>>,
 ) {
     for request in requests.read() {

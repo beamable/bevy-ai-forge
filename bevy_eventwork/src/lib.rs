@@ -167,6 +167,7 @@ pub use async_channel;
 use async_channel::{unbounded, Receiver, Sender};
 pub use async_trait::async_trait;
 use bevy::prelude::*;
+use bevy_reflect::Reflect;
 use error::NetworkError;
 pub use network_message::NetworkMessage;
 use serde::{Deserialize, Serialize};
@@ -222,7 +223,7 @@ impl Debug for NetworkPacket {
     }
 }
 
-#[derive(Debug, Event)]
+#[derive(Debug, Message)]
 /// A network event originating from another eventwork app
 pub enum NetworkEvent {
     /// A new client has connected
@@ -233,7 +234,7 @@ pub enum NetworkEvent {
     Error(NetworkError),
 }
 
-#[derive(Debug, Event)]
+#[derive(Debug, Message)]
 /// [`NetworkData`] is what is sent over the bevy event system
 ///
 /// Please check the root documentation how to up everything

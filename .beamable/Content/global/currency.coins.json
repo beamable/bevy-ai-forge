@@ -1,10 +1,10 @@
 {
   "startingAmount": {
-    "data": 100
+    "data": -5
   },
   "icon": {
     "data": {
-      "referenceKey": "bfecb79b0ae49d640b5bba7b19cdcb0f"
+      "referenceKey": 1
     }
   },
   "clientPermission": {
