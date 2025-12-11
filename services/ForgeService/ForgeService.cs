@@ -9,11 +9,16 @@ using Beamable.Common;
 using Beamable.Common.Api;
 using Beamable.Common.Api.Inventory;
 using Beamable.Common.Api.Stats;
+using Beamable.Common.Content;
 using Beamable.Server;
 using Beamable.Server.Api.RealmConfig;
 using ForgeService.Storage;
 using Newtonsoft.Json;
 using OpenAI.Chat;
+using CurrencyProperty = Beamable.Common.Api.Inventory.CurrencyProperty;
+using ItemCreateRequest = Beamable.Common.Api.Inventory.ItemCreateRequest;
+using ItemDeleteRequest = Beamable.Common.Api.Inventory.ItemDeleteRequest;
+using ItemUpdateRequest = Beamable.Common.Api.Inventory.ItemUpdateRequest;
 
 namespace Beamable.ForgeService
 {
@@ -24,22 +29,29 @@ namespace Beamable.ForgeService
 	public partial class ForgeService : Microservice, IFederatedInventory<AiCloudIdentity>, IFederatedLogin<AiCloudIdentity>
 	{
         const string SwordContentId = "items.AiItemContent.AiSword";
-        private static string openApiKey;
-        static ChatClient GetClient() => new ChatClient(model: "gpt-4o", apiKey: openApiKey);
 
+        // private static string openApiKey;
+        // static ChatClient GetClient() => new ChatClient(model: "gpt-4o", apiKey: openApiKey);
+
+        [ConfigureServices]
+        public static void ConfigureServices(IServiceBuilder builder)
+        {
+            builder.AddSingleton<ChatAiService>();
+        }
+        
         [InitializeServices]
         public static async Task Initialize(IServiceInitializer initializer)
         {
-            var realmConfigService = initializer.GetService<IMicroserviceRealmConfigService>();
-            var config = await realmConfigService.GetRealmConfigSettings();
-            var appId = config.GetSetting("ForgeService", "openApiKey", string.Empty);
-            if (string.IsNullOrWhiteSpace(appId))
+            try
+            {
+                _ = await initializer.GetService<ChatAiService>().GetChat();
+            }
+            catch (Exception e)
             {
                 throw new MicroserviceException((int)HttpStatusCode.BadRequest, "ConfigurationError",
-                    "steam.appid is not defined in realm config. Please apply the configuration and restart the service to make it operational.");
-            }
+                    e.Message);
 
-            openApiKey = appId;
+            }
         }
 
 		public async Promise<FederatedInventoryProxyState> GetInventoryState(string id)
@@ -144,7 +156,7 @@ namespace Beamable.ForgeService
 
         private async Task<AiInventoryItem> MakeNewInventoryItem(string prompt, FederatedItemCreateRequest item, string id)
         {
-            var client = GetClient();
+            var client = await Provider.GetService<ChatAiService>().GetChat();
             try
             {
                 BeamableLogger.Log("Sending {Prompt} to OpenAI API...", prompt);
@@ -277,17 +289,29 @@ namespace Beamable.ForgeService
         }
 
         [ClientCallable]
+        public async Task TriggerInventoryRefresh()
+        {
+            await Provider.GetService<IBeamableRequester>()
+                .Request<Unit>(Method.PUT, $"/object/inventory/{Context.UserId}/proxy/reload");
+        }
+
+        [ClientCallable]
         [SwaggerCategory("Inventory")]
         public async Task<bool> StartForgingSword()
         {
             try
             {
+                var status = await Services.Auth.AttachIdentity(Context.UserId.ToString(),"ForgeService",  "OpenAI");
                 var currencyCost = 50;
-                var currency = await Services.Inventory.GetCurrency("currency.coins");
+                var inventoryView = await Services.Inventory.GetCurrent();
+                
+                long currency = inventoryView.currencies.GetValueOrDefault("currency.coins", 0);
                 if (currency > currencyCost)
                 {
-                    await Services.Inventory.SetCurrency("currency.coins", currency - currencyCost);
-                    await Services.Inventory.AddItem(SwordContentId);
+                    var check = new InventoryUpdateBuilder();
+                    check.AddItem(SwordContentId);
+                    check.CurrencyChange("currency.coins", -currencyCost);
+                    await Services.Inventory.Update(check);
                     return true;
                 }
                 else { return false; }

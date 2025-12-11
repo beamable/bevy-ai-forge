@@ -23,7 +23,7 @@
     <ItemGroup Label="Nuget References">
         <PackageReference Include="Beamable.Microservice.Runtime" Version="$(BeamableVersion)" />
         <PackageReference Include="Beamable.Microservice.SourceGen" Version="$(BeamableVersion)" OutputItemType="Analyzer" />
-        <PackageReference Include="OpenAI" Version="2.1.0" />
+        <PackageReference Include="OpenAI" Version="2.7.0" />
     </ItemGroup>
 
     <ItemGroup>

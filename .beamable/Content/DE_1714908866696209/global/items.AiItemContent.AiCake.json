@@ -1,0 +1,46 @@
+{
+  "properties": {
+    "clientPermission": {
+      "data": {
+        "write_self": false
+      }
+    },
+    "dynamicProperties": {
+      "data": [
+        {
+          "propertyName": "name",
+          "propertyDescription": "cake name"
+        },
+        {
+          "propertyName": "description",
+          "propertyDescription": "cake description, 3000 characters max"
+        },
+        {
+          "propertyName": "calories",
+          "propertyDescription": "calories"
+        },
+        {
+          "propertyName": "ingredients",
+          "propertyDescription": "ingredients, comma separated"
+        }
+      ]
+    },
+    "external": {
+      "data": {
+        "service": "ForgeService",
+        "namespace": "OpenAI"
+      }
+    },
+    "icon": {
+      "data": {}
+    },
+    "itemTheme": {
+      "data": "we love sweets"
+    },
+    "itemType": {
+      "data": "cake made for unicorns"
+    }
+  },
+  "tags": [],
+  "referenceManifestId": "693acea405f03b514aae1461"
+}

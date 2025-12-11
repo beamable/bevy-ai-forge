@@ -29,7 +29,7 @@
   },
   "clientPermission": {
     "data": {
-      "write_self": true
+      "write_self": false
     }
   },
   "itemTheme": {
