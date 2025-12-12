@@ -9,16 +9,11 @@ using Beamable.Common;
 using Beamable.Common.Api;
 using Beamable.Common.Api.Inventory;
 using Beamable.Common.Api.Stats;
-using Beamable.Common.Content;
 using Beamable.Server;
 using Beamable.Server.Api.RealmConfig;
 using ForgeService.Storage;
 using Newtonsoft.Json;
 using OpenAI.Chat;
-using CurrencyProperty = Beamable.Common.Api.Inventory.CurrencyProperty;
-using ItemCreateRequest = Beamable.Common.Api.Inventory.ItemCreateRequest;
-using ItemDeleteRequest = Beamable.Common.Api.Inventory.ItemDeleteRequest;
-using ItemUpdateRequest = Beamable.Common.Api.Inventory.ItemUpdateRequest;
 
 namespace Beamable.ForgeService
 {
@@ -156,9 +151,10 @@ namespace Beamable.ForgeService
 
         private async Task<AiInventoryItem> MakeNewInventoryItem(string prompt, FederatedItemCreateRequest item, string id)
         {
-            var client = await Provider.GetService<ChatAiService>().GetChat();
             try
             {
+                BeamableLogger.Log("Getting chat for OpenAI API...");
+                var client = await Provider.GetService<ChatAiService>().GetChat();
                 BeamableLogger.Log("Sending {Prompt} to OpenAI API...", prompt);
                 var aiResponse = await client.CompleteChatAsync([new UserChatMessage(prompt)], new ChatCompletionOptions
                     {
@@ -240,10 +236,17 @@ namespace Beamable.ForgeService
         {
             try
             {
+                if (Services == null || Services.Stats == null)
+                {
+                    BeamableLogger.LogWarning("No stats found for {ID} with ID {Key}, services were null {NullServices}", id, key, Services == null);
+                    return defaultValue;
+                }
                 var value = await Services.Stats.GetStat(StatsDomainType.Client, StatsAccessType.Private, id, key);
-                if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+                if (string.IsNullOrWhiteSpace(value)) 
+                    return defaultValue;
                 if(int.TryParse(value, out var number))
                     return number;
+                return defaultValue;
             }
             catch (Exception e)
             {
