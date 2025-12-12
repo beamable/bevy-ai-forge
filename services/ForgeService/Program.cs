@@ -1,4 +1,4 @@
-﻿using Beamable.Server;
+using Beamable.Server;
 using System.Threading.Tasks;
 
 namespace Beamable.ForgeService
@@ -10,11 +10,10 @@ namespace Beamable.ForgeService
 		/// </summary>
 		public static async Task Main()
 		{
-			// inject data from the CLI.
-			await MicroserviceBootstrapper.Prepare<ForgeService>();
-			
-			// run the Microservice code
-			await MicroserviceBootstrapper.Start<ForgeService>();
+    		await BeamServer
+    			.Create()
+    			.IncludeRoutes<ForgeService>(routePrefix: "")
+    			.RunForever();
 		}
 	}
 }

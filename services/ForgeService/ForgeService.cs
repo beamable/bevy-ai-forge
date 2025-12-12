@@ -36,7 +36,7 @@ namespace Beamable.ForgeService
         [ConfigureServices]
         public static void ConfigureServices(IServiceBuilder builder)
         {
-            builder.AddSingleton<ChatAiService>();
+            builder.AddSingleton(provider => new ChatAiService(provider.GetService<IMicroserviceRealmConfigService>()));
         }
         
         [InitializeServices]

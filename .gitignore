@@ -7,5 +7,3 @@ target
 /out
 key.pem
 cert.pem
-services/**/bin
-services/**/obj
