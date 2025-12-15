@@ -1,7 +1,7 @@
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use bevy_inspector_egui::bevy_egui::{egui, EguiContext, EguiContexts};
+use bevy_inspector_egui::bevy_egui::{egui, EguiContext, EguiContextPass, EguiContexts};
 use bevy_inspector_egui::bevy_inspector::Filter;
 use bevy_inspector_egui::egui::RichText;
 
@@ -14,7 +14,7 @@ impl Plugin for InspectorPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, configure_egui);
         app.add_systems(
-            Update,
+            EguiContextPass,
             bevy_inspector.run_if(input_toggle_active(false, KeyCode::Backslash)),
         );
     }

@@ -6,7 +6,7 @@ use crate::{
         components::{self, *},
         sound_on_button,
     },
-    microservice::MicroserviceSellSword,
+    microservice::{MicroserviceSellSword, MicroserviceStartForging},
 };
 use beam_microservice::models::SellSwordRequestArgs;
 use bevy::prelude::*;
@@ -29,7 +29,7 @@ impl Plugin for GameStatePlugin {
             .add_observer(on_currency_text_add)
             .init_resource::<ItemsOnSale>();
 
-        #[cfg(target_arch = "wasm32")]
+        // #[cfg(target_arch = "wasm32")]
         app.add_systems(
             FixedUpdate,
             call_update_inventory.run_if(in_state(super::MainGameState::Game).and(
@@ -39,11 +39,10 @@ impl Plugin for GameStatePlugin {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+// #[cfg(target_arch = "wasm32")]
 fn call_update_inventory(ctx: Query<BeamableContexts>, mut cmd: Commands) {
     for ctx in ctx.iter() {
-        cmd.entity(ctx.entity)
-            .beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
+        cmd.entity(ctx.entity).beam_get_inventory(None);
     }
 }
 
@@ -262,9 +261,10 @@ fn on_start_forging_sword_pressed(
     let Ok(ctx) = q.single() else {
         return;
     };
-    commands
-        .entity(ctx.entity)
-        .beam_add_to_inventory(vec!["items.AiItemContent.AiSword".into()]);
+    commands.queue(MicroserviceStartForging(ctx.entity));
+    // commands
+    //     .entity(ctx.entity)
+    //     .beam_add_to_inventory(vec!["items.AiItemContent.AiSword".into()]);
     commands.spawn((
         AudioPlayer::new(asset_server.load("sfx/blacksmith.ogg".to_owned())),
         PlaybackSettings::DESPAWN,
@@ -424,32 +424,30 @@ fn update_inventory(
                                 TextLayout::new_with_justify(JustifyText::Center),
                             ));
                         }
-                        let Some(price) = item.properties.iter().find(|i| &i.name == "price")
-                        else {
-                            return;
+                        if let Some(price) = item.properties.iter().find(|i| &i.name == "price") {
+                            container
+                                .spawn((
+                                    BackgroundColor(INTERACTIVE_BG_COLOR),
+                                    BorderColor(BORDER_COLOR),
+                                    Button,
+                                    Node {
+                                        padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
+                                        border: UiRect::all(Val::Px(4.0)),
+                                        ..Default::default()
+                                    },
+                                    SellItemButton(proxy_id.clone()),
+                                ))
+                                .observe(sell_sword_pressed)
+                                .with_children(|btn| {
+                                    btn.spawn((
+                                        Text::new(format!("Sell it for {}", &price.value)),
+                                        text_style.clone(),
+                                        text_color,
+                                        TextLayout::new_with_justify(JustifyText::Center),
+                                    ));
+                                })
+                                .observe(sound_on_button);
                         };
-                        container
-                            .spawn((
-                                BackgroundColor(INTERACTIVE_BG_COLOR),
-                                BorderColor(BORDER_COLOR),
-                                Button,
-                                Node {
-                                    padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
-                                    border: UiRect::all(Val::Px(4.0)),
-                                    ..Default::default()
-                                },
-                                SellItemButton(proxy_id.clone()),
-                            ))
-                            .observe(sell_sword_pressed)
-                            .with_children(|btn| {
-                                btn.spawn((
-                                    Text::new(format!("Sell it for {}", &price.value)),
-                                    text_style.clone(),
-                                    text_color,
-                                    TextLayout::new_with_justify(JustifyText::Center),
-                                ));
-                            })
-                            .observe(sound_on_button);
                     });
             });
     }
