@@ -28,7 +28,7 @@ fn main() {
             provider_namespace: "OpenAI".to_string(),
         })
         .insert_resource(config)
-        .add_plugins(plugins)
+        .add_plugins(bevy_ehttp::prelude::HttpPlugin)
         .add_plugins(DefaultPlugins.set(AssetPlugin {
             meta_check: bevy::asset::AssetMetaCheck::Never,
             ..default()
