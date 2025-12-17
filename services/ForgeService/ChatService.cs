@@ -204,6 +204,11 @@ public class ChatAiService
         
         return _initPromise;
     }
+
+    public Promise<string> GenerateImage(string p)
+    {
+        return _chat.GenerateImage(p);
+    }
     
     public async Task<AiInventoryItem> MakeNewInventoryItem(AiItemContent item, string id, long forgedTimes)
     {
@@ -218,23 +223,16 @@ public class ChatAiService
             if (TryParseAiResponse(aiResponse, out aiProps))
             {
                 aiProps["price"] = CalculatePrice(aiResponse).ToString();
-                if (aiProps.TryGetValue("image", out var imagePrompt))
-                {
-                    var image = await _chat.GenerateImage(imagePrompt);
-                    aiProps.Add("imageUrl", image);
-                }
-                
             }
         }
         catch(Exception ex)
         {
-            BeamableLogger.LogError("Calling OpenAI API failed");
+            BeamableLogger.LogError("Calling AI backend failed");
             BeamableLogger.LogError(ex);
-            
-            if(!aiProps.ContainsKey("price"))
-            {
-                aiProps.Add("price", CalculatePrice(prompt).ToString());
-            }
+        }
+        if(!aiProps.ContainsKey("price"))
+        {
+            aiProps.Add("price", CalculatePrice(prompt).ToString());
         }
         return new AiInventoryItem
         {
@@ -243,7 +241,7 @@ public class ChatAiService
             Properties = aiProps
         };
     }
-    private static bool TryParseAiResponse(string response, out Dictionary<string, string> aiProps)
+    public static bool TryParseAiResponse(string response, out Dictionary<string, string> aiProps)
     {
         aiProps = null;
         if (string.IsNullOrWhiteSpace(response)) 

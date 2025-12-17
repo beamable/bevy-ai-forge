@@ -6,7 +6,7 @@ use crate::{
         components::{self, *},
         sound_on_button,
     },
-    microservice::{MicroserviceSellSword, MicroserviceStartForging},
+    microservice::{MicroserviceSellSword, MicroserviceStartForging, MicroserviceStartForgingShield},
 };
 use beam_microservice::models::SellSwordRequestArgs;
 use bevy::prelude::*;
@@ -14,8 +14,8 @@ use bevy_beam_sdk::api::BeamableBasicApi;
 use bevy_beam_sdk::slot::prelude::{BeamInventory, BeamableContexts, ItemProperty};
 use bevy_simple_scroll_view::*;
 
-#[derive(Resource, Reflect, Default)]
-pub struct ItemsOnSale(pub Vec<String>);
+#[derive(Resource, Reflect, Default, Deref, DerefMut)]
+pub struct ItemsOnSale(Vec<i64>);
 
 pub struct GameStatePlugin;
 
@@ -25,6 +25,10 @@ impl Plugin for GameStatePlugin {
             .add_systems(
                 Update,
                 (on_inv_changed, update_inventory).run_if(in_state(super::MainGameState::Game)),
+            )
+            .add_systems(
+                Update,
+                (update_items_visibility).run_if(resource_changed::<ItemsOnSale>),
             )
             .add_observer(on_currency_text_add)
             .init_resource::<ItemsOnSale>();
@@ -48,12 +52,12 @@ fn call_update_inventory(ctx: Query<BeamableContexts>, mut cmd: Commands) {
 
 fn sell_sword_pressed(
     t: Trigger<Pointer<Released>>,
-    q: Query<(&SellItemButton, &ChildOf)>,
+    q: Query<&SellItemButton>,
     ctx: Query<BeamableContexts>,
     mut cmd: Commands,
     mut on_sale: ResMut<ItemsOnSale>,
 ) {
-    let Ok((sell_item_info, child_of)) = q.get(t.target()) else {
+    let Ok(sell_item_info) = q.get(t.target()) else {
         return;
     };
     let Ok(ctx) = ctx.single() else {
@@ -61,13 +65,24 @@ fn sell_sword_pressed(
     };
     cmd.queue(MicroserviceSellSword(
         Some(SellSwordRequestArgs {
-            item_id: sell_item_info.0.clone(),
+            item_id: sell_item_info.to_string(),
         }),
         ctx.entity,
     ));
-    on_sale.0.push(sell_item_info.0.clone());
-    if let Ok(mut entity_commands) = cmd.get_entity(child_of.parent()) {
-        entity_commands.despawn();
+    on_sale.push(**sell_item_info);
+}
+
+fn update_items_visibility(
+    on_sale: Res<ItemsOnSale>,
+    mut q: Query<(&mut Node,  &ItemDisplay)>
+) {
+    for (mut n, item_display) in q.iter_mut() {
+        let visible = !on_sale.iter().any(|id| id == &item_display.0);
+        n.display = if visible {
+            Display::Flex
+        } else {
+            Display::None
+        };
     }
 }
 
@@ -287,9 +302,10 @@ fn on_start_forging_shield_pressed(
     let Ok(ctx) = q.single() else {
         return;
     };
-    commands
-        .entity(ctx.entity)
-        .beam_add_to_inventory(vec!["items.AiItemContent.AiShield".into()]);
+    commands.queue(MicroserviceStartForgingShield(ctx.entity));
+    // commands
+    //     .entity(ctx.entity)
+    //     .beam_add_to_inventory(vec!["items.AiItemContent.AiShield".into()]);
     commands.spawn((
         AudioPlayer::new(asset_server.load("sfx/blacksmith.ogg".to_owned())),
         PlaybackSettings::DESPAWN,
@@ -354,6 +370,7 @@ fn update_inventory(
     }
     for (e, item) in inv_items_q.iter() {
         let find = items.iter().position(|i| i.id == item.0);
+        // let find = items.iter().position(|i| i.proxy_id.as_ref().is_some_and(|i| i == &item.0));
         if let Some(index) = find {
             items.remove(index);
         } else {
@@ -365,25 +382,25 @@ fn update_inventory(
         value: "sword".to_owned(),
     };
     for item in items {
+        if item.proxy_id.is_none() {
+            continue;
+        }
+        if on_sale.iter().any(|id| id.eq(&item.id)) {
+            return;
+        }
+        let Some(name) = item.properties.iter().find_map(|i| {
+            if &i.name == "name" {
+                Some(i.value.clone())
+            } else {
+                None
+            }
+        }) else {
+            continue;
+        };
         commands
             .entity(container_entity)
             .with_children(|inventory| {
-                let Some(proxy_id) = item.proxy_id else {
-                    return;
-                };
-                if on_sale.0.iter().any(|id| id.eq(&proxy_id)) {
-                    return;
-                }
 
-                let Some(name) = item.properties.iter().find_map(|i| {
-                    if &i.name == "name" {
-                        Some(i.value.clone())
-                    } else {
-                        None
-                    }
-                }) else {
-                    return;
-                };
                 let item_type = item
                     .properties
                     .iter()
@@ -405,6 +422,7 @@ fn update_inventory(
                         BorderColor(BORDER_COLOR),
                         Name::new(name.clone()),
                         ItemDisplay(item.id),
+                        // ItemDisplay(proxy_id.clone()),
                     ))
                     .with_children(|inv_root| {
                         use bevy::image::{ImageFormat, ImageFormatSetting, ImageLoaderSettings};
@@ -478,7 +496,7 @@ fn update_inventory(
                                                 border: UiRect::all(Val::Px(4.0)),
                                                 ..Default::default()
                                             },
-                                            SellItemButton(proxy_id.clone()),
+                                            SellItemButton(item.id),
                                         ))
                                         .observe(sell_sword_pressed)
                                         .with_children(|btn| {

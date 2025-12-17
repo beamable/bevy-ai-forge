@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,12 +12,14 @@ using Beamable.Common.Api;
 using Beamable.Common.Api.Inventory;
 using Beamable.Common.Api.Stats;
 using Beamable.Common.Content;
+using Beamable.Common.Scheduler;
 using Beamable.Serialization;
 using Beamable.Serialization.SmallerJSON;
 using Beamable.Server;
 using Beamable.Server.Api.Content;
 using Beamable.Server.Api.RealmConfig;
 using ForgeService.Storage;
+using MongoDB.Driver;
 using Newtonsoft.Json;
 using OpenAI.Chat;
 
@@ -29,9 +32,7 @@ namespace Beamable.ForgeService
 	public partial class ForgeService : Microservice, IFederatedInventory<AiCloudIdentity>, IFederatedLogin<AiCloudIdentity>
 	{
         const string SwordContentId = "items.AiItemContent.AiSword";
-
-        // private static string openApiKey;
-        // static ChatClient GetClient() => new ChatClient(model: "gpt-4o", apiKey: openApiKey);
+        const string ShieldContentId = "items.AiItemContent.AiShield";
 
         [ConfigureServices]
         public static void ConfigureServices(IServiceBuilder builder)
@@ -72,57 +73,125 @@ namespace Beamable.ForgeService
             List<FederatedItemUpdateRequest> updateItems)
         {
             var beamId = Context.UserId;
-            BeamableLogger.LogWarning($"StartInventoryTransaction {id} - {beamId}: {newItems.Count}");
+            var stopWatch = Stopwatch.StartNew();
+            BeamableLogger.LogWarning($"StartInventoryTransaction {id} - {beamId}: new items amount {newItems.Count}, delete items amount: {deleteItems.Count}");
             try
             {
                 var db = await Storage.ForgeStorageDatabase();
                 var contentApi = Provider.GetService<AiContentService>();
                 var chat = Provider.GetService<ChatAiService>();
                 var signedRequester = SignedRequester;
+                var scheduler = Services.Scheduler;
                 BeamableLogger.Log($"Is signedRequester empty: {signedRequester == null}");
-                signedRequester.SetPlayerId(id);
-
+                signedRequester!.SetPlayerId(id);
+                var tasks = new List<Promise<Unit>>();
+                var oldItemsPromise = AiInventoryItemCollection.GetAll(db, id);
+                var concurentItems = new ConcurrentBag<AiInventoryItem>();
                 foreach (var newItem in newItems)
                 {
-                    _ = Task.Run(async () =>
+                    tasks.Add(Task.Run(async () =>
                     {
-                        BeamableLogger.Log("Starting task for {item}", newItem.contentId);
+                        var startTime = stopWatch.Elapsed.TotalMilliseconds;
+                        BeamableLogger.Log("Starting insert task for {item} at {StartTime}", newItem.contentId, startTime);
                         if (!contentApi.TryGetContent(newItem.contentId, out var aiItemContent))
                         {
                             BeamableLogger.LogWarning("{ContentId} is not an AiItemContent", newItem.contentId);
                             return;
                         }
-
-                        var key = aiItemContent.StatKey();
                         try
                         {
-                            var forgedTimes = await TryGetIntStat(signedRequester, beamId, key, 0);
-                            BeamableLogger.Log($"Forged times: {forgedTimes}");
+                            long forgedTimes = 0;
+                            if (newItem.properties.TryGetValue("forgedTimes", out var value))
+                            {
+                                if (long.TryParse(value, out var result))
+                                {
+                                    forgedTimes = result;
+                                }
+                            }
+                            var sss = stopWatch.ElapsedMilliseconds;
+                            BeamableLogger.Log($"Forged times of {{itemType}}: {forgedTimes} at {{Time}}", aiItemContent.itemType, sss);
 
                             var newAiItem = await chat.MakeNewInventoryItem(aiItemContent, id, forgedTimes);
+                            BeamableLogger.Log("Created item with AI after {time}", stopWatch.ElapsedMilliseconds);
 
                             await AiInventoryItemCollection.Save(db, newAiItem);
-                            BeamableLogger.Log("Saved item {ID}", newAiItem.ItemId);
-                            // items.Add(newAiItem);
-                            // var forgedTimesUpdated = await TryGetIntStat(signedRequester, beamId, key, 0);
-                            // forgedTimesUpdated++;
-                            TryBumpStat(signedRequester, beamId, key, 1);
-
-                            // BeamableLogger.Log("Reporting back state for {ID}", newAiItem.ItemId);
-                            // await requester.Request<CommonResponse>(Method.PUT,
-                            //     $"/object/inventory/{beamId}/proxy/state",
-                            //     items.ToFederatedInventoryProxyState());
-                            // BeamableLogger.Log("Reported state for {ID}", newAiItem.ItemId);
+                            concurentItems.Add(newAiItem);
+                            var endTime = stopWatch.ElapsedMilliseconds;
+                            BeamableLogger.Log("Saved item {ID} at {endTime}", newAiItem.ItemId, endTime);
+                            if (!newAiItem.Properties.ContainsKey("image"))
+                            {
+                                await scheduler.Schedule().Microservice<ForgeService>().Run(t => t.RebuildItem, newAiItem.ItemId, forgedTimes)
+                                    .After(TimeSpan.FromSeconds(10)).Save($"rebuild-item-{newAiItem.ItemId}");
+                            }
+                            TryBumpStat(signedRequester, beamId, aiItemContent.StatKey(), 1);
                         }
                         catch (Exception ex)
                         {
-                            BeamableLogger.LogError(ex);
+                            var endTime = stopWatch.Elapsed.TotalMilliseconds;
+                            BeamableLogger.LogError("Exception during item add after {endTime} with exception {exception}", endTime, ex);
                         }
-                    });
+                    }).ToPromise());
                 }
 
-                var items = new ConcurrentBag<AiInventoryItem>(await AiInventoryItemCollection.GetAll(db, id));
-                return items.ToFederatedInventoryProxyState();
+                foreach (var deleteItem in deleteItems)
+                {
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var startTime = stopWatch.Elapsed.TotalMilliseconds;
+                            BeamableLogger.Log("Starting delete task for {item} at {StartTime}", deleteItem.contentId, startTime);
+                            await AiInventoryItemCollection.DeleteByKey(db, deleteItem.proxyId);
+                            var endTime = stopWatch.Elapsed.TotalMilliseconds;
+                            BeamableLogger.Log("Removed item {ID} at {endTime}", deleteItem.proxyId, endTime);
+                        }
+                        catch (Exception ex)
+                        {
+                            var endTime = stopWatch.Elapsed.TotalMilliseconds;
+                            BeamableLogger.LogError("Exception during item removal after {endTime} with exception {exception}", endTime, ex);
+                        }
+                    }).ToPromise());
+                }
+
+                await Promise.Sequence(tasks);
+                var jobs = new List<Promise<Job>>();
+                var timer = 1;
+                foreach (var ii in concurentItems)
+                {
+                    jobs.Add(Services.Scheduler.Schedule().Microservice<ForgeService>().Run(t => t.GenerateImage, ii.ItemId)
+                        .After(TimeSpan.FromSeconds(timer)).Save($"genImage-{ii.ItemId}"));
+                    timer += 2;
+                }
+                var updateTime = stopWatch.Elapsed.TotalMilliseconds;   
+                BeamableLogger.Log("updated items after {Duration}", updateTime);
+
+                var itemsResult = await oldItemsPromise;
+                var oldItemsTime = stopWatch.Elapsed.TotalMilliseconds;   
+                BeamableLogger.Log("got old items after {Duration}", oldItemsTime);
+                itemsResult = itemsResult.Where(item =>
+                {
+                    if (deleteItems.Any(i => i.proxyId == item.ItemId))
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }).ToList();
+                itemsResult.AddRange(concurentItems);
+                await Promise.Sequence(jobs);
+                var ddd = stopWatch.Elapsed.TotalMilliseconds;
+                BeamableLogger.Log("Scheduled jobs after {Duration}", ddd);
+                // if (tasks.Count > 0)
+                // {
+                //     var time = stopWatch.Elapsed.TotalMilliseconds;
+                //     BeamableLogger.Log("Reporting back state for {ID} after {Duration}", beamId, time);
+                //     await signedRequester.Request<CommonResponse>(Method.PUT,
+                //         $"/object/inventory/{beamId}/proxy/state",
+                //         items.ToFederatedInventoryProxyState());
+                // }
+                var dd = stopWatch.Elapsed.TotalMilliseconds;
+                BeamableLogger.Log("Complete after {Duration}", dd);
+                return itemsResult.ToFederatedInventoryProxyState();
             }
             catch (Exception e)
             {
@@ -147,12 +216,16 @@ namespace Beamable.ForgeService
             public virtual void Serialize(JsonSerializable.IStreamSerializer s)
             {
                 s.Serialize("id", ref this.id);
-                s.SerializeDictionary<MapOfString, string>("stats", ref this.stats);
+                // s.SerializeDictionary<MapOfString, string>("stats", ref this.stats);
                 if (s.isLoading)
                 {
                     var ss = s.GetValue("stats") as ArrayDict;
                     stats.Clear();
                     statsNumeric.Clear();
+                    if (ss is null)
+                    {
+                        return;
+                    }
                     foreach (var (key, value) in ss)
                     {
                         if (value is long l)
@@ -231,6 +304,17 @@ namespace Beamable.ForgeService
             } catch (Exception e)
             {
                 BeamableLogger.LogError(e);
+                
+                requester.SetPlayerId(id);
+                await requester.Request<Api.Autogenerated.Models.EmptyResponse>(Method.POST, $"/object/stats/client.private.player.{id}", new StatIntUpdateRequest()
+                {
+                    set = new OptionalMapOfInt()
+                    {
+                        HasValue = true,
+                        Value = new MapOfInt(){{key, 1}}
+                    },
+                    // objectId = id.ToString(),
+                });
             }
         }
         private static async Promise<long> TryGetIntStat(IBeamableRequester requester, long id, string key, int defaultValue)
@@ -244,42 +328,6 @@ namespace Beamable.ForgeService
                 {
                     return l;
                 }
-                // var stats = await requester.Request<StatsResponse>(Method.GET, $"/object/stats/client.private.player.{id}",
-                //     new StatsRequest() { stats = key }, true, s =>
-                //     {
-                //         var dictionary = Json.Deserialize(s) as ArrayDict;
-                //         long id = 0;
-                //         if (dictionary["id"] is long test)
-                //         {
-                //             id = test;
-                //         }
-                //
-                //         var stats = new StatsResponse()
-                //         {
-                //             id = id,
-                //             stats = new MapOfString()
-                //         };
-                //         if (dictionary["stats"] is ArrayDict stat)
-                //         {
-                //             foreach (var (key, value) in stat)
-                //             {
-                //                 if (value is string ss)
-                //                 {
-                //                     stats.stats.Add(key, ss);
-                //                 }
-                //             }
-                //         }
-                //         return stats;
-                //     });
-                if (!stats.stats.TryGetValue(key, out string value))
-                {
-                    return defaultValue;
-                }
-                if (string.IsNullOrWhiteSpace(value)) 
-                    return defaultValue;
-                if(long.TryParse(value, out var number))
-                    return number;
-                return defaultValue;
             }
             catch (Exception e)
             {
@@ -315,17 +363,7 @@ namespace Beamable.ForgeService
         {
             var beamId = Context.UserId;
             var key = $"Forged-{itemType}";
-            try
-            {
-                await Requester.Request<Api.Autogenerated.Models.EmptyResponse>(Method.POST, $"/object/stats/client.private.player.{beamId}", JsonSerializable.ToJson(new StatIntUpdateRequest()
-                {
-                    add = new OptionalMapOfLong{HasValue = true, Value = new MapOfLong(){{key,1}}}
-                }));
-                // await TryUpdateStat(SignedRequester, beamId, key, 1);
-            }catch(Exception e)
-            {
-                BeamableLogger.LogError(e);
-            }
+            await TryBumpStat(SignedRequester, beamId, key, 1);
         }
 
         [ClientCallable]
@@ -351,36 +389,51 @@ namespace Beamable.ForgeService
         [SwaggerCategory("Inventory")]
         public async Task<bool> SellSword(string itemId)
         {
-            var user = await Services.Auth.GetUser();
+            var itemIdLong = long.Parse(itemId);
+            // var user = await Services.Auth.GetUser();
 
-            var id = user.external.FirstOrDefault().userId;
-            var db = await Storage.ForgeStorageDatabase();
-            var items = await AiInventoryItemCollection.GetAll(db, id);
-            BeamableLogger.Log($"User {user.id} with ID: {id} has {items.Count} items");
-            var item = items.FirstOrDefault(item => item.ItemId == itemId);
-            if (item is not null)
+            // var id = user.external.FirstOrDefault().userId;
+            // var db = await Storage.ForgeStorageDatabase();
+            // var items = await AiInventoryItemCollection.GetAll(db, id);
+            // BeamableLogger.Log($"User {user.id} with ID: {id} has {items.Count} items");
+            var inv = await Services.Inventory.GetCurrent("items");
+            ItemView item = null;
+            foreach (var items in inv.items)
             {
-                var reward = 0;
-                if (int.TryParse(item.Properties.GetValueOrDefault("price", "10"), out int price))
+                var stop = false;
+                foreach (var itemView in items.Value)
                 {
-                    reward = price;
+                    if (itemView.id == itemIdLong)
+                    {
+                        item = itemView;
+                        stop = true;
+                        break;
+                    }
                 }
 
-                BeamableLogger.Log("Deleting item");
-                await AiInventoryItemCollection.Delete(db, item);
-                items.Remove(item);
-
-                BeamableLogger.Log("Adding currency");
-                await Services.Inventory.AddCurrency("currency.coins", reward);
-
-                BeamableLogger.Log("Reporting back state");
-                await Requester.Request<CommonResponse>(Method.PUT, $"/object/inventory/{Context.UserId}/proxy/state",
-                    items.ToFederatedInventoryProxyState());
-                return true;
+                if (stop)
+                {
+                    break;
+                }
+            }
+            
+            if (item is null)
+            {
+                BeamableLogger.LogWarning("Item {ID} not found", itemId);
+                BeamableLogger.LogWarning("Valid ids: {ids}", string.Join(",", inv.items.Values.Select(s=> string.Join(",", s.Select(ss=> ss.id)))));
+                return false;
             }
 
-            BeamableLogger.LogWarning("Item {ID} not found", itemId);
-            return false;
+            var reward = 0;
+            if (int.TryParse(item.properties.GetValueOrDefault("price", "10"), out int price))
+            {
+                reward = price;
+            }
+            var check = new InventoryUpdateBuilder();
+            check.DeleteItem(item.contentId, item.id);
+            check.CurrencyChange("currency.coins", reward);
+            await Services.Inventory.Update(check);
+            return true;
         }
 
         [ClientCallable]
@@ -392,20 +445,50 @@ namespace Beamable.ForgeService
 
         [ClientCallable]
         [SwaggerCategory("Inventory")]
-        public async Task<bool> StartForgingSword()
+        public Task<bool> StartForgingSword()
         {
+            return ForgeItem(SwordContentId);
+        }
+
+        
+        [ClientCallable]
+        [SwaggerCategory("Inventory")]
+        public Task<bool> StartForgingShield()
+        {
+            return ForgeItem(ShieldContentId);
+        }
+        
+
+        public Promise<FederatedAuthenticationResponse> Authenticate(string token, string challenge,
+            string solution)
+        {
+            return Promise<FederatedAuthenticationResponse>.Successful(new FederatedAuthenticationResponse { user_id = token });
+        }
+        
+        public async Task<bool> ForgeItem(string itemId)
+        {
+            var contentApi = Provider.GetService<AiContentService>();
+            if (!contentApi.TryGetContent(itemId, out var content))
+            {
+                return false;
+            }
+            
             try
             {
-                // var status = await Services.Auth.AttachIdentity(Context.UserId.ToString(),"ForgeService",  "OpenAI");
-                var currencyCost = 50;
-                var inventoryView = await Services.Inventory.GetCurrent("currency.coins");
+                var currencyCost = content.GetForgePrice();
+                var forgedTimesPromise = TryGetIntStat(SignedRequester, Context.Id, content.StatKey(), 0);
+                var inventoryViewPromise = Services.Inventory.GetCurrent("currency.coins");
+                var inventoryView = await inventoryViewPromise;
+                var forgedTimes = await forgedTimesPromise;
+                
                 
                 long currency = inventoryView.currencies.GetValueOrDefault("currency.coins", 0);
                 if (currency > currencyCost)
                 {
                     var check = new InventoryUpdateBuilder();
-                    check.AddItem(SwordContentId);
+                    check.AddItem(itemId, new Dictionary<string, string>{{"forgedTimes", forgedTimes.ToString()}});
                     check.CurrencyChange("currency.coins", -currencyCost);
+                    BeamableLogger.Log("Start forging {Item} that costs {Cost}", itemId, currencyCost);
                     await Services.Inventory.Update(check);
                     return true;
                 }
@@ -418,10 +501,87 @@ namespace Beamable.ForgeService
         }
         
 
-        public Promise<FederatedAuthenticationResponse> Authenticate(string token, string challenge,
-            string solution)
+        [ServerCallable]
+        public async Task GenerateImage(string itemId)
         {
-            return Promise<FederatedAuthenticationResponse>.Successful(new FederatedAuthenticationResponse { user_id = token });
+            var stopWatch = Stopwatch.StartNew();
+            var chat = Provider.GetService<ChatAiService>();
+            var db = await Storage.ForgeStorageDatabase();
+            BeamableLogger.Log("Gen Image- got storage, time {Time}", stopWatch.ElapsedMilliseconds);
+            var items = await AiInventoryItemCollection.GetItem(db, itemId);
+            BeamableLogger.Log("Gen Image- got item, time {Time}", stopWatch.ElapsedMilliseconds);
+            var item = items[0];
+            if (item.Properties.ContainsKey("imageUrl"))
+            {   
+                BeamableLogger.Log("Skip gen image");
+                await Provider.GetService<IBeamableRequester>()
+                    .Request<Unit>(Method.PUT, $"/object/inventory/{item.GamerTag}/proxy/reload");
+                BeamableLogger.Log("Gen Image- reloaded proxy, time {Time}", stopWatch.ElapsedMilliseconds);
+                return;
+            }
+
+            if (!item.Properties.TryGetValue("image", out var imagePrompt))
+            {
+                if (!Provider.GetService<AiContentService>().TryGetContent(item.ContentId, out var aiItemContent))
+                {
+                    return;
+                }
+                var signedRequester = SignedRequester;
+                signedRequester.SetPlayerId(item.GamerTag);
+                var stat = await TryGetIntStat(signedRequester, long.Parse(item.GamerTag), aiItemContent.StatKey(), 0);
+                await Services.Scheduler.Schedule().Microservice<ForgeService>().Run(t => t.RebuildItem, itemId, stat)
+                    .After(TimeSpan.FromSeconds(10)).Save($"rebuild-item-{itemId}");
+                return;
+            }
+            
+            var image = await chat.GenerateImage(imagePrompt);
+            BeamableLogger.Log("Gen Image- got image, time {Time}", stopWatch.ElapsedMilliseconds);
+            item.Properties["image"] = image;
+            var collection = await AiInventoryItemCollection.Get(db);
+            await collection.FindOneAndReplaceAsync(x => x.ItemId == itemId, item);
+            BeamableLogger.Log("Gen Image- updated item, time {Time}", stopWatch.ElapsedMilliseconds);
+            await Provider.GetService<IBeamableRequester>()
+                .Request<Unit>(Method.PUT, $"/object/inventory/{item.GamerTag}/proxy/reload");
+            BeamableLogger.Log("Gen Image- reloaded proxy, time {Time}", stopWatch.ElapsedMilliseconds);
+        }
+
+        [ServerCallable]
+        public async Task RebuildItem(string itemId, long forgedTimes)
+        {
+            var stopWatch = Stopwatch.StartNew();
+            var chat = Provider.GetService<ChatAiService>();
+            var db = await Storage.ForgeStorageDatabase();
+            BeamableLogger.Log("Rebuild Item- got storage, time {Time}", stopWatch.ElapsedMilliseconds);
+            var items = await AiInventoryItemCollection.GetItem(db, itemId);
+            BeamableLogger.Log("Rebuild Item- got item, time {Time}", stopWatch.ElapsedMilliseconds);
+            var item = items[0];
+            if (item.Properties.ContainsKey("image"))
+            {   
+                return;
+            }
+            if (!Provider.GetService<AiContentService>().TryGetContent(item.ContentId, out var aiItemContent))
+            {
+                BeamableLogger.LogWarning("{ContentId} is not an AiItemContent", item.ContentId);
+                return;
+            }
+            BeamableLogger.Log("Rebuild Item Sending prompt to AI API, time {Time}", stopWatch.ElapsedMilliseconds);
+            var cc = await chat.GetChat();
+            var aiResponse = await cc.Prompt(aiItemContent.Prompt(forgedTimes));
+            BeamableLogger.Log("Rebuild Item Received responses {C}, time {Time}", aiResponse, stopWatch.ElapsedMilliseconds);
+
+            if (ChatAiService.TryParseAiResponse(aiResponse, out var aiProps))
+            {
+                aiProps["price"] = ChatAiService.CalculatePrice(aiResponse).ToString();
+            }
+
+            foreach (var aiProp in aiProps)
+            {
+                item.Properties[aiProp.Key] = aiProp.Value;
+            }
+            var collection = await AiInventoryItemCollection.Get(db);
+            await collection.FindOneAndReplaceAsync(x => x.ItemId == itemId, item);
+            await Services.Scheduler.Schedule().Microservice<ForgeService>().Run(t => t.GenerateImage, itemId)
+                .After(TimeSpan.FromSeconds(10)).Save($"genImage-{itemId}");
         }
     }
 }

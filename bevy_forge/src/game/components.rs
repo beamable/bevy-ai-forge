@@ -38,9 +38,9 @@ pub struct InventoryContainer;
 #[reflect(Component)]
 pub struct ItemDisplay(pub i64);
 
-#[derive(Debug, Reflect, Component, Default, Clone)]
+#[derive(Debug, Reflect, Component, Default, Clone, Deref)]
 #[reflect(Component)]
-pub struct SellItemButton(pub String);
+pub struct SellItemButton(pub i64);
 
 #[derive(Debug, Reflect, Component, Default, Clone)]
 #[reflect(Component)]

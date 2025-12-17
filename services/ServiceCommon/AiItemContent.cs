@@ -13,6 +13,9 @@ public class AiItemContent : ItemContent
     public string itemType;
     public string itemTheme;
     public List<DynamicProperty> dynamicProperties;
+    public int itemForgePrice = 0;
+
+    public int GetForgePrice() => itemForgePrice > 0 ? itemForgePrice : 50;
 
     public string StatKey()
     {

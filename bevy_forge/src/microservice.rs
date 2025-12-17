@@ -13,6 +13,9 @@ pub struct MicroserviceSellSword(pub Option<SellSwordRequestArgs>, pub Entity);
 #[derive(Debug, BeamCommand)]
 #[beam_command(StartForgingEventCompleted, bool, apis::Error<StartForgingSwordPostError>, start_forging_sword_post)]
 pub struct MicroserviceStartForging(pub Entity);
+#[derive(Debug, BeamCommand)]
+#[beam_command(StartForgingShieldEventCompleted, bool, apis::Error<StartForgingSwordPostError>, start_forging_shield_post)]
+pub struct MicroserviceStartForgingShield(pub Entity);
 
 pub struct MicroservicePlugin;
 
@@ -21,5 +24,6 @@ impl Plugin for MicroservicePlugin {
         SellSwordEventCompleted::register(app);
         StartForgingEventCompleted::register(app);
         SayHiEventCompleted::register(app);
+        StartForgingShieldEventCompleted::register(app);
     }
 }

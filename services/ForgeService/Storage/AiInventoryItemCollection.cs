@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Beamable.Common;
 using MongoDB.Driver;
 
 namespace ForgeService.Storage
@@ -8,7 +9,7 @@ namespace ForgeService.Storage
     {
         private static IMongoCollection<AiInventoryItem> _collection;
 
-        private static async ValueTask<IMongoCollection<AiInventoryItem>> Get(IMongoDatabase db)
+        public static async ValueTask<IMongoCollection<AiInventoryItem>> Get(IMongoDatabase db)
         {
             if (_collection is null)
             {
@@ -36,6 +37,15 @@ namespace ForgeService.Storage
             return mints;
         }
 
+        public static async Task<List<AiInventoryItem>> GetItem(IMongoDatabase db, string itemId)
+        {
+            var collection = await Get(db);
+            var mints = await collection
+                .Find(x => x.ItemId == itemId)
+                .ToListAsync();
+            return mints;
+        }
+
         public static async Task Save(IMongoDatabase db, AiInventoryItem item)
         {
             var collection = await Get(db);
@@ -46,6 +56,13 @@ namespace ForgeService.Storage
         {
             var collection = await Get(db);
             await collection.DeleteOneAsync(x => x.ItemId == item.ItemId);
+        }
+        public static async Task<bool> DeleteByKey(IMongoDatabase db, string itemKey)
+        {
+            var collection = await Get(db);
+            var deleteResult = await collection.DeleteOneAsync(x => x.ItemId == itemKey);
+            BeamableLogger.Log("Deletion result: {deletedAmount}", deleteResult.IsAcknowledged ? deleteResult.DeletedCount : -1);
+            return deleteResult.IsAcknowledged;
         }
     }
 }
