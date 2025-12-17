@@ -375,7 +375,13 @@ fn update_inventory(
                     return;
                 }
 
-                let Some(name) = item.properties.iter().find(|i| &i.name == "name") else {
+                let Some(name) = item.properties.iter().find_map(|i| {
+                    if &i.name == "name" {
+                        Some(i.value.clone())
+                    } else {
+                        None
+                    }
+                }) else {
                     return;
                 };
                 let item_type = item
@@ -383,71 +389,109 @@ fn update_inventory(
                     .iter()
                     .find(|i| &i.name == "type")
                     .unwrap_or(&binding);
-
                 inventory
                     .spawn((
                         Node {
                             border: UiRect::all(Val::Px(5.0)),
                             margin: UiRect::all(Val::Px(5.0)),
-                            flex_direction: FlexDirection::Column,
-                            column_gap: Val::Px(10.0),
+                            padding: UiRect::all(Val::Px(10.0)),
+                            flex_direction: FlexDirection::Row,
+                            row_gap: Val::Px(5.0),
                             align_self: AlignSelf::Stretch,
                             align_items: AlignItems::Center,
                             ..default()
                         },
                         BackgroundColor(BORDER_COLOR),
                         BorderColor(BORDER_COLOR),
+                        Name::new(name.clone()),
                         ItemDisplay(item.id),
-                        Name::new(name.value.clone()),
                     ))
-                    .with_children(|container| {
-                        let text_style = TextFont {
-                            font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
-                            font_size: 40.0,
-                            ..default()
-                        };
-                        let text_color = TextColor(consts::MY_ACCENT_COLOR);
-                        container.spawn((
-                            Text::new(format!("({}) {}", &item_type.value, &name.value)),
-                            text_style.clone(),
-                            text_color,
-                            TextLayout::new_with_justify(JustifyText::Center),
-                        ));
-                        if let Some(description) =
-                            item.properties.iter().find(|i| &i.name == "description")
+                    .with_children(|inv_root| {
+                        use bevy::image::{ImageFormat, ImageFormatSetting, ImageLoaderSettings};
+                        if let Some(image_url) =
+                            item.properties.iter().find(|i| &i.name == "imageUrl")
                         {
-                            let text_style = text_style.clone().with_font_size(20.0);
-                            container.spawn((
-                                Text::new(&description.value),
-                                text_style.clone(),
-                                text_color,
-                                TextLayout::new_with_justify(JustifyText::Center),
+                            inv_root.spawn((
+                                ImageNode {
+                                    image: asset_server.load_with_settings(
+                                        image_url.value.clone(),
+                                        |settings: &mut ImageLoaderSettings| {
+                                            settings.format =
+                                                ImageFormatSetting::Format(ImageFormat::Jpeg);
+                                        },
+                                    ),
+                                    // image: asset_server.load(image_url.value.clone()),
+                                    ..Default::default()
+                                },
+                                Name::new(image_url.value.clone()),
+                                Node {
+                                    width: Val::Px(128.0),
+                                    height: Val::Px(128.0),
+                                    ..Default::default()
+                                },
                             ));
                         }
-                        if let Some(price) = item.properties.iter().find(|i| &i.name == "price") {
-                            container
-                                .spawn((
-                                    BackgroundColor(INTERACTIVE_BG_COLOR),
-                                    BorderColor(BORDER_COLOR),
-                                    Button,
-                                    Node {
-                                        padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
-                                        border: UiRect::all(Val::Px(4.0)),
-                                        ..Default::default()
-                                    },
-                                    SellItemButton(proxy_id.clone()),
-                                ))
-                                .observe(sell_sword_pressed)
-                                .with_children(|btn| {
-                                    btn.spawn((
-                                        Text::new(format!("Sell it for {}", &price.value)),
+
+                        inv_root
+                            .spawn((Node {
+                                margin: UiRect::all(Val::Px(5.0)),
+                                flex_direction: FlexDirection::Column,
+                                column_gap: Val::Px(10.0),
+                                align_self: AlignSelf::Stretch,
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },))
+                            .with_children(|container| {
+                                let text_style = TextFont {
+                                    font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
+                                    font_size: 40.0,
+                                    ..default()
+                                };
+                                let text_color = TextColor(consts::MY_ACCENT_COLOR);
+                                container.spawn((
+                                    Text::new(format!("({}) {}", &item_type.value, &name)),
+                                    text_style.clone(),
+                                    text_color,
+                                    TextLayout::new_with_justify(JustifyText::Center),
+                                ));
+                                if let Some(description) =
+                                    item.properties.iter().find(|i| &i.name == "description")
+                                {
+                                    let text_style = text_style.clone().with_font_size(20.0);
+                                    container.spawn((
+                                        Text::new(&description.value),
                                         text_style.clone(),
                                         text_color,
                                         TextLayout::new_with_justify(JustifyText::Center),
                                     ));
-                                })
-                                .observe(sound_on_button);
-                        };
+                                }
+                                if let Some(price) =
+                                    item.properties.iter().find(|i| &i.name == "price")
+                                {
+                                    container
+                                        .spawn((
+                                            BackgroundColor(INTERACTIVE_BG_COLOR),
+                                            BorderColor(BORDER_COLOR),
+                                            Button,
+                                            Node {
+                                                padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
+                                                border: UiRect::all(Val::Px(4.0)),
+                                                ..Default::default()
+                                            },
+                                            SellItemButton(proxy_id.clone()),
+                                        ))
+                                        .observe(sell_sword_pressed)
+                                        .with_children(|btn| {
+                                            btn.spawn((
+                                                Text::new(format!("Sell it for {}", &price.value)),
+                                                text_style.clone(),
+                                                text_color,
+                                                TextLayout::new_with_justify(JustifyText::Center),
+                                            ));
+                                        })
+                                        .observe(sound_on_button);
+                                };
+                            });
                     });
             });
     }

@@ -396,9 +396,9 @@ namespace Beamable.ForgeService
         {
             try
             {
-                var status = await Services.Auth.AttachIdentity(Context.UserId.ToString(),"ForgeService",  "OpenAI");
-                var currencyCost = 5;
-                var inventoryView = await Services.Inventory.GetCurrent();
+                // var status = await Services.Auth.AttachIdentity(Context.UserId.ToString(),"ForgeService",  "OpenAI");
+                var currencyCost = 50;
+                var inventoryView = await Services.Inventory.GetCurrent("currency.coins");
                 
                 long currency = inventoryView.currencies.GetValueOrDefault("currency.coins", 0);
                 if (currency > currencyCost)
@@ -409,7 +409,6 @@ namespace Beamable.ForgeService
                     await Services.Inventory.Update(check);
                     return true;
                 }
-                else { return false; }
             }
             catch (Exception e)
             {
