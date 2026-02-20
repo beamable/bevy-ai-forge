@@ -79,7 +79,7 @@ fn main() {
 
 ```rust
 fn handle_incoming_whisper_messages(
-    mut whisper_messages: EventReader<NetworkMessage<WhisperMessage>>,
+    mut whisper_messages: MessageReader<NetworkMessage<WhisperMessage>>,
 ) {
     for whisper_message in whisper_messages.iter() {
         // Handle the whisper

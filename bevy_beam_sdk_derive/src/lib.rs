@@ -148,16 +148,18 @@ pub fn beam_command(input: TokenStream) -> TokenStream {
             }
         }
 
-        #[derive(Event, Debug, Deref, DerefMut)]
+        #[derive(EntityEvent, Debug, Deref, DerefMut)]
         pub struct #event_completed_name(
-            pub Result<#result_type_success, #result_type_error>,
+            #[deref] pub Result<#result_type_success, #result_type_error>,
+            #[event_target] pub Entity,
         );
 
-        impl From<Result<#result_type_success, #result_type_error>> for #event_completed_name {
-            fn from(value: Result<#result_type_success, #result_type_error>) -> Self {
-                #event_completed_name(value)
+        impl BeamEventFactory<#result_type_success, #result_type_error> for #event_completed_name {
+            fn for_entity(value: Result<#result_type_success, #result_type_error>, entity: Entity) -> Self {
+                #event_completed_name(value, entity)
             }
         }
+
         #[derive(Resource, Deref, DerefMut, Default)]
         pub struct #task_name(pub Vec<BeamReceiver<#result_type_success, #result_type_error>>);
 
@@ -167,8 +169,7 @@ pub fn beam_command(input: TokenStream) -> TokenStream {
 
         impl #event_completed_name {
             pub fn register(app: &mut ::bevy::app::App) {
-                app.add_event::<#event_completed_name>()
-                    .init_resource::<#task_name>()
+                app.init_resource::<#task_name>()
                     .add_systems(Update, #task_name::handle_requests);
             }
         }

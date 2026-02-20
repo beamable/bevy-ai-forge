@@ -1,7 +1,7 @@
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use bevy_inspector_egui::bevy_egui::{egui, EguiContext, EguiContexts};
+use bevy_inspector_egui::bevy_egui::{egui, EguiContext, EguiContexts, EguiPrimaryContextPass};
 use bevy_inspector_egui::bevy_inspector::Filter;
 use bevy_inspector_egui::egui::RichText;
 
@@ -14,8 +14,8 @@ impl Plugin for InspectorPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, configure_egui);
         app.add_systems(
-            Update,
-            bevy_inspector.run_if(input_toggle_active(false, KeyCode::Backslash)),
+            EguiPrimaryContextPass,
+            bevy_inspector.run_if(input_toggle_active(false, KeyCode::Backspace)),
         );
     }
 }
@@ -108,14 +108,18 @@ fn configure_egui(mut contexts: EguiContexts) {
                 .push("regular".to_owned());
 
             // Tell egui to use these fonts:
-            contexts.ctx_mut().set_fonts(fonts);
+            if let Ok(ctx) = contexts.ctx_mut() {
+                ctx.set_fonts(fonts);
+            }
         }
     }
-    contexts.ctx_mut().style_mut(|style| {
-        for font_id in style.text_styles.values_mut() {
-            font_id.size *= 1.2;
-        }
-    });
+    if let Ok(ctx) = contexts.ctx_mut() {
+        ctx.style_mut(|style| {
+            for font_id in style.text_styles.values_mut() {
+                font_id.size *= 1.2;
+            }
+        });
+    }
 }
 
 #[cfg(windows)]

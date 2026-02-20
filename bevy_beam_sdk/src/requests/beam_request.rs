@@ -9,12 +9,20 @@ pub struct BeamReceiver<S, E>
 where
     S: Debug + Send + 'static,
     E: Debug + Send + 'static,
-    // R: Clone + Send + 'static,
 {
     #[deref]
     pub receiver: crossbeam_channel::Receiver<Result<S, E>>,
     pub user_tag: Option<i64>,
     pub entity: Entity,
+}
+
+pub trait BeamEventFactory<S, E>:
+    EntityEvent + Deref<Target = Result<S, E>> + for<'a> Event<Trigger<'a>: Default>
+where
+    S: Debug + Send + 'static,
+    E: Debug + Send + 'static,
+{
+    fn for_entity(value: Result<S, E>, entity: Entity) -> Self;
 }
 
 pub trait BeamRequestResource<S, E>:
@@ -23,7 +31,7 @@ where
     S: Debug + Send + 'static,
     E: Debug + Send + 'static,
 {
-    type Event: Event + Deref<Target = Result<S, E>> + From<Result<S, E>>;
+    type Event: BeamEventFactory<S, E>;
 
     fn add(
         &mut self,
@@ -42,12 +50,8 @@ where
         r.retain_mut(|request| {
             if let Ok(result) = request.try_recv() {
                 trace!("{:?}: {:?}", &request.user_tag, &result);
-                let event = Self::Event::from(result);
-                if request.entity != Entity::PLACEHOLDER {
-                    commands.trigger_targets(event, request.entity);
-                } else {
-                    commands.trigger(event);
-                }
+                let event = Self::Event::for_entity(result, request.entity);
+                commands.trigger(event);
                 false // Remove from vector
             } else {
                 true // Keep in vector

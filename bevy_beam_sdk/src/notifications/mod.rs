@@ -7,7 +7,7 @@ use bevy_eventwork::{AppNetworkMessage, NetworkMessage};
 
 pub trait BeamNotification: NetworkMessage {
     fn handle(
-        ev: EventReader<bevy_eventwork::NetworkData<Self>>,
+        ev: MessageReader<bevy_eventwork::NetworkData<Self>>,
         q: Query<BeamableContexts>,
         commands: Commands,
     );

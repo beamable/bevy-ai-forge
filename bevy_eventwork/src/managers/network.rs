@@ -223,7 +223,7 @@ pub(crate) fn handle_new_incoming_connections<NP: NetworkProvider, RT: Runtime>(
     mut server: ResMut<Network<NP>>,
     runtime: Res<EventworkRuntime<RT>>,
     network_settings: Res<NP::NetworkSettings>,
-    mut network_events: EventWriter<NetworkEvent>,
+    mut network_events: MessageWriter<NetworkEvent>,
 ) {
     while let Ok(new_conn) = server.new_connections.receiver.try_recv() {
         let id = server.connection_count;
@@ -307,14 +307,14 @@ impl AppNetworkMessage for App {
             T::NAME
         );
         server.recv_message_map.insert(T::NAME, Vec::new());
-        self.add_event::<NetworkData<T>>();
+        self.add_message::<NetworkData<T>>();
         self.add_systems(PreUpdate, register_message::<T, NP>)
     }
 }
 
 pub(crate) fn register_message<T, NP: NetworkProvider>(
     net_res: ResMut<Network<NP>>,
-    mut events: EventWriter<NetworkData<T>>,
+    mut events: MessageWriter<NetworkData<T>>,
 ) where
     T: NetworkMessage,
 {

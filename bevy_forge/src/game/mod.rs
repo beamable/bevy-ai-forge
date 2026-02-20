@@ -36,7 +36,7 @@ fn timer_update(
 ) {
     for (e, mut timer) in query_timer.iter_mut() {
         timer.0.tick(time.delta());
-        if timer.0.finished() {
+        if timer.0.is_finished() {
             cmd.entity(e).remove::<components::HiddenUiElement>();
         }
     }
@@ -54,7 +54,7 @@ fn show_items(
 }
 
 pub fn sound_on_button(
-    _trigger: Trigger<Pointer<Released>>,
+    _trigger: On<Pointer<Release>>,
     asset_server: Res<AssetServer>,
     other_sounds: Query<Entity, With<components::SoundEffectPlayer>>,
     mut cmd: Commands,

@@ -11,12 +11,12 @@ impl Plugin for MenuStatePlugin {
 }
 
 fn on_start_game_pressed(
-    t: Trigger<Pointer<Released>>,
+    t: On<Pointer<Release>>,
     mut next_state: ResMut<NextState<super::MainGameState>>,
     mut cmd: Commands,
 ) {
-    next_state.set(super::MainGameState::Game);
-    cmd.entity(t.target()).remove::<Interaction>();
+    (*next_state).set_if_neq(super::MainGameState::Game);
+    cmd.entity(t.event().event_target()).remove::<Interaction>();
 }
 
 fn setup(
@@ -38,7 +38,7 @@ fn setup(
         parent
             .spawn((
                 BackgroundColor(INTERACTIVE_BG_COLOR),
-                BorderColor(BORDER_COLOR),
+                BorderColor::all(BORDER_COLOR),
                 Button,
                 Node {
                     padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
@@ -46,13 +46,13 @@ fn setup(
                     margin: UiRect::top(Val::Px(30.0)),
                     ..Default::default()
                 },
-                StateScoped(super::MainGameState::Menu),
+                DespawnOnExit(super::MainGameState::Menu),
             ))
             .observe(on_start_game_pressed)
             .with_children(|btn| {
                 btn.spawn((
                     Text::new("Start Game"),
-                    TextLayout::new_with_justify(JustifyText::Center),
+                    TextLayout::new_with_justify(Justify::Center),
                     text_style,
                     text_color,
                 ));

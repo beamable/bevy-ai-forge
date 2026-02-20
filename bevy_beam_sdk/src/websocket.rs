@@ -28,7 +28,7 @@ pub struct WebSocketConnection {
 }
 
 fn disconnect_on_removal(
-    _trigger: Trigger<OnRemove, WebSocketConnection>,
+    _trigger: On<Remove, WebSocketConnection>,
     q: Query<&WebSocketConnection>,
     net: ResMut<Network<WebSocketProvider>>,
 ) {
@@ -73,7 +73,7 @@ pub fn on_create(
 }
 
 fn handle_network_events(
-    mut new_network_events: EventReader<bevy_eventwork::NetworkEvent>,
+    mut new_network_events: MessageReader<bevy_eventwork::NetworkEvent>,
     mut q: Query<&mut WebSocketConnection>,
 ) {
     for event in new_network_events.read() {

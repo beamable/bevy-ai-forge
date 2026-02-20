@@ -1,4 +1,4 @@
-﻿using Beamable.Server;
+using Beamable.Server;
 
 namespace Beamable.Server
 {
@@ -12,6 +12,6 @@ namespace Beamable.Server
 	[StorageObject("ForgeStorage")]
 	public class ForgeStorage : MongoStorageObject
 	{
-		
+
 	}
 }

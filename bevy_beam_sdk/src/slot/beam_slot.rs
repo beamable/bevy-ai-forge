@@ -12,20 +12,38 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::ops::Deref;
 
-#[derive(Event, Debug, Clone, Reflect, PartialEq, Eq)]
-pub enum UserLoggedIn {
+#[derive(EntityEvent, Debug, Clone, Reflect, PartialEq, Eq)]
+pub struct UserLoggedIn {
+    pub entity: Entity,
+    pub result: UserLoggedInResult,
+}
+
+#[derive(Debug, Clone, Reflect, PartialEq, Eq)]
+pub enum UserLoggedInResult {
     Success,
     Fail { status_code: u16, value: String },
 }
 
-#[derive(Event, Debug, Clone, Reflect, PartialEq, Eq)]
-pub enum UserInfoUpdated {
+#[derive(EntityEvent, Debug, Clone, Reflect, PartialEq, Eq)]
+pub struct UserInfoUpdated {
+    pub entity: Entity,
+    pub result: UserInfoUpdatedResult,
+}
+
+#[derive(Debug, Clone, Reflect, PartialEq, Eq)]
+pub enum UserInfoUpdatedResult {
     Success,
     Fail { status_code: u16, value: String },
 }
 
-#[derive(Event, Debug, Clone, Reflect, PartialEq, Eq)]
-pub enum AttachCredential {
+#[derive(EntityEvent, Debug, Clone, Reflect, PartialEq, Eq)]
+pub struct AttachCredential {
+    pub entity: Entity,
+    pub result: AttachCredentialResult,
+}
+
+#[derive(Debug, Clone, Reflect, PartialEq, Eq)]
+pub enum AttachCredentialResult {
     Success,
     AlreadyInUse,
     Fail { status_code: u16, value: String },
@@ -36,16 +54,16 @@ pub struct GamerTag(Option<i64>);
 
 #[derive(Serialize, Debug, Deserialize, Component, Reflect, Default)]
 #[reflect(Component, Default)]
-#[require(BeamInventory, Name = Name::new("BeamSlot"), BeamStats, StateScoped::<crate::state::BeamableInitStatus>(crate::state::BeamableInitStatus::FullyInitialized))]
+#[require(BeamInventory, Name = Name::new("BeamSlot"), BeamStats, DespawnOnExit::<crate::state::BeamableInitStatus>(crate::state::BeamableInitStatus::FullyInitialized))]
 pub struct BeamSlot {
     pub name: Option<String>,
     pub user: Option<UserView>,
     pub gamer_tag: GamerTag,
 }
 
-pub fn on_slot_added(ev: Trigger<OnAdd, BeamSlot>, mut commands: Commands) {
+pub fn on_slot_added(ev: On<Add, BeamSlot>, mut commands: Commands) {
     commands
-        .entity(ev.target())
+        .entity(ev.event_target())
         .observe(save_user_info)
         .observe(handle_get_token)
         .observe(handle_inventory_get)
@@ -68,14 +86,14 @@ impl BeamSlot {
 #[reflect(Component, Default)]
 pub struct BeamStats(std::collections::HashMap<String, String>);
 
-pub fn save_user_info(ev: Trigger<UserAuthenticationEvent>, mut commands: Commands) {
+pub fn save_user_info(ev: On<UserAuthenticationEvent>, mut commands: Commands) {
     let event = ev.event().deref();
     match event {
         Ok(token) => {
             let access_token = token.access_token.clone().unwrap_or_default();
             let token = TokenStorage::from_token_response(token);
             commands
-                .entity(ev.target())
+                .entity(ev.event_target())
                 .insert(token)
                 .beam_get_token(access_token);
         }
@@ -94,7 +112,14 @@ pub fn save_token(
     }
 }
 
-pub fn try_read_token(pkv: Res<PkvStore>, mut config: BeamableConfiguration) {
+pub fn try_read_token(
+    pkv: Res<PkvStore>,
+    mut config: BeamableConfiguration,
+    existing: Query<(), With<BeamSlot>>,
+) {
+    if !existing.is_empty() {
+        return;
+    }
     let Ok(token) = pkv.get::<TokenStorage>("user_token") else {
         return;
     };
@@ -105,12 +130,12 @@ pub fn try_read_token(pkv: Res<PkvStore>, mut config: BeamableConfiguration) {
 }
 
 pub fn handle_get_token(
-    ev: Trigger<GetTokenEvent>,
+    ev: On<GetTokenEvent>,
     mut commands: Commands,
     mut q: Query<BeamableContexts>,
 ) {
     let event = ev.event().deref();
-    let Ok(mut ctx) = q.get_mut(ev.target()) else {
+    let Ok(mut ctx) = q.get_mut(ev.event_target()) else {
         return;
     };
     match &event {
@@ -120,22 +145,19 @@ pub fn handle_get_token(
                 .access_token = Some(data.token.clone());
             ctx.slot.gamer_tag = GamerTag(data.gamer_tag);
 
-            commands.entity(ev.target()).beam_get_user_info();
+            commands.entity(ev.event_target()).beam_get_user_info();
         }
         Err(_) => {
             let token = ctx.token.expect("Should have token at this point");
             commands
-                .entity(ev.target())
+                .entity(ev.event_target())
                 .beam_new_user(BeamAuth::RefreshToken(token.refresh_token.clone().unwrap()));
         }
     }
 }
-pub fn handle_inventory_get(
-    ev: Trigger<InventoryGetCompletedEvent>,
-    mut q: Query<BeamableContexts>,
-) {
+pub fn handle_inventory_get(ev: On<InventoryGetCompletedEvent>, mut q: Query<BeamableContexts>) {
     let event = ev.event().deref();
-    let Ok(mut ctx) = q.get_mut(ev.target()) else {
+    let Ok(mut ctx) = q.get_mut(ev.event_target()) else {
         return;
     };
     trace!("Inventory update: {:#?}", event);
@@ -158,94 +180,112 @@ pub fn handle_inventory_get(
     }
 }
 
-pub fn handle_post_token(ev: Trigger<UserAuthenticationEvent>, mut commands: Commands) {
+pub fn handle_post_token(ev: On<UserAuthenticationEvent>, mut commands: Commands) {
     let event = ev.event();
     trace!("PostTokenEvent: {:#?}", event);
+    let entity = ev.event_target();
     match &**event {
         Ok(data) => {
             let new_token = TokenStorage::from_token_response(data);
-            commands
-                .entity(ev.target())
-                .insert(new_token)
-                .trigger(UserLoggedIn::Success);
+            commands.entity(entity).insert(new_token);
+            commands.trigger(UserLoggedIn {
+                entity,
+                result: UserLoggedInResult::Success,
+            });
         }
         Err(beam_autogen_rs::apis::Error::ResponseError(e)) => {
             let status_code = e.status.as_u16();
             let value = e.content.clone();
-            let error = UserLoggedIn::Fail { status_code, value };
-            commands.trigger_targets(error, ev.target());
+            commands.trigger(UserLoggedIn {
+                entity,
+                result: UserLoggedInResult::Fail { status_code, value },
+            });
         }
         Err(beam_autogen_rs::apis::Error::Reqwest(e)) => {
             let status_code = e.status().map_or(997, |f| f.as_u16());
             let value = e.to_string();
-            let error = UserLoggedIn::Fail { status_code, value };
-            commands.trigger_targets(error, ev.target());
+            commands.trigger(UserLoggedIn {
+                entity,
+                result: UserLoggedInResult::Fail { status_code, value },
+            });
         }
         Err(_) => {
-            let error = UserLoggedIn::Fail {
-                status_code: 997,
-                value: "Unknown error".to_owned(),
-            };
-            commands.trigger_targets(error, ev.target());
+            commands.trigger(UserLoggedIn {
+                entity,
+                result: UserLoggedInResult::Fail {
+                    status_code: 997,
+                    value: "Unknown error".to_owned(),
+                },
+            });
         }
     }
 }
 
 pub fn handle_get_external_user_info(
-    ev: Trigger<AttachFederatedIdentityCompletedEvent>,
+    ev: On<AttachFederatedIdentityCompletedEvent>,
     mut commands: Commands,
 ) {
     let event = ev.event();
     trace!("AttachFederatedIdentityCompletedEvent: {:#?}", event);
+    let entity = ev.event_target();
     match &**event {
         Ok(info) => match info.result.as_str() {
             "ok" => {
-                commands.trigger_targets(AttachCredential::Success, ev.target());
-                commands.entity(ev.target()).beam_get_user_info();
+                commands.trigger(AttachCredential {
+                    entity,
+                    result: AttachCredentialResult::Success,
+                });
+                commands.entity(entity).beam_get_user_info();
             }
             "challenge" => {
-                let error = AttachCredential::Fail {
-                    status_code: 997,
-                    value: "Challenge, not supported yet on rust SDK side.".into(),
-                };
-                commands.trigger_targets(error, ev.target());
+                commands.trigger(AttachCredential {
+                    entity,
+                    result: AttachCredentialResult::Fail {
+                        status_code: 997,
+                        value: "Challenge, not supported yet on rust SDK side.".into(),
+                    },
+                });
             }
             r => {
-                let error = AttachCredential::Fail {
-                    status_code: 997,
-                    value: format!("Unsupported value: {}", r),
-                };
-                commands.trigger_targets(error, ev.target());
+                commands.trigger(AttachCredential {
+                    entity,
+                    result: AttachCredentialResult::Fail {
+                        status_code: 997,
+                        value: format!("Unsupported value: {}", r),
+                    },
+                });
             }
         },
         Err(beam_autogen_rs::apis::Error::ResponseError(e)) => {
-            let error = if e.content.contains("ExternalIdentityUnavailable") {
-                AttachCredential::AlreadyInUse
+            let result = if e.content.contains("ExternalIdentityUnavailable") {
+                AttachCredentialResult::AlreadyInUse
             } else {
                 let status_code = e.status.as_u16();
                 let value = e.content.clone();
-                AttachCredential::Fail { status_code, value }
+                AttachCredentialResult::Fail { status_code, value }
             };
-            commands.trigger_targets(error, ev.target());
+            commands.trigger(AttachCredential { entity, result });
         }
         Err(err) => {
-            let error = AttachCredential::Fail {
-                status_code: 997,
-                value: err.to_string(),
-            };
-            commands.trigger_targets(error, ev.target());
+            commands.trigger(AttachCredential {
+                entity,
+                result: AttachCredentialResult::Fail {
+                    status_code: 997,
+                    value: err.to_string(),
+                },
+            });
         }
     }
 }
 
-pub fn handle_stats_got(ev: Trigger<StatsGetEvent>, mut q: Query<BeamableContexts>) {
+pub fn handle_stats_got(ev: On<StatsGetEvent>, mut q: Query<BeamableContexts>) {
     let event = ev.event();
     trace!("Stats: {:#?}", event);
     let Ok(event) = &**event else {
         return;
     };
 
-    let Ok(mut ctx) = q.get_mut(ev.target()) else {
+    let Ok(mut ctx) = q.get_mut(ev.event_target()) else {
         return;
     };
     for (key, value) in event.stats.iter() {
@@ -254,13 +294,14 @@ pub fn handle_stats_got(ev: Trigger<StatsGetEvent>, mut q: Query<BeamableContext
 }
 
 pub fn handle_get_user_info(
-    ev: Trigger<GetAccountMeCompletedEvent>,
+    ev: On<GetAccountMeCompletedEvent>,
     mut q: Query<BeamableContexts>,
     mut commands: Commands,
     #[cfg(feature = "websocket")] config: BeamableConfiguration,
 ) {
     let event = ev.event();
-    let Ok(mut ctx) = q.get_mut(ev.target()) else {
+    let entity = ev.event_target();
+    let Ok(mut ctx) = q.get_mut(entity) else {
         return;
     };
     match &**event {
@@ -271,12 +312,15 @@ pub fn handle_get_user_info(
             {
                 let t = ctx.token.expect("Failed to get token").clone();
                 if let Some(connection) = config.websocket_connection(&t) {
-                    commands.entity(ev.target()).insert_if_new(connection);
+                    commands.entity(entity).insert_if_new(connection);
                 }
             }
+            commands.trigger(UserInfoUpdated {
+                entity,
+                result: UserInfoUpdatedResult::Success,
+            });
             commands
-                .entity(ev.target())
-                .trigger(UserInfoUpdated::Success)
+                .entity(entity)
                 .beam_get_stats(
                     Default::default(),
                     crate::data::stats::StatAccessType::Public,
@@ -290,16 +334,18 @@ pub fn handle_get_user_info(
         Err(beam_autogen_rs::apis::Error::ResponseError(e)) => {
             let status_code = e.status.as_u16();
             let value = e.content.clone();
-            commands
-                .entity(ev.target())
-                .trigger(UserInfoUpdated::Fail { status_code, value });
+            commands.trigger(UserInfoUpdated {
+                entity,
+                result: UserInfoUpdatedResult::Fail { status_code, value },
+            });
         }
         Err(e) => {
             let status_code = 997;
             let value = e.to_string();
-            commands
-                .entity(ev.target())
-                .trigger(UserInfoUpdated::Fail { status_code, value });
+            commands.trigger(UserInfoUpdated {
+                entity,
+                result: UserInfoUpdatedResult::Fail { status_code, value },
+            });
         }
     }
 }

@@ -11,9 +11,7 @@ pub struct DebugPlugin;
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, git_info)
-            .add_plugins(EguiPlugin {
-                enable_multipass_for_primary_context: true,
-            })
+            .add_plugins(EguiPlugin::default())
             .add_plugins(
                 WorldInspectorPlugin::new().run_if(input_toggle_active(false, KeyCode::Backspace)),
             )
@@ -51,7 +49,7 @@ fn git_info(
                     ..default()
                 },
                 TextColor(MY_ACCENT_COLOR),
-                TextLayout::new_with_justify(JustifyText::Right),
+                TextLayout::new_with_justify(Justify::Right),
             ));
             p.spawn((
                 Text::new(format!("git:{} ({})", GIT_HASH, GIT_DATE)),
@@ -61,7 +59,7 @@ fn git_info(
                     ..default()
                 },
                 TextColor(MY_ACCENT_COLOR),
-                TextLayout::new_with_justify(JustifyText::Right),
+                TextLayout::new_with_justify(Justify::Right),
             ));
             p.spawn((
                 Text::new(format!("CID.PID: {}.{}", beam_config.cid, beam_config.pid)),
@@ -71,7 +69,7 @@ fn git_info(
                     ..default()
                 },
                 TextColor(MY_ACCENT_COLOR),
-                TextLayout::new_with_justify(JustifyText::Right),
+                TextLayout::new_with_justify(Justify::Right),
             ));
         });
 }

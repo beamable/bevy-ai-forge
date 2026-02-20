@@ -10,7 +10,7 @@
       },
       {
         "propertyName": "description",
-        "propertyDescription": "sword description, max 2000 characters"
+        "propertyDescription": "sword description, max 200 characters, keep it short"
       },
       {
         "propertyName": "image",

@@ -76,12 +76,12 @@ impl BeamExternalIdentityConfig {
 }
 
 pub fn update_config(
-    realm_config_response: Trigger<RealmsConfigEvent>,
+    realm_config_response: On<RealmsConfigEvent>,
     mut commands: Commands,
     mut next_state: ResMut<NextState<crate::state::BeamableInitStatus>>,
 ) {
     let Ok(response) = realm_config_response.event().deref() else {
-        next_state.set(crate::state::BeamableInitStatus::ConfigError);
+        (*next_state).set_if_neq(crate::state::BeamableInitStatus::ConfigError);
         return;
     };
     info!("{:#?}", response);
@@ -90,7 +90,7 @@ pub fn update_config(
         None => BeamableWebsocketUrl(String::new()),
     };
     commands.insert_resource(url);
-    next_state.set(crate::state::BeamableInitStatus::FullyInitialized);
+    (*next_state).set_if_neq(crate::state::BeamableInitStatus::FullyInitialized);
 }
 
 pub fn get_config_defaults(
@@ -116,7 +116,7 @@ pub fn get_config_defaults(
         },
         Entity::PLACEHOLDER,
     ));
-    next_state.set(crate::state::BeamableInitStatus::UpdatingConfiguration);
+    (*next_state).set_if_neq(crate::state::BeamableInitStatus::UpdatingConfiguration);
 }
 
 pub struct ConfigPlugin;

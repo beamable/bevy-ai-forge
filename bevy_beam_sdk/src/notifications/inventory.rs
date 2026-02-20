@@ -14,7 +14,7 @@ pub struct InventoryRefreshNotify {
 
 impl super::BeamNotification for InventoryRefreshNotify {
     fn handle(
-        mut ev: EventReader<bevy_eventwork::NetworkData<InventoryRefreshNotify>>,
+        mut ev: MessageReader<bevy_eventwork::NetworkData<InventoryRefreshNotify>>,
         q: Query<BeamableContexts>,
         mut commands: Commands,
     ) {

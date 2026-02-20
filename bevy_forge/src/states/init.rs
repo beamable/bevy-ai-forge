@@ -11,7 +11,7 @@ impl Plugin for InitStatePlugin {
             .add_systems(
                 OnEnter(bevy_beam_sdk::state::BeamableInitStatus::FullyInitialized),
                 (|mut next_state: ResMut<NextState<super::MainGameState>>| {
-                    next_state.set(super::MainGameState::LoginScreen);
+                    (*next_state).set_if_neq(super::MainGameState::LoginScreen);
                 })
                 .run_if(in_state(super::MainGameState::Init)),
             );
@@ -59,7 +59,7 @@ fn setup(
             parent
                 .spawn((
                     Text::new("Artificial Forge"),
-                    TextLayout::new_with_justify(JustifyText::Center),
+                    TextLayout::new_with_justify(Justify::Center),
                     TextFont {
                         font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
                         font_size: 150.0,

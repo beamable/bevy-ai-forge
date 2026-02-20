@@ -26,7 +26,7 @@ pub struct StatChanges {
 
 impl super::BeamNotification for StatsRefreshNotify {
     fn handle(
-        mut ev: EventReader<bevy_eventwork::NetworkData<StatsRefreshNotify>>,
+        mut ev: MessageReader<bevy_eventwork::NetworkData<StatsRefreshNotify>>,
         mut q: Query<BeamableContexts>,
         mut _commands: Commands,
     ) {

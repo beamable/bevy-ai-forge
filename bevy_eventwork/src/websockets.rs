@@ -7,13 +7,11 @@ pub type WebSocketProvider = native_websocket::NativeWesocketProvider;
 pub type WebSocketProvider = wasm_websocket::WasmWebSocketProvider;
 
 #[cfg(not(target_arch = "wasm32"))]
+pub use async_tungstenite::tungstenite::{client::ClientRequestBuilder, protocol::WebSocketConfig};
+#[cfg(not(target_arch = "wasm32"))]
 pub use native_websocket::NetworkSettings;
-
 #[cfg(target_arch = "wasm32")]
 pub use wasm_websocket::NetworkSettings;
-
-#[cfg(not(target_arch = "wasm32"))]
-pub use async_tungstenite::tungstenite::{protocol::WebSocketConfig, ClientRequestBuilder};
 
 use serde::{Deserialize, Serialize};
 /// A struct representing a notification for Beamable.
@@ -57,7 +55,7 @@ mod native_websocket {
     use async_channel::{Receiver, Sender};
 
     use async_trait::async_trait;
-    use async_tungstenite::async_std::ConnectStream;
+    use async_tungstenite::{async_std::ConnectStream, WebSocketReceiver, WebSocketSender};
 
     use crate::{error::NetworkError, managers::NetworkProvider, NetworkPacket};
     use async_tungstenite::{
@@ -66,10 +64,7 @@ mod native_websocket {
     };
 
     use bevy::prelude::{error, info, trace, Deref, DerefMut, Resource};
-    use futures::{
-        stream::{SplitSink, SplitStream},
-        SinkExt, StreamExt,
-    };
+    use futures::StreamExt;
     use futures_lite::Stream;
 
     /// A provider for WebSockets
@@ -83,9 +78,9 @@ mod native_websocket {
 
         type Socket = WebSocketStream<ConnectStream>;
 
-        type ReadHalf = SplitStream<WebSocketStream<ConnectStream>>;
+        type ReadHalf = WebSocketReceiver<ConnectStream>;
 
-        type WriteHalf = SplitSink<WebSocketStream<ConnectStream>, Message>;
+        type WriteHalf = WebSocketSender<ConnectStream>;
 
         type ConnectInfo = async_tungstenite::tungstenite::ClientRequestBuilder;
 
@@ -109,7 +104,7 @@ mod native_websocket {
                 async_tungstenite::async_std::connect_async_with_tls_connector_and_config(
                     connect_info,
                     Some(Default::default()),
-                    Some(*_network_settings),
+                    Some(_network_settings.0),
                 )
                 .await
                 .map_err(|error| match error {
@@ -134,8 +129,8 @@ mod native_websocket {
                     async_tungstenite::tungstenite::Error::WriteBufferFull(buf) => {
                         NetworkError::Error(format!("Write Buffer Full Error: {}", buf))
                     }
-                    async_tungstenite::tungstenite::Error::Utf8 => {
-                        NetworkError::Error("Utf8 Error".to_string())
+                    async_tungstenite::tungstenite::Error::Utf8(buf) => {
+                        NetworkError::Error(format!("Utf8 Error: {}", buf))
                     }
                     async_tungstenite::tungstenite::Error::AttackAttempt => {
                         NetworkError::Error("Attack Attempt".to_string())

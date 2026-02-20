@@ -10,6 +10,7 @@ pub mod debug;
 pub mod game;
 pub mod microservice;
 pub mod states;
+pub mod ui;
 pub mod utils;
 
 fn main() {
@@ -28,19 +29,20 @@ fn main() {
             provider_namespace: "OpenAI".to_string(),
         })
         .insert_resource(config)
+        .add_plugins(bevy_ehttp::prelude::HttpPlugin)
         .add_plugins(DefaultPlugins.set(AssetPlugin {
             meta_check: bevy::asset::AssetMetaCheck::Never,
             ..default()
         }).set(LogPlugin {
             level: bevy::log::Level::DEBUG,
-            filter: "warn,wgpu_core=warn,wgpu_hal=warn,mygame=debug,cosmic_text=warn,naga=warn,bevy_eventwork=trace".into(),
+            filter: "warn,wgpu_core=warn,wgpu_hal=warn,mygame=debug,bevy_eventwork=trace,bevy_beam_sdk=trace".into(),
             ..default()
         }))
         .add_plugins((BevyArgsPlugin::<GameArgs>::default(), BeamPlugin))
-        .insert_resource(bevy_pkv::PkvStore::new("Beamable", "Ai_Forge"))
+        .insert_resource(bevy_pkv::PkvStore::new("Beamable", "AiForgeSample"))
         .add_plugins((
             DebugPlugin,
-            bevy_simple_scroll_view::ScrollViewPlugin,
+            crate::ui::UiPlugin,
             microservice::MicroservicePlugin,
             game::GamePlugin,
             states::GameStatesPlugin,

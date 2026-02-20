@@ -1,21 +1,23 @@
 use std::time::Duration;
 
+use crate::ui::widgets::scroll_view::*;
 use crate::{
     consts::{self, *},
     game::{
         components::{self, *},
         sound_on_button,
     },
-    microservice::MicroserviceSellSword,
+    microservice::{
+        MicroserviceSellSword, MicroserviceStartForging, MicroserviceStartForgingShield,
+    },
 };
 use beam_microservice::models::SellSwordRequestArgs;
 use bevy::prelude::*;
 use bevy_beam_sdk::api::BeamableBasicApi;
 use bevy_beam_sdk::slot::prelude::{BeamInventory, BeamableContexts, ItemProperty};
-use bevy_simple_scroll_view::*;
 
-#[derive(Resource, Reflect, Default)]
-pub struct ItemsOnSale(pub Vec<String>);
+#[derive(Resource, Reflect, Default, Deref, DerefMut)]
+pub struct ItemsOnSale(Vec<i64>);
 
 pub struct GameStatePlugin;
 
@@ -26,10 +28,14 @@ impl Plugin for GameStatePlugin {
                 Update,
                 (on_inv_changed, update_inventory).run_if(in_state(super::MainGameState::Game)),
             )
+            .add_systems(
+                Update,
+                (update_items_visibility).run_if(resource_changed::<ItemsOnSale>),
+            )
             .add_observer(on_currency_text_add)
             .init_resource::<ItemsOnSale>();
 
-        #[cfg(target_arch = "wasm32")]
+        // #[cfg(target_arch = "wasm32")]
         app.add_systems(
             FixedUpdate,
             call_update_inventory.run_if(in_state(super::MainGameState::Game).and(
@@ -39,22 +45,21 @@ impl Plugin for GameStatePlugin {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+// #[cfg(target_arch = "wasm32")]
 fn call_update_inventory(ctx: Query<BeamableContexts>, mut cmd: Commands) {
     for ctx in ctx.iter() {
-        cmd.entity(ctx.entity)
-            .beam_get_inventory(Some("currency.coins,items.AiItemContent".to_owned()));
+        cmd.entity(ctx.entity).beam_get_inventory(None);
     }
 }
 
 fn sell_sword_pressed(
-    t: Trigger<Pointer<Released>>,
-    q: Query<(&SellItemButton, &ChildOf)>,
+    t: On<Pointer<Release>>,
+    q: Query<&SellItemButton>,
     ctx: Query<BeamableContexts>,
     mut cmd: Commands,
     mut on_sale: ResMut<ItemsOnSale>,
 ) {
-    let Ok((sell_item_info, child_of)) = q.get(t.target()) else {
+    let Ok(sell_item_info) = q.get(t.event().event_target()) else {
         return;
     };
     let Ok(ctx) = ctx.single() else {
@@ -62,13 +67,21 @@ fn sell_sword_pressed(
     };
     cmd.queue(MicroserviceSellSword(
         Some(SellSwordRequestArgs {
-            item_id: sell_item_info.0.clone(),
+            item_id: sell_item_info.to_string(),
         }),
         ctx.entity,
     ));
-    on_sale.0.push(sell_item_info.0.clone());
-    if let Ok(mut entity_commands) = cmd.get_entity(child_of.parent()) {
-        entity_commands.despawn();
+    on_sale.push(**sell_item_info);
+}
+
+fn update_items_visibility(on_sale: Res<ItemsOnSale>, mut q: Query<(&mut Node, &ItemDisplay)>) {
+    for (mut n, item_display) in q.iter_mut() {
+        let visible = !on_sale.iter().any(|id| id == &item_display.0);
+        n.display = if visible {
+            Display::Flex
+        } else {
+            Display::None
+        };
     }
 }
 
@@ -105,24 +118,15 @@ fn setup(
                 },
                 ScrollView::default(),
                 BackgroundColor(FRAME_BG_COLOR),
-                BorderColor(BORDER_COLOR),
+                BorderColor::all(BORDER_COLOR),
                 GameplayObject,
                 Name::new("InventoryRoot"),
             ))
-            .with_child((
-                ScrollableContent::default(),
-                InventoryContainer,
-                Node {
-                    margin: UiRect::all(Val::Px(10.0)),
-                    padding: UiRect::bottom(Val::Px(50.0)),
-                    flex_direction: bevy::ui::FlexDirection::ColumnReverse,
-                    ..scroll_content_node()
-                },
-            ));
+            .with_child((ScrollableContent::default(), InventoryContainer));
         parent
             .spawn((
                 BackgroundColor(FRAME_BG_COLOR),
-                BorderColor(BORDER_COLOR),
+                BorderColor::all(BORDER_COLOR),
                 Node {
                     border: UiRect::all(Val::Px(5.0)),
                     padding: UiRect::new(Val::Px(20.0), Val::Px(80.0), Val::Px(0.0), Val::Px(5.0)),
@@ -154,7 +158,7 @@ fn setup(
         parent
             .spawn((
                 BackgroundColor(INTERACTIVE_BG_COLOR),
-                BorderColor(BORDER_COLOR),
+                BorderColor::all(BORDER_COLOR),
                 Button,
                 Node {
                     position_type: PositionType::Absolute,
@@ -180,13 +184,13 @@ fn setup(
                     Text::new("Forge Sword!"),
                     text_style.clone(),
                     font_color,
-                    TextLayout::new_with_justify(JustifyText::Center),
+                    TextLayout::new_with_justify(Justify::Center),
                 ));
             });
         parent
             .spawn((
                 BackgroundColor(INTERACTIVE_BG_COLOR),
-                BorderColor(BORDER_COLOR),
+                BorderColor::all(BORDER_COLOR),
                 Button,
                 Node {
                     position_type: PositionType::Absolute,
@@ -212,7 +216,7 @@ fn setup(
                     Text::new("Forge Shield!"),
                     text_style.clone(),
                     font_color,
-                    TextLayout::new_with_justify(JustifyText::Center),
+                    TextLayout::new_with_justify(Justify::Center),
                 ));
             });
     });
@@ -224,7 +228,7 @@ fn setup(
 }
 
 fn on_currency_text_add(
-    t: Trigger<OnAdd, CurrencyText>,
+    t: On<Add, CurrencyText>,
     mut total_query: Query<(&mut Text, &CurrencyText)>,
     q: Query<&BeamInventory>,
 ) {
@@ -232,7 +236,7 @@ fn on_currency_text_add(
         return;
     };
 
-    let Ok((mut text, currency)) = total_query.get_mut(t.target()) else {
+    let Ok((mut text, currency)) = total_query.get_mut(t.event().event_target()) else {
         return;
     };
     let value = inv.currencies.get(&currency.0).unwrap_or(&-1);
@@ -254,7 +258,7 @@ fn on_inv_changed(
 }
 
 fn on_start_forging_sword_pressed(
-    t: Trigger<Pointer<Released>>,
+    t: On<Pointer<Release>>,
     asset_server: Res<AssetServer>,
     q: Query<BeamableContexts>,
     mut commands: Commands,
@@ -262,16 +266,17 @@ fn on_start_forging_sword_pressed(
     let Ok(ctx) = q.single() else {
         return;
     };
-    commands
-        .entity(ctx.entity)
-        .beam_add_to_inventory(vec!["items.AiItemContent.AiSword".into()]);
+    commands.queue(MicroserviceStartForging(ctx.entity));
+    // commands
+    //     .entity(ctx.entity)
+    //     .beam_add_to_inventory(vec!["items.AiItemContent.AiSword".into()]);
     commands.spawn((
         AudioPlayer::new(asset_server.load("sfx/blacksmith.ogg".to_owned())),
         PlaybackSettings::DESPAWN,
         SoundEffectPlayer,
     ));
     commands
-        .entity(t.target())
+        .entity(t.event().event_target())
         .insert(components::HiddenUiElement(Timer::new(
             Duration::from_secs(3),
             TimerMode::Once,
@@ -279,7 +284,7 @@ fn on_start_forging_sword_pressed(
 }
 
 fn on_start_forging_shield_pressed(
-    t: Trigger<Pointer<Released>>,
+    t: On<Pointer<Release>>,
     asset_server: Res<AssetServer>,
     q: Query<BeamableContexts>,
     mut commands: Commands,
@@ -287,16 +292,17 @@ fn on_start_forging_shield_pressed(
     let Ok(ctx) = q.single() else {
         return;
     };
-    commands
-        .entity(ctx.entity)
-        .beam_add_to_inventory(vec!["items.AiItemContent.AiShield".into()]);
+    commands.queue(MicroserviceStartForgingShield(ctx.entity));
+    // commands
+    //     .entity(ctx.entity)
+    //     .beam_add_to_inventory(vec!["items.AiItemContent.AiShield".into()]);
     commands.spawn((
         AudioPlayer::new(asset_server.load("sfx/blacksmith.ogg".to_owned())),
         PlaybackSettings::DESPAWN,
         SoundEffectPlayer,
     ));
     commands
-        .entity(t.target())
+        .entity(t.event().event_target())
         .insert(components::HiddenUiElement(Timer::new(
             Duration::from_secs(3),
             TimerMode::Once,
@@ -311,9 +317,12 @@ fn update_inventory(
     on_sale: Res<ItemsOnSale>,
     mut commands: Commands,
 ) {
-    let Ok(ctx) = q.single() else {
-        println!("NO CONTEXT");
-        return;
+    let ctx = match q.single() {
+        Ok(o) => o,
+        Err(e) => {
+            error!("No context: {}", e.to_string());
+            return;
+        }
     };
     let Ok(container_entity) = inv_container_q.single() else {
         println!("NO CONTAINER");
@@ -354,6 +363,7 @@ fn update_inventory(
     }
     for (e, item) in inv_items_q.iter() {
         let find = items.iter().position(|i| i.id == item.0);
+        // let find = items.iter().position(|i| i.proxy_id.as_ref().is_some_and(|i| i == &item.0));
         if let Some(index) = find {
             items.remove(index);
         } else {
@@ -365,91 +375,133 @@ fn update_inventory(
         value: "sword".to_owned(),
     };
     for item in items {
+        if item.proxy_id.is_none() {
+            continue;
+        }
+        if on_sale.iter().any(|id| id.eq(&item.id)) {
+            return;
+        }
+        let Some(name) = item.properties.iter().find_map(|i| {
+            if &i.name == "name" {
+                Some(i.value.clone())
+            } else {
+                None
+            }
+        }) else {
+            continue;
+        };
         commands
             .entity(container_entity)
             .with_children(|inventory| {
-                let Some(proxy_id) = item.proxy_id else {
-                    return;
-                };
-                if on_sale.0.iter().any(|id| id.eq(&proxy_id)) {
-                    return;
-                }
-
-                let Some(name) = item.properties.iter().find(|i| &i.name == "name") else {
-                    return;
-                };
                 let item_type = item
                     .properties
                     .iter()
                     .find(|i| &i.name == "type")
                     .unwrap_or(&binding);
-
                 inventory
                     .spawn((
                         Node {
                             border: UiRect::all(Val::Px(5.0)),
                             margin: UiRect::all(Val::Px(5.0)),
-                            flex_direction: FlexDirection::Column,
-                            column_gap: Val::Px(10.0),
+                            padding: UiRect::all(Val::Px(10.0)),
+                            flex_direction: FlexDirection::Row,
+                            row_gap: Val::Px(5.0),
                             align_self: AlignSelf::Stretch,
                             align_items: AlignItems::Center,
                             ..default()
                         },
                         BackgroundColor(BORDER_COLOR),
-                        BorderColor(BORDER_COLOR),
+                        BorderColor::all(BORDER_COLOR),
+                        Name::new(name.clone()),
                         ItemDisplay(item.id),
-                        Name::new(name.value.clone()),
+                        // ItemDisplay(proxy_id.clone()),
                     ))
-                    .with_children(|container| {
-                        let text_style = TextFont {
-                            font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
-                            font_size: 40.0,
-                            ..default()
-                        };
-                        let text_color = TextColor(consts::MY_ACCENT_COLOR);
-                        container.spawn((
-                            Text::new(format!("({}) {}", &item_type.value, &name.value)),
-                            text_style.clone(),
-                            text_color,
-                            TextLayout::new_with_justify(JustifyText::Center),
-                        ));
-                        if let Some(description) =
-                            item.properties.iter().find(|i| &i.name == "description")
+                    .with_children(|inv_root| {
+                        use bevy::image::{ImageFormat, ImageFormatSetting, ImageLoaderSettings};
+                        if let Some(image_url) =
+                            item.properties.iter().find(|i| &i.name == "imageUrl")
                         {
-                            let text_style = text_style.clone().with_font_size(20.0);
-                            container.spawn((
-                                Text::new(&description.value),
-                                text_style.clone(),
-                                text_color,
-                                TextLayout::new_with_justify(JustifyText::Center),
-                            ));
-                        }
-                        let Some(price) = item.properties.iter().find(|i| &i.name == "price")
-                        else {
-                            return;
-                        };
-                        container
-                            .spawn((
-                                BackgroundColor(INTERACTIVE_BG_COLOR),
-                                BorderColor(BORDER_COLOR),
-                                Button,
-                                Node {
-                                    padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
-                                    border: UiRect::all(Val::Px(4.0)),
+                            inv_root.spawn((
+                                ImageNode {
+                                    image: asset_server.load_with_settings(
+                                        image_url.value.clone(),
+                                        |settings: &mut ImageLoaderSettings| {
+                                            settings.format =
+                                                ImageFormatSetting::Format(ImageFormat::Jpeg);
+                                        },
+                                    ),
+                                    // image: asset_server.load(image_url.value.clone()),
                                     ..Default::default()
                                 },
-                                SellItemButton(proxy_id.clone()),
-                            ))
-                            .observe(sell_sword_pressed)
-                            .with_children(|btn| {
-                                btn.spawn((
-                                    Text::new(format!("Sell it for {}", &price.value)),
+                                Name::new(image_url.value.clone()),
+                                Node {
+                                    width: Val::Px(128.0),
+                                    height: Val::Px(128.0),
+                                    ..Default::default()
+                                },
+                            ));
+                        }
+
+                        inv_root
+                            .spawn((Node {
+                                margin: UiRect::all(Val::Px(5.0)),
+                                flex_direction: FlexDirection::Column,
+                                column_gap: Val::Px(10.0),
+                                align_self: AlignSelf::Stretch,
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },))
+                            .with_children(|container| {
+                                let text_style = TextFont {
+                                    font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
+                                    font_size: 40.0,
+                                    ..default()
+                                };
+                                let text_color = TextColor(consts::MY_ACCENT_COLOR);
+                                container.spawn((
+                                    Text::new(format!("({}) {}", &item_type.value, &name)),
                                     text_style.clone(),
                                     text_color,
-                                    TextLayout::new_with_justify(JustifyText::Center),
+                                    TextLayout::new_with_justify(Justify::Center),
                                 ));
-                            })
-                            .observe(sound_on_button);
+                                if let Some(description) =
+                                    item.properties.iter().find(|i| &i.name == "description")
+                                {
+                                    let text_style = text_style.clone().with_font_size(20.0);
+                                    container.spawn((
+                                        Text::new(&description.value),
+                                        text_style.clone(),
+                                        text_color,
+                                        TextLayout::new_with_justify(Justify::Center),
+                                    ));
+                                }
+                                if let Some(price) =
+                                    item.properties.iter().find(|i| &i.name == "price")
+                                {
+                                    container
+                                        .spawn((
+                                            BackgroundColor(INTERACTIVE_BG_COLOR),
+                                            BorderColor::all(BORDER_COLOR),
+                                            Button,
+                                            Node {
+                                                padding: UiRect::px(15.0, 15.0, 10.0, 15.0),
+                                                border: UiRect::all(Val::Px(4.0)),
+                                                ..Default::default()
+                                            },
+                                            SellItemButton(item.id),
+                                        ))
+                                        .observe(sell_sword_pressed)
+                                        .with_children(|btn| {
+                                            btn.spawn((
+                                                Text::new(format!("Sell it for {}", &price.value)),
+                                                text_style.clone(),
+                                                text_color,
+                                                TextLayout::new_with_justify(Justify::Center),
+                                            ));
+                                        })
+                                        .observe(sound_on_button);
+                                };
+                            });
                     });
             });
     }

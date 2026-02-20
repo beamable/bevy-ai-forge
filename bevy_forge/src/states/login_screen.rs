@@ -6,7 +6,9 @@ use bevy::prelude::*;
 use bevy_beam_sdk::{
     api::BeamableBasicApi,
     config::BeamExternalIdentityConfig,
-    slot::prelude::{AttachCredential, BeamSlot, BeamableConfiguration, UserInfoUpdated},
+    slot::prelude::{
+        AttachCredential, AttachCredentialResult, BeamSlot, BeamableConfiguration, UserInfoUpdated,
+    },
 };
 use bevy_simple_text_input::{TextInputSettings, TextInputValue};
 
@@ -17,13 +19,13 @@ impl Plugin for LoginScreenStatePlugin {
         app.add_systems(OnEnter(super::MainGameState::LoginScreen), setup)
             .add_systems(
                 Update,
-                rotate.run_if(in_state(super::MainGameState::LoginScreen)),
+                rotate.run_if(any_with_component::<LoadingIndicator>),
             );
     }
 }
 
 fn play_as_guest_pressed(
-    _t: Trigger<Pointer<Released>>,
+    _t: On<Pointer<Release>>,
     text: Query<&TextInputValue>,
     mut q1: Query<(&mut Node, Option<&LoadingIndicator>), With<LoginScreenObject>>,
     mut beam_config: BeamableConfiguration,
@@ -45,48 +47,47 @@ fn play_as_guest_pressed(
     }
 }
 
-fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<LoadingIndicator>>) {
-    let Ok(mut loading) = query.single_mut() else {
-        return;
-    };
-    loading.rotate(Quat::from_rotation_z(time.delta_secs() * 1.0));
-    loading.scale = Vec3::splat(time.elapsed_secs().sin().abs() * 0.2 + 0.45);
+fn rotate(time: Res<Time>, mut query: Query<&mut UiTransform, With<LoadingIndicator>>) {
+    for mut loading in query.iter_mut() {
+        loading.rotation = Rot2::degrees(loading.rotation.as_degrees() + time.delta_secs() * 50.0);
+        loading.scale = Vec2::splat((time.elapsed_secs() * 1.7).sin().abs() * 0.2 + 0.45);
+    }
 }
 
 fn handle_user_info_updated(
-    t: Trigger<UserInfoUpdated>,
+    t: On<UserInfoUpdated>,
     q: Query<&BeamSlot>,
     mut commands: Commands,
     external: Res<BeamExternalIdentityConfig>,
     mut next_state: ResMut<NextState<super::MainGameState>>,
 ) {
-    let Ok(slot) = q.get(t.target()) else {
+    let Ok(slot) = q.get(t.event().entity) else {
         return;
     };
     let Some(info) = &slot.user else {
         return;
     };
     if info.external.as_ref().is_some_and(|f| !f.is_empty()) {
-        next_state.set(super::MainGameState::Menu);
+        (*next_state).set_if_neq(super::MainGameState::Menu);
     } else {
         commands
-            .entity(t.target())
+            .entity(t.event().entity)
             .beam_attach_federated_identity(external.make_attach_request(info.id.to_string()));
     }
 }
 
 fn attach_credential_result(
-    t: Trigger<AttachCredential>,
+    t: On<AttachCredential>,
     mut commands: Commands,
     external: Res<BeamExternalIdentityConfig>,
     q: Query<&BeamSlot>,
 ) {
-    let Ok(slot) = q.get(t.target()) else {
+    let Ok(slot) = q.get(t.event().entity) else {
         return;
     };
-    if t.event().eq(&AttachCredential::AlreadyInUse) {
+    if t.event().result == AttachCredentialResult::AlreadyInUse {
         commands
-            .entity(t.target())
+            .entity(t.event().entity)
             .beam_new_user(external.auth(slot.get_gamer_tag().unwrap().to_string()));
     }
 }
@@ -103,10 +104,10 @@ fn setup(
     let show_register_form = q.is_empty();
     commands
         .add_observer(handle_user_info_updated)
-        .insert(StateScoped(super::MainGameState::LoginScreen));
+        .insert(DespawnOnExit(super::MainGameState::LoginScreen));
     commands
         .add_observer(attach_credential_result)
-        .insert(StateScoped(super::MainGameState::LoginScreen));
+        .insert(DespawnOnExit(super::MainGameState::LoginScreen));
     commands.entity(root_entity).with_children(|parent| {
         parent.spawn((
             ImageNode::new(asset_server.load("gfx/gameIconTransparent.png")),
@@ -121,7 +122,7 @@ fn setup(
                 ..default()
             },
             LoadingIndicator,
-            StateScoped(super::MainGameState::LoginScreen),
+            DespawnOnExit(super::MainGameState::LoginScreen),
             LoginScreenObject,
         ));
         if !show_register_form {
@@ -136,8 +137,8 @@ fn setup(
                     ..default()
                 },
                 BackgroundColor(FRAME_BG_COLOR),
-                BorderColor(BORDER_COLOR),
-                StateScoped(super::MainGameState::LoginScreen),
+                BorderColor::all(BORDER_COLOR),
+                DespawnOnExit(super::MainGameState::LoginScreen),
                 LoginScreenObject,
             ))
             .with_children(|parent| {
@@ -149,7 +150,7 @@ fn setup(
                 let text_color = TextColor(consts::MY_ACCENT_COLOR);
                 parent.spawn((
                     Text::new("User Name"),
-                    TextLayout::new_with_justify(JustifyText::Center),
+                    TextLayout::new_with_justify(Justify::Center),
                     text_style.clone(),
                     text_color,
                     LoginScreenObject,
@@ -163,7 +164,7 @@ fn setup(
                         ..default()
                     },
                     BackgroundColor(INTERACTIVE_BG_COLOR),
-                    BorderColor(BORDER_COLOR),
+                    BorderColor::all(BORDER_COLOR),
                     bevy_simple_text_input::TextInput,
                     bevy_simple_text_input::TextInputTextFont(text_style.clone()),
                     bevy_simple_text_input::TextInputTextColor(text_color),
@@ -174,8 +175,9 @@ fn setup(
                     TextInputSettings {
                         retain_on_submit: true,
                         mask_character: None,
+                        max_length: Some(25),
                     },
-                    StateScoped(super::MainGameState::LoginScreen),
+                    DespawnOnExit(super::MainGameState::LoginScreen),
                     LoginScreenObject,
                 ));
                 parent
@@ -188,15 +190,15 @@ fn setup(
                             ..Default::default()
                         },
                         BackgroundColor(INTERACTIVE_BG_COLOR),
-                        BorderColor(BORDER_COLOR),
-                        StateScoped(super::MainGameState::LoginScreen),
+                        BorderColor::all(BORDER_COLOR),
+                        DespawnOnExit(super::MainGameState::LoginScreen),
                         LoginScreenObject,
                     ))
                     .observe(play_as_guest_pressed)
                     .with_children(|btn| {
                         btn.spawn((
                             Text::new("Play as guest"),
-                            TextLayout::new_with_justify(JustifyText::Center),
+                            TextLayout::new_with_justify(Justify::Center),
                             text_style.clone(),
                             text_color,
                         ));

@@ -25,7 +25,6 @@ impl Plugin for GameStatesPlugin {
             menu::MenuStatePlugin,
             bevy_simple_text_input::TextInputPlugin,
         ))
-        .init_state::<MainGameState>()
-        .enable_state_scoped_entities::<MainGameState>();
+        .init_state::<MainGameState>();
     }
 }

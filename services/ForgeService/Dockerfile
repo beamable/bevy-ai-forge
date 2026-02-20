@@ -1,4 +1,4 @@
-﻿ARG BEAM_DOTNET_VERSION="8.0-alpine"
+ARG BEAM_DOTNET_VERSION="8.0-alpine"
 FROM mcr.microsoft.com/dotnet/runtime:${BEAM_DOTNET_VERSION}
 
 # These args are provided by the Beam CLI
@@ -15,20 +15,22 @@ ARG BEAM_APP_SRC_PATH
 #  This value is usually /beamApp/ForgeService
 ARG BEAM_APP_DEST
 
-# <beamReserved> Beamable may inject custom settings into this Dockerfile. Please do not remove these lines. 
+# <beamReserved> Beamable may inject custom settings into this Dockerfile. Please do not remove these lines.
 # </beamReserved>
 
 # /beamApp is the directory that will hold the application
 WORKDIR /beamApp
 
 # expose the health port
-EXPOSE 6565 
+EXPOSE 6565
 
 # copy general supporting files
 COPY $BEAM_SUPPORT_SRC_PATH .
 
 # copy specific application code
 COPY $BEAM_APP_SRC_PATH .
+
+RUN echo "Listing root directory:" && ls -al .
 
 # ensure that the application is runnable
 RUN chmod +x $BEAM_APP_DEST

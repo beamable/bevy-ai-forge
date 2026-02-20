@@ -1,5 +1,4 @@
 use crate::slot::prelude::*;
-use beam_slot::AttachCredential;
 use bevy::prelude::*;
 use bevy_pkv::PkvStore;
 
@@ -11,7 +10,8 @@ mod user_view;
 
 pub mod prelude {
     pub use crate::slot::beam_slot::{
-        AttachCredential, BeamSlot, BeamStats, GamerTag, UserInfoUpdated, UserLoggedIn,
+        AttachCredential, AttachCredentialResult, BeamSlot, BeamStats, GamerTag, UserInfoUpdated,
+        UserInfoUpdatedResult, UserLoggedIn, UserLoggedInResult,
     };
     pub use crate::slot::contexts::{BeamableConfiguration, BeamableContexts};
     pub use crate::slot::inventory::{BeamInventory, Item, ItemProperty};
@@ -36,15 +36,14 @@ impl Plugin for BeamSlotPlugin {
                     .and(in_state(crate::state::BeamableInitStatus::FullyInitialized)),
             ),
         )
-        .add_event::<UserLoggedIn>()
-        .add_event::<AttachCredential>()
-        .add_event::<UserInfoUpdated>()
+        .register_type::<beam_slot::UserLoggedInResult>()
+        .register_type::<beam_slot::UserInfoUpdatedResult>()
+        .register_type::<beam_slot::AttachCredentialResult>()
         .add_systems(
             OnEnter(crate::state::BeamableInitStatus::FullyInitialized),
             beam_slot::try_read_token.run_if(resource_exists::<PkvStore>),
         )
         .add_observer(beam_slot::on_slot_added)
-        .enable_state_scoped_entities::<crate::state::BeamableInitStatus>()
         .register_type::<BeamInventory>()
         .register_type::<BeamStats>()
         .register_type::<BeamSlot>()

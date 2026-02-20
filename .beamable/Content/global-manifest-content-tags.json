@@ -1,5 +1,3 @@
-﻿{
-  "base": [
-    "currency.coins"
-  ]
+{
+  "base": ["currency.coins"]
 }
