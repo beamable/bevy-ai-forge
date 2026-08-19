@@ -1,5 +1,6 @@
 use crate::config::BeamableConfigResource;
 use crate::slot::prelude::{BeamSlot, TokenStorage};
+use bevy::ecs::component::Mutable;
 use bevy::prelude::*;
 use std::fmt::Debug;
 use std::ops::{Deref, DerefMut};
@@ -26,7 +27,7 @@ where
 }
 
 pub trait BeamRequestResource<S, E>:
-    Resource + FromWorld + Sized + DerefMut<Target = Vec<BeamReceiver<S, E>>>
+    Resource<Mutability = Mutable> + FromWorld + Sized + DerefMut<Target = Vec<BeamReceiver<S, E>>>
 where
     S: Debug + Send + 'static,
     E: Debug + Send + 'static,

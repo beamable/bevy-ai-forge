@@ -59,10 +59,12 @@ fn setup(
             parent
                 .spawn((
                     Text::new("Artificial Forge"),
-                    TextLayout::new_with_justify(Justify::Center),
+                    TextLayout::justify(Justify::Center),
                     TextFont {
-                        font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
-                        font_size: 150.0,
+                        font: asset_server
+                            .load("fonts/coolvetica_condensed_rg.otf")
+                            .into(),
+                        font_size: FontSize::Px(150.0),
                         ..default()
                     },
                     TextColor(consts::MY_ACCENT_COLOR),

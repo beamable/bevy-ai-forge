@@ -6,8 +6,8 @@ default:
 web_build:
     cargo build --target wasm32-unknown-unknown --release
     wasm-bindgen --out-dir ./out/ --target web ./target/wasm32-unknown-unknown/release/bevy_forge.wasm
-    cp -u bevy_forge/wasm/* out/
-    cp -R -u bevy_forge/assets out/
+    cp -f bevy_forge/wasm/* out/
+    cp -R -f bevy_forge/assets out/
     ls -R out
 
 # self host web version, run web_build first
@@ -27,7 +27,7 @@ web_check:
 # installs cli tools used in the project
 prepare:
     cargo install lwa_simple_server
-    cargo install wasm-bindgen-cli
+    cargo install wasm-bindgen-cli --version 0.2.108 --locked
 
 deploy_microservices:
     dotnet beam deploy plan

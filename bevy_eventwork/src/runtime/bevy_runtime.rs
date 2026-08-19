@@ -16,7 +16,7 @@ impl Runtime for bevy::tasks::TaskPool {
 
         #[cfg(target_arch = "wasm32")]
         {
-            self.spawn(task);
+            self.spawn(task).detach();
             None
         }
     }
@@ -32,7 +32,7 @@ impl Runtime for bevy::tasks::TaskPool {
 
         #[cfg(target_arch = "wasm32")]
         {
-            self.spawn_local(task);
+            self.spawn_local(task).detach();
             None
         }
     }

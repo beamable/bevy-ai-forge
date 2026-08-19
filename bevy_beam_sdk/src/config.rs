@@ -36,7 +36,7 @@ impl BeamableWebsocketUrl {
         if self.is_empty() {
             format!("wss://api.beamable.com/api{}", CONNECT_URI)
         } else {
-            format!("{}{}", &**self, CONNECT_URI)
+            format!("{}{}", **self, CONNECT_URI)
         }
     }
 }
@@ -133,7 +133,7 @@ impl Plugin for ConfigPlugin {
                 Update,
                 get_config_defaults.run_if(
                     resource_added::<BeamableConfigResource>
-                        .or(resource_exists_and_changed::<BeamableConfigResource>),
+                        .or_else(resource_exists_and_changed::<BeamableConfigResource>),
                 ),
             );
     }

@@ -33,7 +33,7 @@ impl Plugin for BeamSlotPlugin {
             Update,
             beam_slot::save_token.run_if(
                 resource_exists::<PkvStore>
-                    .and(in_state(crate::state::BeamableInitStatus::FullyInitialized)),
+                    .and_then(in_state(crate::state::BeamableInitStatus::FullyInitialized)),
             ),
         )
         .register_type::<beam_slot::UserLoggedInResult>()

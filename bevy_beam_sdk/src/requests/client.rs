@@ -39,7 +39,7 @@ impl ReqwestClient {
         if let Some(token) = &token.access_token {
             headers.insert(
                 "authorization",
-                format!("Bearer {}", &token).parse().expect(""),
+                format!("Bearer {}", token).parse().expect(""),
             );
             access_token = Some(token.to_owned().clone());
         }

@@ -139,6 +139,8 @@ pub fn beam_command(input: TokenStream) -> TokenStream {
             }
 
         impl bevy::ecs::system::Command for #name {
+            type Out = ();
+
             fn apply(self, world: &mut World) {
                 #entity_assign
                 let request_client = Self::make_request_client(&world, token);

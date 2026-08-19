@@ -38,7 +38,7 @@ impl Plugin for GameStatePlugin {
         // #[cfg(target_arch = "wasm32")]
         app.add_systems(
             FixedUpdate,
-            call_update_inventory.run_if(in_state(super::MainGameState::Game).and(
+            call_update_inventory.run_if(in_state(super::MainGameState::Game).and_then(
                 bevy::time::common_conditions::on_timer(Duration::from_secs(10)),
             )),
         );
@@ -92,8 +92,10 @@ fn setup(
     mut game_bg: Query<(&mut ImageNode, &mut Node), With<GameBackground>>,
 ) {
     let text_style = TextFont {
-        font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
-        font_size: 50.0,
+        font: asset_server
+            .load("fonts/coolvetica_condensed_rg.otf")
+            .into(),
+        font_size: FontSize::Px(50.0),
         ..Default::default()
     };
     let font_color = TextColor(consts::MY_ACCENT_COLOR);
@@ -176,15 +178,17 @@ fn setup(
             .observe(on_start_forging_sword_pressed)
             .with_children(|btn| {
                 let text_style = TextFont {
-                    font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
-                    font_size: 40.0,
+                    font: asset_server
+                        .load("fonts/coolvetica_condensed_rg.otf")
+                        .into(),
+                    font_size: FontSize::Px(40.0),
                     ..default()
                 };
                 btn.spawn((
                     Text::new("Forge Sword!"),
                     text_style.clone(),
                     font_color,
-                    TextLayout::new_with_justify(Justify::Center),
+                    TextLayout::justify(Justify::Center),
                 ));
             });
         parent
@@ -208,15 +212,17 @@ fn setup(
             .observe(on_start_forging_shield_pressed)
             .with_children(|btn| {
                 let text_style = TextFont {
-                    font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
-                    font_size: 40.0,
+                    font: asset_server
+                        .load("fonts/coolvetica_condensed_rg.otf")
+                        .into(),
+                    font_size: FontSize::Px(40.0),
                     ..Default::default()
                 };
                 btn.spawn((
                     Text::new("Forge Shield!"),
                     text_style.clone(),
                     font_color,
-                    TextLayout::new_with_justify(Justify::Center),
+                    TextLayout::justify(Justify::Center),
                 ));
             });
     });
@@ -423,13 +429,13 @@ fn update_inventory(
                         {
                             inv_root.spawn((
                                 ImageNode {
-                                    image: asset_server.load_with_settings(
-                                        image_url.value.clone(),
-                                        |settings: &mut ImageLoaderSettings| {
+                                    image: asset_server
+                                        .load_builder()
+                                        .with_settings(|settings: &mut ImageLoaderSettings| {
                                             settings.format =
                                                 ImageFormatSetting::Format(ImageFormat::Jpeg);
-                                        },
-                                    ),
+                                        })
+                                        .load(image_url.value.clone()),
                                     // image: asset_server.load(image_url.value.clone()),
                                     ..Default::default()
                                 },
@@ -453,16 +459,18 @@ fn update_inventory(
                             },))
                             .with_children(|container| {
                                 let text_style = TextFont {
-                                    font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
-                                    font_size: 40.0,
+                                    font: asset_server
+                                        .load("fonts/coolvetica_condensed_rg.otf")
+                                        .into(),
+                                    font_size: FontSize::Px(40.0),
                                     ..default()
                                 };
                                 let text_color = TextColor(consts::MY_ACCENT_COLOR);
                                 container.spawn((
-                                    Text::new(format!("({}) {}", &item_type.value, &name)),
+                                    Text::new(format!("({}) {}", item_type.value, name)),
                                     text_style.clone(),
                                     text_color,
-                                    TextLayout::new_with_justify(Justify::Center),
+                                    TextLayout::justify(Justify::Center),
                                 ));
                                 if let Some(description) =
                                     item.properties.iter().find(|i| &i.name == "description")
@@ -472,7 +480,7 @@ fn update_inventory(
                                         Text::new(&description.value),
                                         text_style.clone(),
                                         text_color,
-                                        TextLayout::new_with_justify(Justify::Center),
+                                        TextLayout::justify(Justify::Center),
                                     ));
                                 }
                                 if let Some(price) =
@@ -493,10 +501,10 @@ fn update_inventory(
                                         .observe(sell_sword_pressed)
                                         .with_children(|btn| {
                                             btn.spawn((
-                                                Text::new(format!("Sell it for {}", &price.value)),
+                                                Text::new(format!("Sell it for {}", price.value)),
                                                 text_style.clone(),
                                                 text_color,
-                                                TextLayout::new_with_justify(Justify::Center),
+                                                TextLayout::justify(Justify::Center),
                                             ));
                                         })
                                         .observe(sound_on_button);

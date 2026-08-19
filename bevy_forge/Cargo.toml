@@ -6,19 +6,19 @@ license = "MIT OR Apache-2.0 OR CC0-1.0"
 
 
 [dependencies]
-bevy_pkv = "0.15"
-bevy_simple_text_input = "0.14"
-bevy_args = "3.0"
+bevy_pkv = "0.16"
+bevy_simple_text_input = "0.15"
+bevy_args = "4.0"
 clap = { version = "4.5", features = ["derive"] }
 crossbeam-channel = "0.5"
-rand = "0.8.5"
-bevy-inspector-egui = { version = "0.36" }
+rand = "0.10"
+bevy-inspector-egui = { version = "0.37" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-bevy_ehttp = "0.7"
+bevy_ehttp = "0.8"
 
 [dependencies.bevy]
-version = "0.18"
+version = "0.19"
 features = ["jpeg"]
 
 [target.'cfg(target_arch = "aarch64")'.dependencies]

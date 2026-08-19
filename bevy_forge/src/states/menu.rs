@@ -29,8 +29,10 @@ fn setup(
     };
     commands.entity(root_entity).with_children(|parent| {
         let text_style = TextFont {
-            font: asset_server.load("fonts/coolvetica_condensed_rg.otf"),
-            font_size: 40.0,
+            font: asset_server
+                .load("fonts/coolvetica_condensed_rg.otf")
+                .into(),
+            font_size: FontSize::Px(40.0),
             ..default()
         };
         let text_color = TextColor(consts::MY_ACCENT_COLOR);
@@ -52,7 +54,7 @@ fn setup(
             .with_children(|btn| {
                 btn.spawn((
                     Text::new("Start Game"),
-                    TextLayout::new_with_justify(Justify::Center),
+                    TextLayout::justify(Justify::Center),
                     text_style,
                     text_color,
                 ));

@@ -28,12 +28,17 @@ fn bevy_inspector(world: &mut World) {
         return;
     };
     let mut egui_context = egui_context.clone();
-    egui::SidePanel::right("Bevy State")
-        .frame(
-            egui::Frame::canvas(&egui_context.get_mut().style())
-                .inner_margin(egui::Margin::same(10)),
-        )
-        .show_animated(egui_context.get_mut(), true, |ui| {
+    let ctx = egui_context.get_mut();
+    let mut viewport_ui = egui::Ui::new(
+        ctx.clone(),
+        "viewport".into(),
+        egui::UiBuilder::new()
+            .layer_id(egui::LayerId::background())
+            .max_rect(ctx.viewport_rect()),
+    );
+    egui::Panel::right("Bevy State")
+        .frame(egui::Frame::canvas(&ctx.global_style()).inner_margin(egui::Margin::same(10)))
+        .show_inside(&mut viewport_ui, |ui| {
             ui.add_space(10.0);
             ui.label(
                 RichText::new("Beamable")
@@ -114,7 +119,7 @@ fn configure_egui(mut contexts: EguiContexts) {
         }
     }
     if let Ok(ctx) = contexts.ctx_mut() {
-        ctx.style_mut(|style| {
+        ctx.global_style_mut(|style| {
             for font_id in style.text_styles.values_mut() {
                 font_id.size *= 1.2;
             }

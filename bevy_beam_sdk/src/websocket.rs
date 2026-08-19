@@ -54,7 +54,7 @@ pub fn on_create(
 
         #[cfg(not(target_arch = "wasm32"))]
         {
-            let token = format!("Bearer {}", &connection.token);
+            let token = format!("Bearer {}", connection.token);
             let scope = connection.scope.clone();
             let build = ClientRequestBuilder::new(uri.try_into().unwrap())
                 .with_header("Authorization", token)

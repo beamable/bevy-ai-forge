@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use rand::Rng;
+use rand::RngExt;
 
 pub mod components;
 
@@ -62,8 +62,8 @@ pub fn sound_on_button(
     for e in other_sounds.iter() {
         cmd.entity(e).despawn();
     }
-    let mut rng = rand::thread_rng();
-    let number = rng.gen::<u32>();
+    let mut rng = rand::rng();
+    let number = rng.random::<u32>();
     cmd.spawn((
         AudioPlayer::new(asset_server.load(format!(
             "sfx/interface_{}.ogg",
