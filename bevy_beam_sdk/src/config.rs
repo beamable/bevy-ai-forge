@@ -131,10 +131,7 @@ impl Plugin for ConfigPlugin {
             .add_observer(crate::content::on_manifest_got)
             .add_systems(
                 Update,
-                get_config_defaults.run_if(
-                    resource_added::<BeamableConfigResource>
-                        .or_else(resource_exists_and_changed::<BeamableConfigResource>),
-                ),
+                get_config_defaults.run_if(resource_exists_and_changed::<BeamableConfigResource>),
             );
     }
 }

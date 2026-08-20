@@ -51,7 +51,7 @@ fn setup(
                         position_type: PositionType::Absolute,
                         ..default()
                     },
-                    BackgroundColor(Color::WHITE),
+                    BackgroundColor(Color::WHITE.with_alpha(0.0)),
                     ZIndex(-1),
                     ImageNode::new(asset_server.load("gfx/steampunk_bg_robot.png")),
                 ))

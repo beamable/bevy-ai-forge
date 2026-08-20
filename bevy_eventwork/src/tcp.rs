@@ -125,7 +125,7 @@ impl NetworkProvider for TcpProvider {
             }
             info!("Message read");
 
-            let packet: NetworkPacket = match bincode::deserialize(&buffer[..length]) {
+            let packet: NetworkPacket = match crate::codec::deserialize(&buffer[..length]) {
                 Ok(packet) => packet,
                 Err(err) => {
                     error!("Failed to decode network packet from: {}", err);
@@ -147,7 +147,7 @@ impl NetworkProvider for TcpProvider {
         _settings: Self::NetworkSettings,
     ) {
         while let Ok(message) = messages.recv().await {
-            let encoded = match bincode::serialize(&message) {
+            let encoded = match crate::codec::serialize(&message) {
                 Ok(encoded) => encoded,
                 Err(err) => {
                     error!("Could not encode packet {:?}: {}", message, err);

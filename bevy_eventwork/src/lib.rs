@@ -144,6 +144,7 @@ As you can see, they are both quite similar, and provide everything a basic netw
 Currently, Bevy's [TaskPool](bevy::tasks::TaskPool) is the default runtime used by Eventwork.
 */
 
+mod codec;
 /// Contains error enum.
 pub mod error;
 mod network_message;

@@ -8,8 +8,10 @@ use bevy_beam_sdk::{
     config::BeamExternalIdentityConfig,
     slot::prelude::{
         AttachCredential, AttachCredentialResult, BeamSlot, BeamableConfiguration, UserInfoUpdated,
+        UserInfoUpdatedResult, UserLoggedIn, UserLoggedInResult,
     },
 };
+use bevy_pkv::PkvStore;
 use bevy_simple_text_input::{TextInputSettings, TextInputValue};
 
 pub struct LoginScreenStatePlugin;
@@ -60,7 +62,14 @@ fn handle_user_info_updated(
     mut commands: Commands,
     external: Res<BeamExternalIdentityConfig>,
     mut next_state: ResMut<NextState<super::MainGameState>>,
+    mut storage: ResMut<PkvStore>,
+    mut ui: Query<(&mut Node, Option<&LoadingIndicator>), With<LoginScreenObject>>,
 ) {
+    if let UserInfoUpdatedResult::Fail { status_code, .. } = &t.event().result {
+        warn!("account hydration failed with status {status_code}; resetting persisted session");
+        recover_from_failed_session(t.event().entity, &mut commands, &mut storage, &mut ui);
+        return;
+    }
     let Ok(slot) = q.get(t.event().entity) else {
         return;
     };
@@ -81,14 +90,53 @@ fn attach_credential_result(
     mut commands: Commands,
     external: Res<BeamExternalIdentityConfig>,
     q: Query<&BeamSlot>,
+    mut storage: ResMut<PkvStore>,
+    mut ui: Query<(&mut Node, Option<&LoadingIndicator>), With<LoginScreenObject>>,
 ) {
-    let Ok(slot) = q.get(t.event().entity) else {
-        return;
-    };
-    if t.event().result == AttachCredentialResult::AlreadyInUse {
-        commands
-            .entity(t.event().entity)
-            .beam_new_user(external.auth(slot.get_gamer_tag().unwrap().to_string()));
+    match &t.event().result {
+        AttachCredentialResult::Success => {}
+        AttachCredentialResult::AlreadyInUse => {
+            let Ok(slot) = q.get(t.event().entity) else {
+                return;
+            };
+            commands
+                .entity(t.event().entity)
+                .beam_new_user(external.auth(slot.get_gamer_tag().unwrap().to_string()));
+        }
+        AttachCredentialResult::Fail { status_code, .. } => {
+            warn!("credential attachment failed with status {status_code}; resetting session");
+            recover_from_failed_session(t.event().entity, &mut commands, &mut storage, &mut ui);
+        }
+    }
+}
+
+fn handle_user_logged_in(
+    t: On<UserLoggedIn>,
+    mut commands: Commands,
+    mut storage: ResMut<PkvStore>,
+    mut ui: Query<(&mut Node, Option<&LoadingIndicator>), With<LoginScreenObject>>,
+) {
+    if let UserLoggedInResult::Fail { status_code, .. } = &t.event().result {
+        warn!("authentication failed with status {status_code}; resetting persisted session");
+        recover_from_failed_session(t.event().entity, &mut commands, &mut storage, &mut ui);
+    }
+}
+
+fn recover_from_failed_session(
+    entity: Entity,
+    commands: &mut Commands,
+    storage: &mut PkvStore,
+    ui: &mut Query<(&mut Node, Option<&LoadingIndicator>), With<LoginScreenObject>>,
+) {
+    commands.entity(entity).despawn();
+    let _ = storage.remove("user_token");
+    let _ = storage.remove("user_slot");
+    for (mut node, loading) in ui.iter_mut() {
+        node.display = if loading.is_some() {
+            Display::None
+        } else {
+            Display::Flex
+        };
     }
 }
 
@@ -108,6 +156,9 @@ fn setup(
     commands
         .add_observer(attach_credential_result)
         .insert(DespawnOnExit(super::MainGameState::LoginScreen));
+    commands
+        .add_observer(handle_user_logged_in)
+        .insert(DespawnOnExit(super::MainGameState::LoginScreen));
     commands.entity(root_entity).with_children(|parent| {
         parent.spawn((
             ImageNode::new(asset_server.load("gfx/gameIconTransparent.png")),
@@ -125,12 +176,14 @@ fn setup(
             DespawnOnExit(super::MainGameState::LoginScreen),
             LoginScreenObject,
         ));
-        if !show_register_form {
-            return;
-        }
         parent
             .spawn((
                 Node {
+                    display: if show_register_form {
+                        Display::Flex
+                    } else {
+                        Display::None
+                    },
                     border: UiRect::all(Val::Px(5.0)),
                     padding: UiRect::all(Val::Px(25.0)),
                     flex_direction: bevy::ui::FlexDirection::Column,

@@ -21,10 +21,10 @@ impl super::BeamNotification for InventoryRefreshNotify {
         for e in ev.read() {
             let scope = e.scopes.as_ref().map(|array| array.join(","));
             let source = Some(*e.source());
-            for ctx in q
-                .iter()
-                .filter(|ctx| ctx.connection.is_some_and(|connection| connection.id == source))
-            {
+            for ctx in q.iter().filter(|ctx| {
+                ctx.connection
+                    .is_some_and(|connection| connection.id == source)
+            }) {
                 commands
                     .entity(ctx.entity)
                     .beam_get_inventory(scope.clone());

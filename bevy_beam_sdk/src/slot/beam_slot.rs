@@ -172,25 +172,39 @@ pub fn handle_inventory_get(
         return;
     };
     let scopes = ctx.inventory_sync.active_scopes.clone();
-    if let Ok(event) = event {
-        let inventory = BeamInventory::from((*event).clone());
-        ctx.inventory.apply_snapshot(inventory, scopes.as_deref());
-        ctx.inventory_sync.revision += 1;
-        ctx.inventory_sync.last_error = None;
-        debug!(
-            "inventory request completed in {:.0}ms (revision {}, {} scopes)",
-            (time.elapsed_secs_f64() - ctx.inventory_sync.request_started_seconds) * 1000.0,
-            ctx.inventory_sync.revision,
-            scopes.as_ref().map_or(0, Vec::len)
-        );
-        commands.trigger(BeamInventoryUpdated {
-            entity: ctx.entity,
-            scopes: scopes.clone().unwrap_or_default(),
-            revision: ctx.inventory_sync.revision,
-        });
-    } else {
-        ctx.inventory_sync.last_error = Some("inventory refresh failed".to_owned());
-        warn!("inventory request failed; cached inventory was preserved");
+    match event {
+        Ok(event) => {
+            let inventory = BeamInventory::from((*event).clone());
+            ctx.inventory.apply_snapshot(inventory, scopes.as_deref());
+            ctx.inventory_sync.revision += 1;
+            ctx.inventory_sync.last_error = None;
+            debug!(
+                "inventory request completed in {:.0}ms (revision {}, {} scopes)",
+                (time.elapsed_secs_f64() - ctx.inventory_sync.request_started_seconds) * 1000.0,
+                ctx.inventory_sync.revision,
+                scopes.as_ref().map_or(0, Vec::len)
+            );
+            commands.trigger(BeamInventoryUpdated {
+                entity: ctx.entity,
+                scopes: scopes.clone().unwrap_or_default(),
+                revision: ctx.inventory_sync.revision,
+            });
+        }
+        Err(beam_autogen_rs::apis::Error::ResponseError(error)) => {
+            let message = format!("inventory refresh returned HTTP {}", error.status.as_u16());
+            ctx.inventory_sync.last_error = Some(message.clone());
+            warn!("{message}; cached inventory was preserved");
+        }
+        Err(beam_autogen_rs::apis::Error::Reqwest(_)) => {
+            let message = "inventory refresh transport failed".to_owned();
+            ctx.inventory_sync.last_error = Some(message.clone());
+            warn!("{message}; cached inventory was preserved");
+        }
+        Err(_) => {
+            let message = "inventory refresh failed".to_owned();
+            ctx.inventory_sync.last_error = Some(message.clone());
+            warn!("{message}; cached inventory was preserved");
+        }
     }
     if let Some(scope) = ctx.inventory_sync.finish() {
         commands.entity(ctx.entity).beam_get_inventory(scope);
@@ -354,6 +368,7 @@ pub fn handle_get_user_info(
         Err(beam_autogen_rs::apis::Error::ResponseError(e)) => {
             let status_code = e.status.as_u16();
             let value = e.content.clone();
+            warn!("account hydration returned HTTP {status_code}");
             commands.trigger(UserInfoUpdated {
                 entity,
                 result: UserInfoUpdatedResult::Fail { status_code, value },
@@ -362,6 +377,7 @@ pub fn handle_get_user_info(
         Err(e) => {
             let status_code = 997;
             let value = e.to_string();
+            warn!("account hydration transport failed");
             commands.trigger(UserInfoUpdated {
                 entity,
                 result: UserInfoUpdatedResult::Fail { status_code, value },

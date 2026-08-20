@@ -344,7 +344,7 @@ impl<T: RequestMessage> Request<T> {
     pub fn respond(self, response: T::ResponseMessage) -> Result<(), NetworkError> {
         let packet = NetworkPacket {
             kind: String::from(T::ResponseMessage::NAME),
-            data: bincode::serialize(&ResponseInternal {
+            data: crate::codec::serialize(&ResponseInternal {
                 response_id: self.request_id,
                 response,
             })

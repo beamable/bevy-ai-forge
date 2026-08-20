@@ -1,4 +1,7 @@
-use std::{collections::{HashSet, VecDeque}, time::Duration};
+use std::{
+    collections::{HashSet, VecDeque},
+    time::Duration,
+};
 
 use crate::ui::widgets::scroll_view::*;
 use crate::{
@@ -9,8 +12,7 @@ use crate::{
     },
     microservice::{
         MicroserviceSellSword, MicroserviceStartForging, MicroserviceStartForgingShield,
-        SellSwordEventCompleted, StartForgingEventCompleted,
-        StartForgingShieldEventCompleted,
+        SellSwordEventCompleted, StartForgingEventCompleted, StartForgingShieldEventCompleted,
     },
 };
 use beam_microservice::models::SellSwordRequestArgs;
@@ -48,7 +50,12 @@ impl Plugin for GameStatePlugin {
         app.add_systems(OnEnter(super::MainGameState::Game), setup)
             .add_systems(
                 Update,
-                (on_inv_changed, update_inventory, update_busy_text, health_based_refresh)
+                (
+                    on_inv_changed,
+                    update_inventory,
+                    update_busy_text,
+                    health_based_refresh,
+                )
                     .run_if(in_state(super::MainGameState::Game)),
             )
             .add_systems(
@@ -92,7 +99,10 @@ fn sell_sword_pressed(
     pending_sales.order.push_back(**sell_item_info);
 }
 
-fn update_items_visibility(pending_sales: Res<PendingSales>, mut q: Query<(&mut Node, &ItemDisplay)>) {
+fn update_items_visibility(
+    pending_sales: Res<PendingSales>,
+    mut q: Query<(&mut Node, &ItemDisplay)>,
+) {
     for (mut n, item_display) in q.iter_mut() {
         let visible = !pending_sales.ids.contains(&item_display.0);
         n.display = if visible {
@@ -300,9 +310,11 @@ fn on_inv_changed(
         .items
         .values()
         .flatten()
-        .filter(|item| item.properties.iter().any(|property| {
-            property.name == "forgeStatus" && property.value == "processing"
-        }))
+        .filter(|item| {
+            item.properties
+                .iter()
+                .any(|property| property.name == "forgeStatus" && property.value == "processing")
+        })
         .count();
     if processing_count > 0 && activity.processing_count == 0 {
         activity.processing_started_seconds = Some(time.elapsed_secs_f64());
@@ -335,7 +347,9 @@ fn on_start_forging_sword_pressed(
         PlaybackSettings::DESPAWN,
         SoundEffectPlayer,
     ));
-    commands.entity(t.event().event_target()).insert(ForgeRequestPending);
+    commands
+        .entity(t.event().event_target())
+        .insert(ForgeRequestPending);
     activity.requests_in_flight += 1;
     activity.last_error = None;
 }
@@ -363,7 +377,9 @@ fn on_start_forging_shield_pressed(
         PlaybackSettings::DESPAWN,
         SoundEffectPlayer,
     ));
-    commands.entity(t.event().event_target()).insert(ForgeRequestPending);
+    commands
+        .entity(t.event().event_target())
+        .insert(ForgeRequestPending);
     activity.requests_in_flight += 1;
     activity.last_error = None;
 }
@@ -374,13 +390,7 @@ fn on_forge_sword_completed(
     mut activity: ResMut<ForgeActivity>,
     mut commands: Commands,
 ) {
-    finish_forge_request(
-        &event,
-        &buttons,
-        &mut activity,
-        &mut commands,
-        "sword",
-    );
+    finish_forge_request(&event, &buttons, &mut activity, &mut commands, "sword");
 }
 
 fn on_forge_shield_completed(
@@ -389,13 +399,7 @@ fn on_forge_shield_completed(
     mut activity: ResMut<ForgeActivity>,
     mut commands: Commands,
 ) {
-    finish_forge_request(
-        &event,
-        &buttons,
-        &mut activity,
-        &mut commands,
-        "shield",
-    );
+    finish_forge_request(&event, &buttons, &mut activity, &mut commands, "shield");
 }
 
 fn finish_forge_request<E>(
@@ -405,7 +409,15 @@ fn finish_forge_request<E>(
     commands: &mut Commands,
     item_type: &str,
 ) where
-    E: EntityEvent + std::ops::Deref<Target = Result<bool, beam_microservice::apis::Error<beam_microservice::apis::uncategorized_api::StartForgingSwordPostError>>>,
+    E: EntityEvent
+        + std::ops::Deref<
+            Target = Result<
+                bool,
+                beam_microservice::apis::Error<
+                    beam_microservice::apis::uncategorized_api::StartForgingSwordPostError,
+                >,
+            >,
+        >,
 {
     for button in buttons.iter() {
         commands.entity(button).remove::<ForgeRequestPending>();
@@ -449,13 +461,17 @@ fn on_sale_completed(
             if let Some(id) = sold_id {
                 pending_sales.ids.remove(&id);
             }
-            activity.last_error = Some("That item could not be sold. It is visible again; retry after refreshing.".to_owned());
+            activity.last_error = Some(
+                "That item could not be sold. It is visible again; retry after refreshing."
+                    .to_owned(),
+            );
         }
         Err(_) => {
             if let Some(id) = sold_id {
                 pending_sales.ids.remove(&id);
             }
-            activity.last_error = Some("Sale failed. Check the connection; the item has been restored.".to_owned());
+            activity.last_error =
+                Some("Sale failed. Check the connection; the item has been restored.".to_owned());
         }
     }
 }
@@ -479,10 +495,7 @@ fn on_inventory_authoritative(
     pending_sales.order.retain(|id| retained.contains(id));
 }
 
-fn update_busy_text(
-    activity: Res<ForgeActivity>,
-    mut text: Query<&mut Text, With<ForgeBusyText>>,
-) {
+fn update_busy_text(activity: Res<ForgeActivity>, mut text: Query<&mut Text, With<ForgeBusyText>>) {
     if !activity.is_changed() {
         return;
     }
@@ -512,9 +525,9 @@ fn health_based_refresh(
     let Ok(context) = contexts.single() else {
         return;
     };
-    let connected = context.connection.is_some_and(|connection| {
-        connection.status == BeamConnectionStatus::Connected
-    });
+    let connected = context
+        .connection
+        .is_some_and(|connection| connection.status == BeamConnectionStatus::Connected);
     let pending_work = !pending_sales.ids.is_empty()
         || activity.requests_in_flight > 0
         || activity.processing_count > 0;
@@ -594,9 +607,10 @@ fn update_inventory(
         items.append(&mut it);
     }
     items.retain(|item| {
-        !item.properties.iter().any(|property| {
-            property.name == "forgeStatus" && property.value == "processing"
-        })
+        !item
+            .properties
+            .iter()
+            .any(|property| property.name == "forgeStatus" && property.value == "processing")
     });
     for (e, item) in inv_items_q.iter() {
         let find = items.iter().position(|i| i.id == item.0);

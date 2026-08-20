@@ -63,6 +63,7 @@ pub struct WebSocketConnection {
     #[reflect(ignore)]
     pub(crate) retry_timer: Option<Timer>,
     pub(crate) retry_attempt: u32,
+    pub(crate) refresh_before_connect: bool,
 }
 
 impl std::fmt::Debug for WebSocketConnection {
@@ -92,7 +93,9 @@ fn disconnect_on_removal(
     net: ResMut<Network<WebSocketProvider>>,
 ) {
     for connection_id in net.list_connection_ids() {
-        if q.iter().any(|connection| connection.id == Some(connection_id)) {
+        if q.iter()
+            .any(|connection| connection.id == Some(connection_id))
+        {
             continue;
         }
         let _ = net.disconnect(connection_id);
@@ -130,6 +133,10 @@ fn start_disconnected_connections(
         }
         connection.id = None;
         connection.status = BeamConnectionStatus::Connecting;
+        if !connection.refresh_before_connect {
+            connect_with_access_token(&connection, &net, &settings, &task_pool);
+            continue;
+        }
         let refresh_token = token_storage
             .and_then(|storage| storage.refresh_token.clone())
             .or_else(|| connection.refresh_token.clone());
@@ -148,7 +155,7 @@ fn start_disconnected_connections(
                     user_agent: None,
                     ..Default::default()
                 };
-                let result = api_auth_tokens_refresh_token_post(
+                let request = api_auth_tokens_refresh_token_post(
                     &configuration,
                     ApiAuthTokensRefreshTokenPostParams {
                         x_beam_scope: Some(scope),
@@ -158,13 +165,18 @@ fn start_disconnected_connections(
                             ..Default::default()
                         }),
                     },
-                )
-                .await
-                .map_err(|error| safe_auth_error(&error));
+                );
+                #[cfg(target_arch = "wasm32")]
+                let result = request.await;
+                #[cfg(not(target_arch = "wasm32"))]
+                let result = async_compat::Compat::new(request).await;
+                let result = result.map_err(|error| safe_auth_error(&error));
                 let _ = sender.send(result);
             })
             .detach();
-        pending.0.push(PendingCredentialRefresh { entity, receiver });
+        pending
+            .0
+            .push(PendingCredentialRefresh { entity, receiver });
     }
 }
 
@@ -176,8 +188,15 @@ fn poll_credential_refreshes(
     task_pool: Res<EventworkRuntime<TaskPool>>,
 ) {
     pending.0.retain_mut(|refresh| {
-        let Ok(result) = refresh.receiver.try_recv() else {
-            return true;
+        let result = match refresh.receiver.try_recv() {
+            Ok(result) => result,
+            Err(crossbeam_channel::TryRecvError::Empty) => return true,
+            Err(crossbeam_channel::TryRecvError::Disconnected) => {
+                if let Ok((mut connection, _)) = q.get_mut(refresh.entity) {
+                    schedule_backoff(&mut connection, "credential refresh task stopped");
+                }
+                return false;
+            }
         };
         let Ok((mut connection, token_storage)) = q.get_mut(refresh.entity) else {
             return false;
@@ -198,6 +217,7 @@ fn poll_credential_refreshes(
                 } else if let Some(mut storage) = token_storage {
                     storage.access_token = Some(access_token);
                 }
+                connection.refresh_before_connect = false;
                 connect_with_access_token(&connection, &net, &settings, &task_pool);
             }
             Err(error) => schedule_backoff(&mut connection, &error),
@@ -212,7 +232,10 @@ fn connect_with_access_token(
     settings: &NetworkSettings,
     task_pool: &EventworkRuntime<TaskPool>,
 ) {
-    debug!("connecting Beamable websocket to {}", redact_uri(&connection.uri));
+    debug!(
+        "connecting Beamable websocket to {}",
+        redact_uri(&connection.uri)
+    );
     #[cfg(not(target_arch = "wasm32"))]
     {
         let request = ClientRequestBuilder::new(
@@ -227,7 +250,11 @@ fn connect_with_access_token(
     }
     #[cfg(target_arch = "wasm32")]
     {
-        let separator = if connection.uri.contains('?') { '&' } else { '?' };
+        let separator = if connection.uri.contains('?') {
+            '&'
+        } else {
+            '?'
+        };
         let uri = url::Url::parse(&format!(
             "{}{separator}access_token={}",
             connection.uri, connection.token
@@ -252,6 +279,7 @@ fn handle_network_events(
                     connection.status = BeamConnectionStatus::Connected;
                     connection.retry_attempt = 0;
                     connection.retry_timer = None;
+                    connection.refresh_before_connect = false;
                     info!("Beamable websocket connected");
                 }
             }
@@ -265,16 +293,17 @@ fn handle_network_events(
                 }
             }
             bevy_eventwork::NetworkEvent::Error(error) => {
-                let reason = match error {
-                    bevy_eventwork::error::NetworkError::Http { status, .. } => {
-                        format!("websocket handshake returned HTTP {status}")
-                    }
-                    _ => "websocket transport failed".to_owned(),
-                };
                 for mut connection in q
                     .iter_mut()
                     .filter(|connection| connection.status == BeamConnectionStatus::Connecting)
                 {
+                    let reason = match error {
+                        bevy_eventwork::error::NetworkError::Http { status, .. } => {
+                            connection.refresh_before_connect = matches!(*status, 401 | 403);
+                            format!("websocket handshake returned HTTP {status}")
+                        }
+                        _ => "websocket transport failed".to_owned(),
+                    };
                     connection.id = None;
                     schedule_backoff(&mut connection, &reason);
                 }
@@ -290,10 +319,7 @@ fn schedule_backoff(connection: &mut WebSocketConnection, reason: &str) {
     let jitter = 0.85 + ((connection.retry_attempt.wrapping_mul(37) % 31) as f32 / 100.0);
     let delay = (base_seconds * jitter).min(60.0);
     connection.retry_attempt = connection.retry_attempt.saturating_add(1);
-    connection.retry_timer = Some(Timer::new(
-        Duration::from_secs_f32(delay),
-        TimerMode::Once,
-    ));
+    connection.retry_timer = Some(Timer::new(Duration::from_secs_f32(delay), TimerMode::Once));
     connection.status = BeamConnectionStatus::BackingOff;
     warn!("{reason}; retrying websocket in {delay:.1}s");
 }
@@ -305,9 +331,14 @@ fn redact_uri(uri: &str) -> &str {
 fn safe_auth_error<T>(error: &beam_autogen_rs::apis::Error<T>) -> String {
     match error {
         beam_autogen_rs::apis::Error::ResponseError(response) => {
-            format!("credential refresh returned HTTP {}", response.status.as_u16())
+            format!(
+                "credential refresh returned HTTP {}",
+                response.status.as_u16()
+            )
         }
-        beam_autogen_rs::apis::Error::Reqwest(_) => "credential refresh transport failed".to_owned(),
+        beam_autogen_rs::apis::Error::Reqwest(_) => {
+            "credential refresh transport failed".to_owned()
+        }
         _ => "credential refresh failed".to_owned(),
     }
 }

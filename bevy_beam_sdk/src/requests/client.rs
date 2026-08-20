@@ -1,6 +1,7 @@
 use crate::config::BeamableConfigResource;
 use crate::slot::prelude::*;
 use bevy::prelude::Resource;
+use std::hash::{DefaultHasher, Hash, Hasher};
 use std::sync::Mutex;
 
 #[derive(Resource)]
@@ -22,17 +23,30 @@ impl BeamHttpClient {
         &self,
         config: &BeamableConfigResource,
         routing: Option<&crate::config::RoutingMapKey>,
+        access_token: Option<&str>,
     ) -> reqwest::Client {
         let route = routing.map(|value| value.to_string()).unwrap_or_default();
+        let auth_key = access_token.map_or(0, |token| {
+            let mut hasher = DefaultHasher::new();
+            token.hash(&mut hasher);
+            hasher.finish()
+        });
+        let client_key = format!("{route}\0auth:{auth_key}");
         let mut clients = self.clients.lock().expect("Beamable HTTP pool poisoned");
         clients
-            .entry(route.clone())
+            .entry(client_key)
             .or_insert_with(|| {
                 let mut headers = ReqwestClient::with_default_headers(config);
                 if !route.is_empty() {
                     headers.insert(
                         "X-BEAM-SERVICE-ROUTING-KEY",
                         route.parse().expect("invalid service routing key"),
+                    );
+                }
+                if let Some(token) = access_token {
+                    headers.insert(
+                        reqwest::header::AUTHORIZATION,
+                        ReqwestClient::authorization_header(token),
                     );
                 }
                 reqwest::ClientBuilder::new()
@@ -74,6 +88,14 @@ pub struct ReqwestClient {
 }
 
 impl ReqwestClient {
+    fn authorization_header(token: &str) -> reqwest::header::HeaderValue {
+        let mut authorization = format!("Bearer {token}")
+            .parse::<reqwest::header::HeaderValue>()
+            .expect("invalid Beamable access token");
+        authorization.set_sensitive(true);
+        authorization
+    }
+
     pub fn with_default_headers(config: &BeamableConfigResource) -> reqwest::header::HeaderMap {
         let beam_sdk_version = env!("CARGO_PKG_VERSION");
         let mut default_headers = reqwest::header::HeaderMap::new();
@@ -101,7 +123,7 @@ impl ReqwestClient {
         if let Some(token) = &token.access_token {
             access_token = Some(token.to_owned().clone());
         }
-        let client = http.client(config, routing);
+        let client = http.client(config, routing, access_token.as_deref());
         Self {
             x_beam_scope,
             client,
@@ -121,5 +143,18 @@ impl std::ops::Deref for ReqwestClient {
 impl std::ops::DerefMut for ReqwestClient {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.client
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ReqwestClient;
+
+    #[test]
+    fn authenticated_clients_supply_generator_fallback_headers() {
+        let authorization = ReqwestClient::authorization_header("access-token");
+
+        assert_eq!(authorization, "Bearer access-token");
+        assert!(authorization.is_sensitive());
     }
 }

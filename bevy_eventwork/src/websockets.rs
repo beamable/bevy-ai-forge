@@ -55,7 +55,7 @@ mod native_websocket {
     use async_channel::{Receiver, Sender};
 
     use async_trait::async_trait;
-    use async_tungstenite::{async_std::ConnectStream, WebSocketReceiver, WebSocketSender};
+    use async_tungstenite::{smol::ConnectStream, WebSocketReceiver, WebSocketSender};
 
     use crate::{error::NetworkError, managers::NetworkProvider, NetworkPacket};
     use async_tungstenite::{
@@ -101,7 +101,7 @@ mod native_websocket {
         ) -> Result<Self::Socket, NetworkError> {
             info!("Beginning connection");
             let (stream, _response) =
-                async_tungstenite::async_std::connect_async_with_tls_connector_and_config(
+                async_tungstenite::smol::connect_async_with_tls_connector_and_config(
                     connect_info,
                     Some(Default::default()),
                     Some(_network_settings.0),
@@ -201,7 +201,7 @@ mod native_websocket {
                             continue;
                         }
                     }
-                    Message::Binary(binary) => match bincode::deserialize(&binary) {
+                    Message::Binary(binary) => match crate::codec::deserialize(&binary) {
                         Ok(packet) => packet,
                         Err(err) => {
                             error!("Failed to decode network packet from: {}", err);
@@ -237,7 +237,7 @@ mod native_websocket {
             _settings: Self::NetworkSettings,
         ) {
             while let Ok(message) = messages.recv().await {
-                let encoded = match bincode::serialize(&message) {
+                let encoded = match crate::codec::serialize(&message) {
                     Ok(encoded) => encoded,
                     Err(err) => {
                         error!("Could not encode packet {:?}: {}", message, err);
@@ -338,7 +338,7 @@ mod wasm_websocket {
             _network_settings: Self::NetworkSettings,
         ) -> Result<Self::Socket, NetworkError> {
             info!("Beginning connection");
-            let stream = tokio_tungstenite_wasm::connect(connect_info)
+            let stream = tokio_tungstenite_wasm::connect(connect_info.as_str())
                 .await
                 .map_err(|error| match error {
                     tokio_tungstenite_wasm::Error::ConnectionClosed => {
@@ -362,8 +362,11 @@ mod wasm_websocket {
                     tokio_tungstenite_wasm::Error::WriteBufferFull(err) => {
                         NetworkError::Error(format!("Write Buffer Full: {}", err))
                     }
-                    tokio_tungstenite_wasm::Error::Utf8 => {
-                        NetworkError::Error("UTF8 Encoding Error".to_string())
+                    tokio_tungstenite_wasm::Error::Utf8(err) => {
+                        NetworkError::Error(format!("UTF8 Encoding Error: {err}"))
+                    }
+                    tokio_tungstenite_wasm::Error::Sending => {
+                        NetworkError::Error("Failed to send websocket message".to_string())
                     }
                     tokio_tungstenite_wasm::Error::AttackAttempt => {
                         NetworkError::Error("Attack Attempt Detected".to_string())
@@ -441,7 +444,7 @@ mod wasm_websocket {
                             continue;
                         }
                     }
-                    Message::Binary(binary) => match bincode::deserialize(&binary) {
+                    Message::Binary(binary) => match crate::codec::deserialize(&binary) {
                         Ok(packet) => packet,
                         Err(err) => {
                             error!("Failed to decode network packet from: {}", err);
@@ -469,7 +472,7 @@ mod wasm_websocket {
             _settings: Self::NetworkSettings,
         ) {
             while let Ok(message) = messages.recv().await {
-                let encoded = match bincode::serialize(&message) {
+                let encoded = match crate::codec::serialize(&message) {
                     Ok(encoded) => encoded,
                     Err(err) => {
                         error!("Could not encode packet {:?}: {}", message, err);

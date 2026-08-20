@@ -145,7 +145,7 @@ impl<NP: NetworkProvider> Network<NP> {
 
         let packet = NetworkPacket {
             kind: String::from(T::NAME),
-            data: bincode::serialize(&message).map_err(|_| NetworkError::Serialization)?,
+            data: crate::codec::serialize(&message).map_err(|_| NetworkError::Serialization)?,
         };
 
         match connection.send_message.try_send(packet) {
@@ -161,7 +161,8 @@ impl<NP: NetworkProvider> Network<NP> {
 
     /// Broadcast a message to all connected clients
     pub fn broadcast<T: NetworkMessage + Clone>(&self, message: T) {
-        let serialized_message = bincode::serialize(&message).expect("Couldn't serialize message!");
+        let serialized_message =
+            crate::codec::serialize(&message).expect("Couldn't serialize message!");
         for connection in self.established_connections.iter() {
             let packet = NetworkPacket {
                 kind: String::from(T::NAME),

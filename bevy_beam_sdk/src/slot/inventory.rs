@@ -188,8 +188,14 @@ mod tests {
                 ("currency.gems".to_owned(), 3),
             ]),
             items: HashMap::from([
-                ("items.swords.iron".to_owned(), vec![Item { id: 1, ..default() }]),
-                ("items.shields".to_owned(), vec![Item { id: 2, ..default() }]),
+                (
+                    "items.swords.iron".to_owned(),
+                    vec![Item { id: 1, ..default() }],
+                ),
+                (
+                    "items.shields".to_owned(),
+                    vec![Item { id: 2, ..default() }],
+                ),
             ]),
         }
     }
@@ -214,8 +220,14 @@ mod tests {
     #[test]
     fn refreshes_coalesce_to_one_follow_up() {
         let mut state = BeamInventorySyncState::default();
-        assert_eq!(state.begin_or_queue(Some("items".into()), 0.0), Some(Some("items".into())));
-        assert_eq!(state.begin_or_queue(Some("currency.coins".into()), 0.1), None);
+        assert_eq!(
+            state.begin_or_queue(Some("items".into()), 0.0),
+            Some(Some("items".into()))
+        );
+        assert_eq!(
+            state.begin_or_queue(Some("currency.coins".into()), 0.1),
+            None
+        );
         assert_eq!(state.begin_or_queue(Some("items".into()), 0.2), None);
         let follow_up = state.finish();
         assert_eq!(follow_up, Some(Some("currency.coins,items".into())));

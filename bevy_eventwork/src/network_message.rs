@@ -31,6 +31,6 @@ pub trait NetworkMessage: Serialize + DeserializeOwned + Send + Sync + 'static {
     where
         T: NetworkMessage,
     {
-        bincode::deserialize::<T>(bytes).ok()
+        crate::codec::deserialize::<T>(bytes).ok()
     }
 }

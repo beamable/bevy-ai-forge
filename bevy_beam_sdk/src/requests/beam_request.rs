@@ -50,7 +50,12 @@ where
     fn handle_requests(mut commands: Commands, mut r: ResMut<Self>) {
         r.retain_mut(|request| {
             if let Ok(result) = request.try_recv() {
-                trace!("request completed for player {:?}", &request.user_tag);
+                trace!(
+                    "{} completed for player {:?} ({})",
+                    std::any::type_name::<Self::Event>(),
+                    &request.user_tag,
+                    if result.is_ok() { "success" } else { "failure" }
+                );
                 let event = Self::Event::for_entity(result, request.entity);
                 commands.trigger(event);
                 false // Remove from vector
