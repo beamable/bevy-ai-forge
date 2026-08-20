@@ -31,9 +31,17 @@ jobs:
         with:
           target: wasm32-unknown-unknown
           components: clippy,rustfmt
+      - name: Resolve wasm-bindgen version
+        id: wasm_bindgen_version
+        run: |
+          version="$(
+            cargo metadata --format-version 1 --filter-platform wasm32-unknown-unknown |
+              jq -er '[.packages[] | select(.name == "wasm-bindgen") | .version] | unique | if length == 1 then .[0] else error("expected exactly one wasm-bindgen version") end'
+          )"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
       - uses: taiki-e/cache-cargo-install-action@v2
         with:
-          tool: wasm-bindgen-cli@0.2.108
+          tool: wasm-bindgen-cli@${{ steps.wasm_bindgen_version.outputs.version }}
       - name: Install Linux dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         if: ${{ runner.os == 'linux' }}
