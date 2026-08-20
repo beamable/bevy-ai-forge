@@ -101,8 +101,12 @@ pub fn beam_command(input: TokenStream) -> TokenStream {
                         prefix: None,
                     });
                     let bearer_access_token = client.access_token.clone();
+                    #[cfg(target_arch = "wasm32")]
+                    let user_agent: Option<String> = None;
+                    #[cfg(not(target_arch = "wasm32"))]
+                    let user_agent = Some("Bevy-0.19".to_owned());
                     apis::configuration::Configuration {
-                        user_agent: Some("Bevy-0.15".to_owned()),
+                        user_agent,
                         client: (**client).clone(),
                         api_key,
                         bearer_access_token,
