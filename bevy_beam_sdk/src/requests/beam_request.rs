@@ -50,7 +50,7 @@ where
     fn handle_requests(mut commands: Commands, mut r: ResMut<Self>) {
         r.retain_mut(|request| {
             if let Ok(result) = request.try_recv() {
-                trace!("{:?}: {:?}", &request.user_tag, &result);
+                trace!("request completed for player {:?}", &request.user_tag);
                 let event = Self::Event::for_entity(result, request.entity);
                 commands.trigger(event);
                 false // Remove from vector
@@ -91,7 +91,10 @@ where
             .get_resource::<BeamableConfigResource>()
             .expect("No Beamable Config available");
         let routing = world.get_resource::<crate::config::RoutingMapKey>();
+        let http = world
+            .get_resource::<super::client::BeamHttpClient>()
+            .expect("No shared Beamable HTTP client available");
 
-        super::client::ReqwestClient::new(config, routing, gamer_tag, &token)
+        super::client::ReqwestClient::new(http, config, routing, gamer_tag, &token)
     }
 }

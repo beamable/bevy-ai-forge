@@ -29,6 +29,7 @@ pub struct BeamPlugin;
 impl Plugin for BeamPlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<state::BeamableInitStatus>()
+            .init_resource::<requests::prelude::BeamHttpClient>()
             .add_plugins(ConfigPlugin)
             .add_plugins(BeamSlotPlugin);
         #[cfg(feature = "websocket")]

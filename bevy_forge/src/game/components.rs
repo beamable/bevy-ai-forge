@@ -36,6 +36,22 @@ pub struct InventoryContainer;
 
 #[derive(Debug, Reflect, Component, Default, Clone)]
 #[reflect(Component)]
+pub struct ForgeBusyText;
+
+#[derive(Debug, Reflect, Component, Default, Clone)]
+#[reflect(Component)]
+pub struct SwordForgeButton;
+
+#[derive(Debug, Reflect, Component, Default, Clone)]
+#[reflect(Component)]
+pub struct ShieldForgeButton;
+
+#[derive(Debug, Reflect, Component, Default, Clone)]
+#[reflect(Component)]
+pub struct ForgeRequestPending;
+
+#[derive(Debug, Reflect, Component, Default, Clone)]
+#[reflect(Component)]
 pub struct ItemDisplay(pub i64);
 
 #[derive(Debug, Reflect, Component, Default, Clone, Deref)]

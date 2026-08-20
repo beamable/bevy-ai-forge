@@ -281,6 +281,13 @@ pub(crate) fn handle_new_incoming_connections<NP: NetworkProvider, RT: Runtime>(
             .remove(&disconnected_connection);
         network_events.write(NetworkEvent::Disconnected(disconnected_connection));
     }
+
+    // Connection tasks report failures through a separate channel.  This used to be
+    // left undrained, which meant callers could neither surface an HTTP failure nor
+    // decide when to reconnect.
+    while let Ok(error) = server.error_channel.receiver.try_recv() {
+        network_events.write(NetworkEvent::Error(error));
+    }
 }
 
 /// A utility trait on [`App`] to easily register [`NetworkMessage`]s

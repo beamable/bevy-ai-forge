@@ -52,6 +52,15 @@ namespace ForgeService.Storage
             await collection.InsertOneAsync(item);
         }
 
+        public static async Task Replace(IMongoDatabase db, AiInventoryItem item)
+        {
+            var collection = await Get(db);
+            await collection.ReplaceOneAsync(
+                x => x.GamerTag == item.GamerTag && x.ItemId == item.ItemId,
+                item,
+                new ReplaceOptions { IsUpsert = true });
+        }
+
         public static async Task Delete(IMongoDatabase db, AiInventoryItem item)
         {
             var collection = await Get(db);

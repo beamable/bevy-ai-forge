@@ -5,5 +5,5 @@ pub mod prelude {
     pub use super::beam_request::{
         BeamEventFactory, BeamReceiver, BeamRequest, BeamRequestResource,
     };
-    pub use super::client::ReqwestClient;
+    pub use super::client::{BeamHttpClient, ReqwestClient};
 }

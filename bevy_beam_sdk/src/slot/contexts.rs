@@ -2,6 +2,7 @@ use crate::api::BeamableBasicApi;
 use crate::data::auth::BeamAuth;
 use crate::slot::beam_slot::*;
 use crate::slot::inventory::BeamInventory;
+use crate::slot::inventory::BeamInventorySyncState;
 use crate::slot::prelude::*;
 #[cfg(feature = "websocket")]
 use crate::websocket::WebSocketConnection;
@@ -16,7 +17,9 @@ pub struct BeamableContexts {
     pub entity: Entity,
     pub slot: &'static mut BeamSlot,
     pub inventory: &'static mut BeamInventory,
+    pub inventory_sync: &'static mut BeamInventorySyncState,
     pub stats: &'static mut BeamStats,
+    pub(crate) hydration: &'static mut crate::slot::beam_slot::BeamSessionHydration,
     pub token: Option<&'static mut TokenStorage>,
     #[cfg(feature = "websocket")]
     pub connection: Option<&'static WebSocketConnection>,
@@ -54,6 +57,7 @@ impl BeamableConfiguration<'_, '_> {
                 uri: web_config.uri(),
                 scope: self.config.get_x_beam_scope(),
                 token: access.clone(),
+                refresh_token: token.refresh_token.clone(),
                 ..Default::default()
             }
             .into()

@@ -12,6 +12,12 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::ops::Deref;
 
+#[derive(Component, Debug, Reflect, Default)]
+#[reflect(Component, Default)]
+pub(crate) struct BeamSessionHydration {
+    completed: bool,
+}
+
 #[derive(EntityEvent, Debug, Clone, Reflect, PartialEq, Eq)]
 pub struct UserLoggedIn {
     pub entity: Entity,
@@ -54,7 +60,7 @@ pub struct GamerTag(Option<i64>);
 
 #[derive(Serialize, Debug, Deserialize, Component, Reflect, Default)]
 #[reflect(Component, Default)]
-#[require(BeamInventory, Name = Name::new("BeamSlot"), BeamStats, DespawnOnExit::<crate::state::BeamableInitStatus>(crate::state::BeamableInitStatus::FullyInitialized))]
+#[require(BeamInventory, BeamInventorySyncState, BeamSessionHydration, Name = Name::new("BeamSlot"), BeamStats, DespawnOnExit::<crate::state::BeamableInitStatus>(crate::state::BeamableInitStatus::FullyInitialized))]
 pub struct BeamSlot {
     pub name: Option<String>,
     pub user: Option<UserView>,
@@ -155,34 +161,45 @@ pub fn handle_get_token(
         }
     }
 }
-pub fn handle_inventory_get(ev: On<InventoryGetCompletedEvent>, mut q: Query<BeamableContexts>) {
+pub fn handle_inventory_get(
+    ev: On<InventoryGetCompletedEvent>,
+    mut q: Query<BeamableContexts>,
+    mut commands: Commands,
+    time: Res<Time>,
+) {
     let event = ev.event().deref();
     let Ok(mut ctx) = q.get_mut(ev.event_target()) else {
         return;
     };
-    trace!("Inventory update: {:#?}", event);
+    let scopes = ctx.inventory_sync.active_scopes.clone();
     if let Ok(event) = event {
         let inventory = BeamInventory::from((*event).clone());
-        for (currency, amount) in inventory.currencies {
-            if let Some(cur) = ctx.inventory.currencies.get_mut(&currency) {
-                *cur = amount;
-            } else {
-                ctx.inventory.currencies.insert(currency, amount);
-            }
-        }
-        for (item, new_items) in inventory.items {
-            if let Some(items) = ctx.inventory.items.get_mut(&item) {
-                *items = new_items;
-            } else {
-                ctx.inventory.items.insert(item, new_items);
-            }
-        }
+        ctx.inventory.apply_snapshot(inventory, scopes.as_deref());
+        ctx.inventory_sync.revision += 1;
+        ctx.inventory_sync.last_error = None;
+        debug!(
+            "inventory request completed in {:.0}ms (revision {}, {} scopes)",
+            (time.elapsed_secs_f64() - ctx.inventory_sync.request_started_seconds) * 1000.0,
+            ctx.inventory_sync.revision,
+            scopes.as_ref().map_or(0, Vec::len)
+        );
+        commands.trigger(BeamInventoryUpdated {
+            entity: ctx.entity,
+            scopes: scopes.clone().unwrap_or_default(),
+            revision: ctx.inventory_sync.revision,
+        });
+    } else {
+        ctx.inventory_sync.last_error = Some("inventory refresh failed".to_owned());
+        warn!("inventory request failed; cached inventory was preserved");
+    }
+    if let Some(scope) = ctx.inventory_sync.finish() {
+        commands.entity(ctx.entity).beam_get_inventory(scope);
     }
 }
 
 pub fn handle_post_token(ev: On<UserAuthenticationEvent>, mut commands: Commands) {
     let event = ev.event();
-    trace!("PostTokenEvent: {:#?}", event);
+    trace!("authentication request completed");
     let entity = ev.event_target();
     match &**event {
         Ok(data) => {
@@ -319,17 +336,20 @@ pub fn handle_get_user_info(
                 entity,
                 result: UserInfoUpdatedResult::Success,
             });
-            commands
-                .entity(entity)
-                .beam_get_stats(
-                    Default::default(),
-                    crate::data::stats::StatAccessType::Public,
-                )
-                .beam_get_stats(
-                    Default::default(),
-                    crate::data::stats::StatAccessType::Private,
-                )
-                .beam_get_inventory(None);
+            if !ctx.hydration.completed {
+                ctx.hydration.completed = true;
+                commands
+                    .entity(entity)
+                    .beam_get_stats(
+                        Default::default(),
+                        crate::data::stats::StatAccessType::Public,
+                    )
+                    .beam_get_stats(
+                        Default::default(),
+                        crate::data::stats::StatAccessType::Private,
+                    )
+                    .beam_get_inventory(None);
+            }
         }
         Err(beam_autogen_rs::apis::Error::ResponseError(e)) => {
             let status_code = e.status.as_u16();

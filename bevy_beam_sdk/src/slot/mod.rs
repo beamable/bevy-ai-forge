@@ -14,7 +14,9 @@ pub mod prelude {
         UserInfoUpdatedResult, UserLoggedIn, UserLoggedInResult,
     };
     pub use crate::slot::contexts::{BeamableConfiguration, BeamableContexts};
-    pub use crate::slot::inventory::{BeamInventory, Item, ItemProperty};
+    pub use crate::slot::inventory::{
+        BeamInventory, BeamInventorySyncState, BeamInventoryUpdated, Item, ItemProperty,
+    };
     pub use crate::slot::token_storage::TokenStorage;
     pub use crate::slot::user_view::{ExternalIdentity, UserView};
     pub mod functions {
@@ -45,6 +47,7 @@ impl Plugin for BeamSlotPlugin {
         )
         .add_observer(beam_slot::on_slot_added)
         .register_type::<BeamInventory>()
+        .register_type::<inventory::BeamInventorySyncState>()
         .register_type::<BeamStats>()
         .register_type::<BeamSlot>()
         .register_type::<TokenStorage>();

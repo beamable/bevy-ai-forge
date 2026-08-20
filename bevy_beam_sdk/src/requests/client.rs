@@ -1,5 +1,67 @@
 use crate::config::BeamableConfigResource;
 use crate::slot::prelude::*;
+use bevy::prelude::Resource;
+use std::sync::Mutex;
+
+#[derive(Resource)]
+/// Shared HTTP transport. Clones reuse reqwest's connection pool.
+pub struct BeamHttpClient {
+    clients: Mutex<std::collections::HashMap<String, reqwest::Client>>,
+}
+
+impl Default for BeamHttpClient {
+    fn default() -> Self {
+        Self {
+            clients: Mutex::new(std::collections::HashMap::new()),
+        }
+    }
+}
+
+impl BeamHttpClient {
+    fn client(
+        &self,
+        config: &BeamableConfigResource,
+        routing: Option<&crate::config::RoutingMapKey>,
+    ) -> reqwest::Client {
+        let route = routing.map(|value| value.to_string()).unwrap_or_default();
+        let mut clients = self.clients.lock().expect("Beamable HTTP pool poisoned");
+        clients
+            .entry(route.clone())
+            .or_insert_with(|| {
+                let mut headers = ReqwestClient::with_default_headers(config);
+                if !route.is_empty() {
+                    headers.insert(
+                        "X-BEAM-SERVICE-ROUTING-KEY",
+                        route.parse().expect("invalid service routing key"),
+                    );
+                }
+                reqwest::ClientBuilder::new()
+                    .default_headers(headers)
+                    .build()
+                    .expect("failed to create Beamable HTTP client")
+            })
+            .clone()
+    }
+
+    pub(crate) fn client_for_scope(&self, scope: &str) -> reqwest::Client {
+        let key = format!("scope:{scope}");
+        let mut clients = self.clients.lock().expect("Beamable HTTP pool poisoned");
+        clients
+            .entry(key)
+            .or_insert_with(|| {
+                let mut headers = reqwest::header::HeaderMap::new();
+                headers.insert(
+                    "X-BEAM-SCOPE",
+                    scope.parse().expect("invalid Beamable scope"),
+                );
+                reqwest::ClientBuilder::new()
+                    .default_headers(headers)
+                    .build()
+                    .expect("failed to create Beamable HTTP client")
+            })
+            .clone()
+    }
+}
 
 #[derive(Clone)]
 /// Wrapper around the ReqwestClient, that when inserted as a resource will start connection pools towards
@@ -28,31 +90,18 @@ impl ReqwestClient {
     }
 
     pub fn new(
+        http: &BeamHttpClient,
         config: &BeamableConfigResource,
         routing: Option<&crate::config::RoutingMapKey>,
         gamer_tag: Option<i64>,
         token: &TokenStorage,
     ) -> Self {
         let x_beam_scope = config.get_x_beam_scope();
-        let mut headers = ReqwestClient::with_default_headers(config);
         let mut access_token = None;
         if let Some(token) = &token.access_token {
-            headers.insert(
-                "authorization",
-                format!("Bearer {}", token).parse().expect(""),
-            );
             access_token = Some(token.to_owned().clone());
         }
-        if let Some(route) = routing {
-            if !route.is_empty() {
-                headers.insert("X-BEAM-SERVICE-ROUTING-KEY", route.parse().expect(""));
-            }
-        }
-
-        let client = reqwest::ClientBuilder::new()
-            .default_headers(headers)
-            .build()
-            .expect("Failed to create a reqwest client");
+        let client = http.client(config, routing);
         Self {
             x_beam_scope,
             client,

@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{collections::{HashSet, VecDeque}, time::Duration};
 
 use crate::ui::widgets::scroll_view::*;
 use crate::{
@@ -9,15 +9,37 @@ use crate::{
     },
     microservice::{
         MicroserviceSellSword, MicroserviceStartForging, MicroserviceStartForgingShield,
+        SellSwordEventCompleted, StartForgingEventCompleted,
+        StartForgingShieldEventCompleted,
     },
 };
 use beam_microservice::models::SellSwordRequestArgs;
+use bevy::ecs::query::QueryFilter;
 use bevy::prelude::*;
 use bevy_beam_sdk::api::BeamableBasicApi;
-use bevy_beam_sdk::slot::prelude::{BeamInventory, BeamableContexts, ItemProperty};
+use bevy_beam_sdk::{
+    slot::prelude::{BeamInventory, BeamInventoryUpdated, BeamableContexts, ItemProperty},
+    websocket::BeamConnectionStatus,
+};
 
-#[derive(Resource, Reflect, Default, Deref, DerefMut)]
-pub struct ItemsOnSale(Vec<i64>);
+#[derive(Resource, Default)]
+pub struct PendingSales {
+    ids: HashSet<i64>,
+    order: VecDeque<i64>,
+}
+
+#[derive(Resource, Default)]
+struct ForgeActivity {
+    requests_in_flight: usize,
+    processing_count: usize,
+    processing_started_seconds: Option<f64>,
+    last_error: Option<String>,
+}
+
+#[derive(Resource, Default)]
+struct FallbackRefresh {
+    elapsed_seconds: f32,
+}
 
 pub struct GameStatePlugin;
 
@@ -26,29 +48,21 @@ impl Plugin for GameStatePlugin {
         app.add_systems(OnEnter(super::MainGameState::Game), setup)
             .add_systems(
                 Update,
-                (on_inv_changed, update_inventory).run_if(in_state(super::MainGameState::Game)),
+                (on_inv_changed, update_inventory, update_busy_text, health_based_refresh)
+                    .run_if(in_state(super::MainGameState::Game)),
             )
             .add_systems(
                 Update,
-                (update_items_visibility).run_if(resource_changed::<ItemsOnSale>),
+                update_items_visibility.run_if(resource_changed::<PendingSales>),
             )
             .add_observer(on_currency_text_add)
-            .init_resource::<ItemsOnSale>();
-
-        // #[cfg(target_arch = "wasm32")]
-        app.add_systems(
-            FixedUpdate,
-            call_update_inventory.run_if(in_state(super::MainGameState::Game).and_then(
-                bevy::time::common_conditions::on_timer(Duration::from_secs(10)),
-            )),
-        );
-    }
-}
-
-// #[cfg(target_arch = "wasm32")]
-fn call_update_inventory(ctx: Query<BeamableContexts>, mut cmd: Commands) {
-    for ctx in ctx.iter() {
-        cmd.entity(ctx.entity).beam_get_inventory(None);
+            .add_observer(on_forge_sword_completed)
+            .add_observer(on_forge_shield_completed)
+            .add_observer(on_sale_completed)
+            .add_observer(on_inventory_authoritative)
+            .init_resource::<PendingSales>()
+            .init_resource::<ForgeActivity>()
+            .init_resource::<FallbackRefresh>();
     }
 }
 
@@ -57,7 +71,7 @@ fn sell_sword_pressed(
     q: Query<&SellItemButton>,
     ctx: Query<BeamableContexts>,
     mut cmd: Commands,
-    mut on_sale: ResMut<ItemsOnSale>,
+    mut pending_sales: ResMut<PendingSales>,
 ) {
     let Ok(sell_item_info) = q.get(t.event().event_target()) else {
         return;
@@ -65,18 +79,22 @@ fn sell_sword_pressed(
     let Ok(ctx) = ctx.single() else {
         return;
     };
+    if pending_sales.ids.contains(&**sell_item_info) {
+        return;
+    }
     cmd.queue(MicroserviceSellSword(
         Some(SellSwordRequestArgs {
             item_id: sell_item_info.to_string(),
         }),
         ctx.entity,
     ));
-    on_sale.push(**sell_item_info);
+    pending_sales.ids.insert(**sell_item_info);
+    pending_sales.order.push_back(**sell_item_info);
 }
 
-fn update_items_visibility(on_sale: Res<ItemsOnSale>, mut q: Query<(&mut Node, &ItemDisplay)>) {
+fn update_items_visibility(pending_sales: Res<PendingSales>, mut q: Query<(&mut Node, &ItemDisplay)>) {
     for (mut n, item_display) in q.iter_mut() {
-        let visible = !on_sale.iter().any(|id| id == &item_display.0);
+        let visible = !pending_sales.ids.contains(&item_display.0);
         n.display = if visible {
             Display::Flex
         } else {
@@ -142,7 +160,7 @@ fn setup(
                 Name::new("CoinsRoot"),
             ))
             .with_children(|coin| {
-                coin.spawn((Text::new(""), text_style, font_color))
+                coin.spawn((Text::new(""), text_style.clone(), font_color))
                     .insert(CurrencyText("currency.coins".to_owned()));
                 coin.spawn((
                     ImageNode::new(asset_server.load("gfx/coins.png")),
@@ -174,6 +192,7 @@ fn setup(
                     ..Default::default()
                 },
                 GameplayObject,
+                SwordForgeButton,
             ))
             .observe(on_start_forging_sword_pressed)
             .with_children(|btn| {
@@ -208,6 +227,7 @@ fn setup(
                     ..Default::default()
                 },
                 GameplayObject,
+                ShieldForgeButton,
             ))
             .observe(on_start_forging_shield_pressed)
             .with_children(|btn| {
@@ -225,6 +245,19 @@ fn setup(
                     TextLayout::justify(Justify::Center),
                 ));
             });
+        parent.spawn((
+            Text::new("Forge ready"),
+            text_style.clone().with_font_size(28.0),
+            font_color,
+            Node {
+                position_type: PositionType::Absolute,
+                bottom: Val::Px(255.0),
+                right: Val::Percent(15.0),
+                ..default()
+            },
+            GameplayObject,
+            ForgeBusyText,
+        ));
     });
     let Ok(mut background) = game_bg.single_mut() else {
         return;
@@ -252,6 +285,8 @@ fn on_currency_text_add(
 fn on_inv_changed(
     q: Query<&BeamInventory, Changed<BeamInventory>>,
     mut total_query: Query<(&mut Text, &CurrencyText)>,
+    mut activity: ResMut<ForgeActivity>,
+    time: Res<Time>,
 ) {
     let Ok(inv) = q.single() else {
         return;
@@ -261,17 +296,36 @@ fn on_inv_changed(
         let value = inv.currencies.get(&currency.0).unwrap_or(&-1);
         **text = format!("{}", value);
     }
+    let processing_count = inv
+        .items
+        .values()
+        .flatten()
+        .filter(|item| item.properties.iter().any(|property| {
+            property.name == "forgeStatus" && property.value == "processing"
+        }))
+        .count();
+    if processing_count > 0 && activity.processing_count == 0 {
+        activity.processing_started_seconds = Some(time.elapsed_secs_f64());
+    } else if processing_count == 0 {
+        activity.processing_started_seconds = None;
+    }
+    activity.processing_count = processing_count;
 }
 
 fn on_start_forging_sword_pressed(
     t: On<Pointer<Release>>,
     asset_server: Res<AssetServer>,
     q: Query<BeamableContexts>,
+    pending: Query<(), With<components::ForgeRequestPending>>,
     mut commands: Commands,
+    mut activity: ResMut<ForgeActivity>,
 ) {
     let Ok(ctx) = q.single() else {
         return;
     };
+    if pending.get(t.event().event_target()).is_ok() {
+        return;
+    }
     commands.queue(MicroserviceStartForging(ctx.entity));
     // commands
     //     .entity(ctx.entity)
@@ -281,23 +335,25 @@ fn on_start_forging_sword_pressed(
         PlaybackSettings::DESPAWN,
         SoundEffectPlayer,
     ));
-    commands
-        .entity(t.event().event_target())
-        .insert(components::HiddenUiElement(Timer::new(
-            Duration::from_secs(3),
-            TimerMode::Once,
-        )));
+    commands.entity(t.event().event_target()).insert(ForgeRequestPending);
+    activity.requests_in_flight += 1;
+    activity.last_error = None;
 }
 
 fn on_start_forging_shield_pressed(
     t: On<Pointer<Release>>,
     asset_server: Res<AssetServer>,
     q: Query<BeamableContexts>,
+    pending: Query<(), With<components::ForgeRequestPending>>,
     mut commands: Commands,
+    mut activity: ResMut<ForgeActivity>,
 ) {
     let Ok(ctx) = q.single() else {
         return;
     };
+    if pending.get(t.event().event_target()).is_ok() {
+        return;
+    }
     commands.queue(MicroserviceStartForgingShield(ctx.entity));
     // commands
     //     .entity(ctx.entity)
@@ -307,12 +363,182 @@ fn on_start_forging_shield_pressed(
         PlaybackSettings::DESPAWN,
         SoundEffectPlayer,
     ));
-    commands
-        .entity(t.event().event_target())
-        .insert(components::HiddenUiElement(Timer::new(
-            Duration::from_secs(3),
-            TimerMode::Once,
-        )));
+    commands.entity(t.event().event_target()).insert(ForgeRequestPending);
+    activity.requests_in_flight += 1;
+    activity.last_error = None;
+}
+
+fn on_forge_sword_completed(
+    event: On<StartForgingEventCompleted>,
+    buttons: Query<Entity, With<SwordForgeButton>>,
+    mut activity: ResMut<ForgeActivity>,
+    mut commands: Commands,
+) {
+    finish_forge_request(
+        &event,
+        &buttons,
+        &mut activity,
+        &mut commands,
+        "sword",
+    );
+}
+
+fn on_forge_shield_completed(
+    event: On<StartForgingShieldEventCompleted>,
+    buttons: Query<Entity, With<ShieldForgeButton>>,
+    mut activity: ResMut<ForgeActivity>,
+    mut commands: Commands,
+) {
+    finish_forge_request(
+        &event,
+        &buttons,
+        &mut activity,
+        &mut commands,
+        "shield",
+    );
+}
+
+fn finish_forge_request<E>(
+    event: &On<E>,
+    buttons: &Query<Entity, impl QueryFilter>,
+    activity: &mut ForgeActivity,
+    commands: &mut Commands,
+    item_type: &str,
+) where
+    E: EntityEvent + std::ops::Deref<Target = Result<bool, beam_microservice::apis::Error<beam_microservice::apis::uncategorized_api::StartForgingSwordPostError>>>,
+{
+    for button in buttons.iter() {
+        commands.entity(button).remove::<ForgeRequestPending>();
+    }
+    activity.requests_in_flight = activity.requests_in_flight.saturating_sub(1);
+    match &**event.event() {
+        Ok(true) => {
+            activity.last_error = None;
+            commands
+                .entity(event.event_target())
+                .beam_get_inventory(Some("items,currency.coins".to_owned()));
+        }
+        Ok(false) => {
+            activity.last_error = Some(format!(
+                "Could not forge {item_type}. Check your coin balance and try again."
+            ));
+        }
+        Err(_) => {
+            activity.last_error = Some(format!(
+                "The {item_type} request failed. Check the connection and try again."
+            ));
+        }
+    }
+}
+
+fn on_sale_completed(
+    event: On<SellSwordEventCompleted>,
+    mut pending_sales: ResMut<PendingSales>,
+    mut activity: ResMut<ForgeActivity>,
+    mut commands: Commands,
+) {
+    let sold_id = pending_sales.order.pop_front();
+    match &**event.event() {
+        Ok(true) => {
+            activity.last_error = None;
+            commands
+                .entity(event.event_target())
+                .beam_get_inventory(Some("items,currency.coins".to_owned()));
+        }
+        Ok(false) => {
+            if let Some(id) = sold_id {
+                pending_sales.ids.remove(&id);
+            }
+            activity.last_error = Some("That item could not be sold. It is visible again; retry after refreshing.".to_owned());
+        }
+        Err(_) => {
+            if let Some(id) = sold_id {
+                pending_sales.ids.remove(&id);
+            }
+            activity.last_error = Some("Sale failed. Check the connection; the item has been restored.".to_owned());
+        }
+    }
+}
+
+fn on_inventory_authoritative(
+    event: On<BeamInventoryUpdated>,
+    inventory: Query<&BeamInventory>,
+    mut pending_sales: ResMut<PendingSales>,
+) {
+    let Ok(inventory) = inventory.get(event.event().entity) else {
+        return;
+    };
+    pending_sales.ids.retain(|id| {
+        inventory
+            .items
+            .values()
+            .flatten()
+            .any(|item| item.id == *id)
+    });
+    let retained = pending_sales.ids.clone();
+    pending_sales.order.retain(|id| retained.contains(id));
+}
+
+fn update_busy_text(
+    activity: Res<ForgeActivity>,
+    mut text: Query<&mut Text, With<ForgeBusyText>>,
+) {
+    if !activity.is_changed() {
+        return;
+    }
+    let message = if let Some(error) = &activity.last_error {
+        error.clone()
+    } else if activity.requests_in_flight > 0 || activity.processing_count > 0 {
+        format!(
+            "Requests: {}  |  Forging: {}",
+            activity.requests_in_flight, activity.processing_count
+        )
+    } else {
+        "Forge ready".to_owned()
+    };
+    for mut text in &mut text {
+        **text = message.clone();
+    }
+}
+
+fn health_based_refresh(
+    time: Res<Time>,
+    contexts: Query<BeamableContexts>,
+    pending_sales: Res<PendingSales>,
+    activity: Res<ForgeActivity>,
+    mut fallback: ResMut<FallbackRefresh>,
+    mut commands: Commands,
+) {
+    let Ok(context) = contexts.single() else {
+        return;
+    };
+    let connected = context.connection.is_some_and(|connection| {
+        connection.status == BeamConnectionStatus::Connected
+    });
+    let pending_work = !pending_sales.ids.is_empty()
+        || activity.requests_in_flight > 0
+        || activity.processing_count > 0;
+    let processing_long = activity.processing_started_seconds.is_some_and(|started| {
+        time.elapsed_secs_f64() - started >= Duration::from_secs(30).as_secs_f64()
+    });
+    let interval = if connected {
+        processing_long.then_some(30.0)
+    } else if pending_work {
+        Some(2.0)
+    } else {
+        Some(30.0)
+    };
+    let Some(interval) = interval else {
+        fallback.elapsed_seconds = 0.0;
+        return;
+    };
+    fallback.elapsed_seconds += time.delta_secs();
+    if fallback.elapsed_seconds >= interval {
+        fallback.elapsed_seconds = 0.0;
+        commands
+            .entity(context.entity)
+            .beam_get_inventory(Some("items,currency.coins".to_owned()));
+    }
 }
 
 fn update_inventory(
@@ -320,7 +546,7 @@ fn update_inventory(
     inv_container_q: Query<Entity, With<InventoryContainer>>,
     inv_items_q: Query<(Entity, &ItemDisplay), With<ItemDisplay>>,
     q: Query<BeamableContexts>,
-    on_sale: Res<ItemsOnSale>,
+    pending_sales: Res<PendingSales>,
     mut commands: Commands,
 ) {
     let ctx = match q.single() {
@@ -367,6 +593,11 @@ fn update_inventory(
         }
         items.append(&mut it);
     }
+    items.retain(|item| {
+        !item.properties.iter().any(|property| {
+            property.name == "forgeStatus" && property.value == "processing"
+        })
+    });
     for (e, item) in inv_items_q.iter() {
         let find = items.iter().position(|i| i.id == item.0);
         // let find = items.iter().position(|i| i.proxy_id.as_ref().is_some_and(|i| i == &item.0));
@@ -384,8 +615,8 @@ fn update_inventory(
         if item.proxy_id.is_none() {
             continue;
         }
-        if on_sale.iter().any(|id| id.eq(&item.id)) {
-            return;
+        if pending_sales.ids.contains(&item.id) {
+            continue;
         }
         let Some(name) = item.properties.iter().find_map(|i| {
             if &i.name == "name" {

@@ -120,6 +120,15 @@ impl BeamableBasicApi for EntityCommands<'_> {
             let Some(object_id) = world.get_beam_id(id) else {
                 return;
             };
+            let now_seconds = world
+                .get_resource::<Time>()
+                .map_or(0.0, Time::elapsed_secs_f64);
+            let Some(scope) = world
+                .get_mut::<crate::slot::prelude::BeamInventorySyncState>(id)
+                .and_then(|mut state| state.begin_or_queue(scope, now_seconds))
+            else {
+                return;
+            };
             world.commands().queue(inventory::InventoryGet(
                 beam_autogen_rs::apis::default_api::ObjectInventoryObjectIdGetParams {
                     x_beam_scope,

@@ -8,6 +8,14 @@ pub enum NetworkError {
     /// A default networking error returned when no other more specific type can be determined
     Error(String),
 
+    /// An HTTP response prevented a transport connection from being established.
+    Http {
+        /// HTTP status code returned by the remote endpoint.
+        status: u16,
+        /// A credential-safe description of the failed operation.
+        message: String,
+    },
+
     /// Error occured when accepting a new connection.
     Accept(std::io::Error),
 
@@ -34,6 +42,9 @@ impl Display for NetworkError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Error(string) => f.write_fmt(format_args!("Network Error: {0}", string)),
+            Self::Http { status, message } => {
+                f.write_fmt(format_args!("HTTP {status}: {message}"))
+            }
             Self::Accept(e) => f.write_fmt(format_args!(
                 "An error occured when accepting a new connnection: {0}",
                 e

@@ -138,9 +138,10 @@ mod native_websocket {
                     async_tungstenite::tungstenite::Error::Url(url) => {
                         NetworkError::Error(format!("Url Error: {}", url))
                     }
-                    async_tungstenite::tungstenite::Error::Http(http) => {
-                        NetworkError::Error(format!("HTTP Error: {:?}", http))
-                    }
+                    async_tungstenite::tungstenite::Error::Http(http) => NetworkError::Http {
+                        status: http.status().as_u16(),
+                        message: "websocket handshake rejected".to_owned(),
+                    },
                     async_tungstenite::tungstenite::Error::HttpFormat(http_format) => {
                         NetworkError::Error(format!("HTTP Format Error: {}", http_format))
                     }
@@ -370,9 +371,10 @@ mod wasm_websocket {
                     tokio_tungstenite_wasm::Error::Url(err) => {
                         NetworkError::Error(format!("Url Error: {}", err))
                     }
-                    tokio_tungstenite_wasm::Error::Http(err) => {
-                        NetworkError::Error(format!("HTTP Error: {:?}", err))
-                    }
+                    tokio_tungstenite_wasm::Error::Http(err) => NetworkError::Http {
+                        status: err.status().as_u16(),
+                        message: "websocket handshake rejected".to_owned(),
+                    },
                     tokio_tungstenite_wasm::Error::HttpFormat(err) => {
                         NetworkError::Error(format!("HTTP Format Error: {}", err))
                     }
